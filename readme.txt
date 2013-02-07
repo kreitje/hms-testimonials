@@ -8,7 +8,7 @@ Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Display your customer testimonials on pages or posts. Use our widgets to display them in your sidebars and even have them rotate through.
+Display your customer testimonials on pages or posts. Use our widgets to display them in your sidebars and even have them rotate through. Use the settings area to allow your users to write their own testimonials on your site.
 
 
 == Description ==
@@ -16,6 +16,8 @@ Display your customer testimonials on pages or posts. Use our widgets to display
 HMS Testimonials offers you a shortcode and two widgets. The shortcode allows you to show all of your testimonials, a group of testimonials or just a single testimonial. This shortcode can be placed inside a page or a blog post. If your theme uses sidebars you can use one or both of the widgets we offer. The first widget does the same as our shortcode. It shows all, a group or just one testimonial. Our second widget rotates through the selected testimonials one at a time. After a few seconds it will fade out the old and fade in the new testimonial.
 
 Create groups to display specific testimonials on different pages. You can change the order they are shown in using a simple drag and drop method.
+
+Use the settings to allow access for your users to write testimonials about your company.
     
 
 == Installation ==
@@ -58,6 +60,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 1.3 =
+* Added the ability to allow users of lesser roles add / edit their own testimonials. The administrator email address will receive a notification for all new and updated testimonials.
 
 = 1.2 =
 * Fixed the slashes being added in front of quotes and apostrophes in your testimonials.

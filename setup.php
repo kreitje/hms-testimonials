@@ -14,6 +14,7 @@ function hms_testimonials_install() {
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 		$sql_1 = "CREATE TABLE $table_name (
 			id int(11) NOT NULL AUTO_INCREMENT,
+			user_id int(11) DEFAULT '0' NOT NULL,
 			blog_id int(11) DEFAULT '0' NOT NULL,
 			name text NOT NULL,
 			testimonial text NOT NULL,
@@ -45,6 +46,7 @@ function hms_testimonials_install() {
 		dbDelta($sql_3);
 
 		update_option('hms_testimonials_db_version', $hms_testimonials_db_version);
+		update_option('hms_testimonials', array('role' => 'administrator', 'autoapprove' => 'administrator', 'resetapproval' => 1));
 	}
 }
 
