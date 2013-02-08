@@ -46,13 +46,14 @@ function hms_testimonials_install() {
 		dbDelta($sql_3);
 
 		update_option('hms_testimonials_db_version', $hms_testimonials_db_version);
-		update_option('hms_testimonials', array('role' => 'administrator', 'autoapprove' => 'administrator', 'resetapproval' => 1));
+		update_option('hms_testimonials', array('role' => 'administrator', 'autoapprove' => 'administrator', 'moderator' => 'administrator', 'resetapproval' => 1, 'num_users_can_create' => 1));
 	}
 }
 
 function hms_testimonials_uninstall() {
-	global $wpdb;
 	
+	delete_option('hms_testimonials_db_version');
+	delete_option('hms_testimonials');
 }
 
 function hms_testimonials_db_check() {
