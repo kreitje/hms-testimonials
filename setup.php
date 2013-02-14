@@ -46,7 +46,8 @@ function hms_testimonials_install() {
 		dbDelta($sql_3);
 
 		update_option('hms_testimonials_db_version', $hms_testimonials_db_version);
-		update_option('hms_testimonials', array('role' => 'administrator', 'autoapprove' => 'administrator', 'moderator' => 'administrator', 'resetapproval' => 1, 'num_users_can_create' => 1));
+		update_option('hms_testimonials', 
+			array('role' => 'administrator', 'autoapprove' => 'administrator', 'moderator' => 'administrator', 'resetapproval' => 1, 'num_users_can_create' => 1, 'show_active_links' => 0, 'active_links_nofollow' => 1));
 	}
 }
 

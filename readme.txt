@@ -65,6 +65,10 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 1.4.1 =
+* Each testimonial now sits in a div container. Each part also sits in a container. testimonial, author and url classes have been added to each part.
+* Added settings to show the URLs of testimonials as an active link and whether or not to add a nofollow relationship on them.
+
 = 1.4 =
 * Moved admin pages to a class. This helped decrease the amount of queries to the database and removed global functions
 * Added a rotating testimonial shortcode. Use with [hms_testimonials_rotating group=1 seconds=6]

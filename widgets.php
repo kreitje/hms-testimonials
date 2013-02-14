@@ -57,6 +57,8 @@ class HMS_Testimonials_View extends WP_Widget {
 
 	public function widget($args, $instance) {
 		global $wpdb, $blog_id;
+		$settings = get_option('hms_testimonials');
+
 		if (!isset($instance['show']))
 			$instance['show'] = 'all';
 		if (!isset($instance['show_value']))
@@ -91,16 +93,39 @@ class HMS_Testimonials_View extends WP_Widget {
 				echo $args['before_title'].$instance['title'].$args['after_title'];
 
 		if ($single==1) {
-			echo nl2br($get['testimonial']).'<br />'.nl2br($get['name']);
-			if ($get['url']!='') echo '<br />'.$get['url'];
+			echo '<div class="hms-testimonial-container">
+				<div class="testimonial">'.nl2br($get['testimonial']).'</div><div class="author">'.nl2br($get['name']).'</div>';
 
-			echo '<br /><br />';
+			if ($get['url'] != '') {
+				if (substr($get['url'],0,4)!='http')
+					$href = 'http://'.$get['url'];
+				else
+					$href = $get['url'];
+
+
+				if ($settings['show_active_links'] == 1) {
+					$nofollow = '';
+
+					if ($settings['active_links_nofollow'] == 1)
+						$nofollow = 'rel="nofollow"';
+
+					echo '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+				} else {
+					echo '<div class="url">'.$href.'</div>';
+				}
+
+			}
+
+			echo '</div>';
 		} else {
+			$x = 1;
 			foreach($get as $g) {
-				echo nl2br($g['testimonial']).'<br />'.nl2br($g['name']);
-				if ($g['url']!='') echo '<br />'.$g['url'];
 
-				echo '<br /><br />';
+				echo '<div class="hms-testimonial-container hms-testimonial-counter-'.$x.'">
+				 <div class="testimonial">'.nl2br($g['testimonial']).'</div><div class="author">'.nl2br($g['name']).'</div>';
+				if ($g['url']!='') echo '<div class="url">'.$g['url'].'</div>';
+				echo '</div>';
+				$x++;
 			}
 		}
 		echo $args['after_widget'];
@@ -160,6 +185,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 	public function widget($args, $instance) {
 		global $wpdb, $blog_id;
+		$settings = get_option('hms_testimonials');
 
 		if (!isset($instance['group']))
 			$instance['group'] = 0;
@@ -175,24 +201,70 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		$identifier = $this->_randomstring();
 
+
+
 		echo $args['before_widget'];
 		if (!empty($instance['title']))
 			echo $args['before_title'].$instance['title'].$args['after_title'];
 
 		echo '<div id="hms-testimonial-'.$identifier.'">';
 
-			echo nl2br($get[0]['testimonial']).'<br />'.nl2br($get[0]['name']);
-			if ($get[0]['url']!='') echo '<br />'.$get[0]['url'];
+			echo '<div class="hms-testimonial-container">
+				<div class="testimonial">'.nl2br($get[0]['testimonial']).'</div><div class="author">'.nl2br($get[0]['name']).'</div>';
 
+			if ($get[0]['url'] != '') {
+				if (substr($get[0]['url'],0,4)!='http')
+					$href = 'http://'.$get[0]['url'];
+				else
+					$href = $get[0]['url'];
+
+
+				if ($settings['show_active_links'] == 1) {
+					$nofollow = '';
+
+					if ($settings['active_links_nofollow'] == 1)
+						$nofollow = 'rel="nofollow"';
+
+					echo '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+				} else {
+					echo '<div class="url">'.$href.'</div>';
+				}
+
+			}
+			
+			echo '</div>';
 		echo '</div>';
 		?>
 
 		<div style="display:none;" id="hms-testimonial-list-<?php echo $identifier; ?>">
+
 			<?php
 				foreach($get as $g) {
-					echo '<span>'.nl2br($g['testimonial']).'<br />'.nl2br($g['name']);
-					if ($g['url']!='') echo '<br />'.$g['url'];
-					echo '</span>';
+					echo '<div class="hms-testimonial-container">
+							<div class="testimonial">'.nl2br($g['testimonial']).'</div>
+							<div class="author">'.nl2br($g['name']).'</div>';
+					
+					if ($g['url'] != '') {
+						if (substr($g['url'],0,4)!='http')
+							$href = 'http://'.$g['url'];
+						else
+							$href = $g['url'];
+
+
+						if ($settings['show_active_links'] == 1) {
+							$nofollow = '';
+
+							if ($settings['active_links_nofollow'] == 1)
+								$nofollow = 'rel="nofollow"';
+
+							echo '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+						} else {
+							echo '<div class="url">'.$href.'</div>';
+						}
+
+					}
+
+					echo '</div>';
 				} ?>
 		</div>
 
@@ -200,10 +272,10 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			var index_<?php echo $identifier; ?> = 1;
 			jQuery(document).ready(function() {
 				setInterval(function() {
-					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> span").get(index_<?php echo $identifier; ?>);
+					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(index_<?php echo $identifier; ?>);
 					if (nextitem == undefined) {
 						index_<?php echo $identifier; ?> = 0;
-						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> span").get(0);
+						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
 					}
 					jQuery("#hms-testimonial-<?php echo $identifier; ?>").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
 					index_<?php echo $identifier; ?> = index_<?php echo $identifier; ?> + 1;
