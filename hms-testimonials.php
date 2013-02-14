@@ -29,6 +29,7 @@ add_action('widgets_init', 'hms_testimonials_widgets');
 
 add_shortcode('hms_testimonials', 'hms_testimonials_show');
 add_shortcode('hms_testimonials_rotating', 'hms_testimonials_show_rotating');
+add_shortcode('hms_testimonials_form', 'hms_testimonials_form');
 
 
 add_filter('plugin_action_links', array(HMS_Testimonials, 'settings_link'), 10, 2);

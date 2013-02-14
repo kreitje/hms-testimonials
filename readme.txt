@@ -13,7 +13,7 @@ Display your customer testimonials on pages or posts. Our new rotating shortcode
 
 == Description ==
 
-HMS Testimonials offers you two shortcodes and two widgets. The first shortcode allows you to show all of your testimonials, a group of testimonials or just a single testimonial. The second shortcode allows you to show all or a group of testimonials that rotate through one at a time. This shortcode can be placed inside a page or a blog post. If your theme uses sidebars you can use one or both of the widgets we offer. The first widget does the same as our shortcode. It shows all, a group or just one testimonial. Our second widget rotates through the selected testimonials one at a time. After a few seconds it will fade out the old and fade in the new testimonial.
+HMS Testimonials offers you three shortcodes and two widgets. The first shortcode allows you to show all of your testimonials, a group of testimonials or just a single testimonial. The second shortcode allows you to show all or a group of testimonials that rotate through one at a time. Our third shortcode will display a form on a page or post to alow your visitors to submit testimonials. This shortcode can be placed inside a page or a blog post. If your theme uses sidebars you can use one or both of the widgets we offer. The first widget does the same as our shortcode. It shows all, a group or just one testimonial. Our second widget rotates through the selected testimonials one at a time. After a few seconds it will fade out the old and fade in the new testimonial.
 
 Create groups to display specific testimonials on different pages. You can change the order they are shown in using a simple drag and drop method.
 
@@ -32,6 +32,10 @@ Use the settings to allow access for your users to write testimonials about your
 If upgrading from version 1.3 to a new version please go to the settings and resave them.
 
 == Frequently Asked Questions ==
+
+= Can I have visitors submit testimonials to me? =
+
+Yes, add the [hms_testimonials_form] shortcode to a page or a post.
 
 = Can I show only 1 testimonial? =
 
@@ -64,6 +68,12 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 1.5 =
+* Added a new shortcode ( [hms_testimonials_form] ) to allow website visitors to submit testimonials.
+* Added reCAPTCHA settings (enable/disable, public/private keys) to the settings for the form
+* Added a setting to allow or disallow a moderator to access the settings pages
+* New testimonials have a display order set to put them at the end of the list
 
 = 1.4.1 =
 * Each testimonial now sits in a div container. Each part also sits in a container. testimonial, author and url classes have been added to each part.
