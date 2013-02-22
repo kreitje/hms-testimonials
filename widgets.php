@@ -146,6 +146,11 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		$title = (isset($instance[ 'title' ])) ? $instance[ 'title' ] : __( 'Testimonials');
 		$group = (isset($instance[ 'group' ])) ? $instance[ 'group' ] : 0;
 		$seconds = (isset($instance[ 'seconds' ])) ? $instance[ 'seconds' ] : 10;
+		$show_links = (isset($instance[ 'show_links' ]) && $instance['show_links'] == 1) ? 1 : 0;
+		$link_next = (isset($instance['link_next'])) ? $instance['link_next'] : '';
+		$link_prev = (isset($instance['link_prev'])) ? $instance['link_prev'] : '';
+		$link_pause = (isset($instance['link_pause'])) ? $instance['link_pause'] : '';
+		$link_play = (isset($instance['link_play'])) ? $instance['link_play'] : '';
 
 		
 		?>
@@ -169,6 +174,27 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			<label for="<?php echo $this->get_field_id( 'seconds' ); ?>"><?php _e( 'Seconds Between:' ); ?></label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'seconds' ); ?>" name="<?php echo $this->get_field_name( 'seconds' ); ?>" type="text" value="<?php echo esc_attr( $seconds ); ?>" style="width:25px;" />
 		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id('show_links'); ?>"><?php _e( 'Show Links:' ); ?></label>
+			<input type="checkbox" id="<?php echo $this->get_field_id( 'show_links' ); ?>" name="<?php echo $this->get_field_name( 'show_links' ); ?>" value="1" <?php if ($show_links == 1) echo ' checked="checked"'; ?> />
+		</p>
+
+		<p>
+			<label for="<?php echo $this->get_field_id( 'link_next' ); ?>"><?php _e( 'Next Text:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_next' ); ?>" name="<?php echo $this->get_field_name( 'link_next' ); ?>" type="text" value="<?php echo esc_attr( $link_next ); ?>" />
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'link_prev' ); ?>"><?php _e( 'Previous Text:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_prev' ); ?>" name="<?php echo $this->get_field_name( 'link_prev' ); ?>" type="text" value="<?php echo esc_attr( $link_prev ); ?>" />
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'link_play' ); ?>"><?php _e( 'Play Text:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_play' ); ?>" name="<?php echo $this->get_field_name( 'link_play' ); ?>" type="text" value="<?php echo esc_attr( $link_play ); ?>" />
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'link_pause' ); ?>"><?php _e( 'Pause Text:' ); ?></label> 
+			<input class="widefat" id="<?php echo $this->get_field_id( 'link_pause' ); ?>" name="<?php echo $this->get_field_name( 'link_pause' ); ?>" type="text" value="<?php echo esc_attr( $link_pause ); ?>" />
+		</p>
 		
 		
 		<?php 
@@ -179,6 +205,12 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['group'] = (int)$new_instance['group'];
 		$instance['seconds'] = (int)$new_instance['seconds'];
+		$instance['show_links'] = (int)$new_instance['show_links'];
+
+		$instance['link_next'] = $new_instance['link_next'];
+		$instance['link_prev'] = $new_instance['link_prev'];
+		$instance['link_pause'] = $new_instance['link_pause'];
+		$instance['link_play'] = $new_instance['link_play'];
 		
 		return $instance;
 	}
@@ -233,6 +265,9 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			}
 			
 			echo '</div>';
+
+			if ($instance['show_links'] == 1)
+				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause pause">'.$instance['link_pause'].'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
 		echo '</div>';
 		?>
 
@@ -270,17 +305,81 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		<script type="text/javascript">
 			var index_<?php echo $identifier; ?> = 1;
+			var timeout_<?php echo $identifier; ?> = null;
+			var play_<?php echo $identifier; ?> = 1;
+
 			jQuery(document).ready(function() {
-				setInterval(function() {
+
+				si_<?php echo $identifier; ?>();
+
+				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .pause").click(function() {
+					if (play_<?php echo $identifier; ?> == 1) {
+						jQuery(this).text('<?php echo $instance['link_play']; ?>').removeClass('pause').addClass('play');
+						clearInterval(timeout_<?php echo $identifier; ?>);
+						play_<?php echo $identifier; ?> = 0;
+					} else {
+						jQuery(this).text('<?php echo $instance['link_pause']; ?>').removeClass('play').addClass('pause');
+						si_<?php echo $identifier; ?>();
+						play_<?php echo $identifier; ?> = 1;
+					}
+
+					return false;
+				});
+
+				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .prev").click(function() {
+
+					var new_index = (index_<?php echo $identifier; ?> - 2);
+					
+					if (new_index < 0) {
+						new_index = (jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").length - 1);
+					}
+					
+
+					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(new_index);
+					if (nextitem == undefined) {
+						index_<?php echo $identifier; ?> = 0;
+						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
+					}
+					jQuery("#hms-testimonial-<?php echo $identifier; ?> .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					index_<?php echo $identifier; ?> = new_index + 1;
+
+					if (play_<?php echo $identifier; ?> == 1) {
+						clearInterval(timeout_<?php echo $identifier; ?>);
+						si_<?php echo $identifier; ?>();
+					}
+					return false;
+
+				});
+				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .next").click(function() {
 					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(index_<?php echo $identifier; ?>);
 					if (nextitem == undefined) {
 						index_<?php echo $identifier; ?> = 0;
 						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
 					}
-					jQuery("#hms-testimonial-<?php echo $identifier; ?>").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					jQuery("#hms-testimonial-<?php echo $identifier; ?> .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					index_<?php echo $identifier; ?> = index_<?php echo $identifier; ?> + 1;
+
+					if (play_<?php echo $identifier; ?> == 1) {
+						clearInterval(timeout_<?php echo $identifier; ?>);
+						si_<?php echo $identifier; ?>();
+					}
+					return false;
+				});
+				
+			});
+
+			function si_<?php echo $identifier; ?>() {
+
+				timeout_<?php echo $identifier; ?> = setInterval(function() {
+					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(index_<?php echo $identifier; ?>);
+					if (nextitem == undefined) {
+						index_<?php echo $identifier; ?> = 0;
+						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
+					}
+					jQuery("#hms-testimonial-<?php echo $identifier; ?> .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
 					index_<?php echo $identifier; ?> = index_<?php echo $identifier; ?> + 1;
 				}, <?php echo $instance['seconds']; ?>000);
-			});
+			}
 			
 		</script>
 		<?php

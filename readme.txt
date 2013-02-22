@@ -69,6 +69,11 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 1.6 =
+* Added Prev,Pause(Play), and Next links to the rotating shortcode and widget.
+* Updated the shortcode widget form to set the text for the links.
+* Updated the documentation page to reflect these new options.
+
 = 1.5 =
 * Added a new shortcode ( [hms_testimonials_form] ) to allow website visitors to submit testimonials.
 * Added reCAPTCHA settings (enable/disable, public/private keys) to the settings for the form

@@ -228,7 +228,12 @@ function hms_testimonials_show_rotating( $atts ) {
 	extract(shortcode_atts(
 		array(
 			'group' => 0,
-			'seconds' => 6
+			'seconds' => 6,
+			'show_links' => false,
+			'link_prev' => '&laquo;',
+			'link_next' => '&raquo;',
+			'link_pause' => 'Pause',
+			'link_play' => 'Play'
 		), $atts
 	));
 
@@ -271,6 +276,9 @@ function hms_testimonials_show_rotating( $atts ) {
 		}
 
 		$return .= '</div>';
+	if ($show_links && $show_links != "false")
+		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause pause">'.$link_pause.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
+	
 	$return .= '</div>';
 
 
@@ -307,17 +315,77 @@ function hms_testimonials_show_rotating( $atts ) {
 	$return .= <<<JS
 	<script type="text/javascript">
 		var index_{$random_string} = 1;
+		var timeout_{$random_string} = null;
+		var play_{$random_string} = 1;
 		jQuery(document).ready(function() {
-				setInterval(function() {
+				si_{$random_string}();
+
+				jQuery("#hms-testimonial-sc-{$random_string} .controls .playpause").click(function() {
+					if (play_{$random_string} == 1) {
+						jQuery(this).text('{$link_play}').removeClass('pause').addClass('play');
+						clearInterval(timeout_{$random_string});
+						play_{$random_string} = 0;
+					} else {
+						jQuery(this).text('{$link_pause}').removeClass('play').addClass('pause');
+						si_{$random_string}();
+						play_{$random_string} = 1;
+					}
+
+					return false;
+				});
+
+				jQuery("#hms-testimonial-sc-{$random_string} .controls .prev").click(function() {
+
+					var new_index = (index_{$random_string} - 2);
+					
+					if (new_index < 0) {
+						new_index = (jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").length - 1);
+					}
+					console.log(new_index);
+
+					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(new_index);
+					if (nextitem == undefined) {
+						index_{$random_string} = 0;
+						var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(0);
+					}
+					jQuery("#hms-testimonial-sc-{$random_string} .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					index_{$random_string} = new_index + 1;
+
+					if (play_{$random_string} == 1) {
+						clearInterval(timeout_{$random_string});
+						si_{$random_string}();
+					}
+					return false;
+
+				});
+				jQuery("#hms-testimonial-sc-{$random_string} .controls .next").click(function() {
 					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(index_{$random_string});
 					if (nextitem == undefined) {
 						index_{$random_string} = 0;
 						var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(0);
 					}
-					jQuery("#hms-testimonial-sc-{$random_string}").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					jQuery("#hms-testimonial-sc-{$random_string} .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
 					index_{$random_string} = index_{$random_string} + 1;
-				}, {$seconds}000);
-			});
+
+					if (play_{$random_string} == 1) {
+						clearInterval(timeout_{$random_string});
+						si_{$random_string}();
+					}
+					return false;
+				});
+		});
+
+		function si_{$random_string}() {
+			timeout_{$random_string} = setInterval(function() {
+				var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(index_{$random_string});
+				if (nextitem == undefined) {
+					index_{$random_string} = 0;
+					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(0);
+				}
+				jQuery("#hms-testimonial-sc-{$random_string} .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+				index_{$random_string} = index_{$random_string} + 1;
+			}, {$seconds}000);
+		}
 			
 	</script>
 JS;

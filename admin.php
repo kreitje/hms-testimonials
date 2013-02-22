@@ -481,6 +481,11 @@ JS;
 				<li><strong>[hms_testimonials_rotating]</strong> &nbsp; Rotates through all of your testimonials that are set to be displayed</li>
 				<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Rotates through all of your testimonials in a particular group defined by "group". In this case, group 1</li>
 				<li><strong>[hms_testimonials seconds="6"]</strong> &nbsp; Sets the interval in seconds for how often the testimonials are rotated.</li>
+				<li><strong>[hms_testimonials show_links="true"]</strong> &nbsp; Show Prev,Pause(Play) and Next links. Defaults to false</li>
+				<li><strong>[hms_testimonials link_prev="Previous"]</strong> &nbsp; Text for the previous link. Defaults to &laquo;</li>
+				<li><strong>[hms_testimonials link_next="Next"]</strong> &nbsp; Text for the next link. Defaults to &raquo;</li>
+				<li><strong>[hms_testimonials link_pause="Pause"]</strong> &nbsp; Text for the pause link. Defaults to Pause</li>
+				<li><strong>[hms_testimonials link_next="Play"]</strong> &nbsp; Text for the play link. Defaults to Play</li>
 			</ol>
 
 			<br /><br />
@@ -526,6 +531,31 @@ JS;
 				<tr>
 					<td>hms-testimonials-rotator</td>
 					<td>Added to the parent testimonial container for rotating testimonials</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp; controls</td>
+					<td>A div container for the previous, pause/play and next links</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp;&nbsp;&nbsp; prev</td>
+					<td>The previous link</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp;&nbsp;&nbsp; next</td>
+					<td>The next link</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp;&nbsp;&nbsp; playpause</td>
+					<td>The play/pause link</td>
+				</tr>
+
+				<tr>
+					<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; play</td>
+					<td>A class added to the play/pause link when showing the play text</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pause</td>
+					<td>A class added to the play/pause link when showing the pause text</td>
 				</tr>
 			</table>
 
