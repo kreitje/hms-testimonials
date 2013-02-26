@@ -449,11 +449,13 @@ JS;
 			<h2>Documentation</h2>
 
 			<p>This plugin allows you to add customer testimonials to your site in an easy to manage way. HMS Testimonials offers 2 shortcodes with multiple options and 2 widgets.</p>
-
 			<br />
+			<strong>Jump To:</strong> <a href="#hms_testimonials_features">Features</a> | <a href="#hms_testimonials_shortcodes">Shortcodes</a> | 
+				<a href="#hms_testimonials_widgets">Widgets</a> | <a href="#hms_testimonials_css">CSS Classes</a> | <a href="#hms_testimonials_templates">Templates</a>
+			<br /><br />
 
 			
-			<h3>Features</h3>
+			<h3 id="hms_testimonials_features">Features</h3>
 
 			<ol>
 				<li>Set permissiosn based on user roles to allow your users to add testimonials</li>
@@ -466,13 +468,14 @@ JS;
 
 			<br /><br />
 
-			<h3>Shortcode</h3>
+			<h3 id="hms_testimonials_shortcodes">Shortcodes</h3>
 
 			<p>Our shortcode <strong>[hms_testimonials]</strong> offers a few options.</p>
 			<ol>
 				<li><strong>[hms_testimonials]</strong> &nbsp; Shows all of your testimonials that are set to be displayed.</li>
 				<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Shows all of your testimonials in a particular group defined by "group". In this case, group 1</li>
 				<li><strong>[hms_testimonials id="1"]</strong> &nbsp; Only shows 1 testimonial with the id specified. In this case, 1.</li>
+				<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).
 			</ol>
 
 			<br /><br />
@@ -480,6 +483,7 @@ JS;
 			<ol>
 				<li><strong>[hms_testimonials_rotating]</strong> &nbsp; Rotates through all of your testimonials that are set to be displayed</li>
 				<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Rotates through all of your testimonials in a particular group defined by "group". In this case, group 1</li>
+				<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).
 				<li><strong>[hms_testimonials seconds="6"]</strong> &nbsp; Sets the interval in seconds for how often the testimonials are rotated.</li>
 				<li><strong>[hms_testimonials show_links="true"]</strong> &nbsp; Show Prev,Pause(Play) and Next links. Defaults to false</li>
 				<li><strong>[hms_testimonials link_prev="Previous"]</strong> &nbsp; Text for the previous link. Defaults to &laquo;</li>
@@ -495,13 +499,13 @@ JS;
 			<p>Place these shortcodes in your posts or pages. If you prefer to stick them in your sidebar see below for the widgets we offer.</p>
 
 			<br /><br />
-			<h3>Widgets</h3>
+			<h3 id="hms_testimonials_widgets">Widgets</h3>
 			<p>We offer a standard widget called HMS Testimonials where you can display all, a group or a single testimonial. We also offer a rotating widget called 
 				HMS Testimonial Rotator that will show 1 at a time of the entire list or a group and swap them out after x amount of seconds</p>
 
 
 			<br /><br />
-			<h3>CSS Classes</h3>
+			<h3 id="hms_testimonials_css">CSS Classes</h3>
 			<p>We have added some classes to different parts of the testimonial to allow you better styling.</p>
 			<table width="100%">
 				<tr>
@@ -558,6 +562,36 @@ JS;
 					<td>A class added to the play/pause link when showing the pause text</td>
 				</tr>
 			</table>
+			<br /><br />
+
+			<h3 id="hms_testimonials_templates">Templates</h3>
+			<table width="100%">
+				<tr>
+					<td>1</td>
+					<td>Testimonial, Author, URL</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Testimonial, URL, Author</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>Author, Testimonial, URL</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td>Author, URL, Testimonial</td>
+				</tr>
+				<tr>
+					<td>5</td>
+					<td>URL, Author, Testimonial</td>
+				</tr>
+				<tr>
+					<td>6</td>
+					<td>URL, Testimonial, Author</td>
+				</tr>
+			</table>
+
 
 			<br /><br />
 			<div align="center">
@@ -1518,6 +1552,30 @@ JS;
 
 				$counter++;
 			}
+		}
+	}
+
+	public static function template($template, $testimonial, $author, $url) {
+		switch((int)$template) {
+			case 1:
+			default:
+				return $testimonial.$author.$url;
+			break;
+			case 2:
+				return $testimonial.$url.$author;
+			break;
+			case 3:
+				return $author.$testimonial.$url;
+			break;
+			case 4:
+				return $author.$url.$testimonial;
+			break;
+			case 5:
+				return $url.$author.$testimonial;
+			break;
+			case 6:
+				return $url.$testimonial.$author;
+			break;
 		}
 	}
 }

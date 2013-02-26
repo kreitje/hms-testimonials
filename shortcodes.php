@@ -131,7 +131,8 @@ function hms_testimonials_show( $atts ) {
 	extract(shortcode_atts(
 		array(
 			'id' => 0,
-			'group' => 0
+			'group' => 0,
+			'template' => 1
 		), $atts
 	));
 
@@ -143,8 +144,11 @@ function hms_testimonials_show( $atts ) {
 		if (count($get)<1)
 			return '';
 
-		$ret = '<div class="hms-testimonial-container hms-testimonial-single">
-			<div class="testimonial">'.$get['testimonial'].'</div><div class="author">'.nl2br($get['name']).'</div>';
+		$ret = '<div class="hms-testimonial-container hms-testimonial-single">';
+
+		$testimonial = '<div class="testimonial">'.nl2br($get['testimonial']).'</div>';
+		$author = '<div class="author">'.nl2br($get['name']).'</div>';
+		$url = '';
 		if ($get['url'] != '') {
 			if (substr($get['url'],0,4)!='http')
 				$href = 'http://'.$get['url'];
@@ -157,11 +161,13 @@ function hms_testimonials_show( $atts ) {
 				if ($settings['active_links_nofollow'] == 1)
 					$nofollow = 'rel="nofollow"';
 
-				$ret .= '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+				$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 			} else {
-				$ret .= '<div class="url">'.$href.'</div>';
+				$url = '<div class="url">'.$href.'</div>';
 			}
 		}
+
+		$ret .= HMS_Testimonials::template($template, $testimonial, $author, $url);
 
 		$ret .= '</div>';
 		
@@ -185,9 +191,12 @@ function hms_testimonials_show( $atts ) {
 		$ret = '<div class="hms-testimonial-group">';
 		foreach($get as $g) {
 
-			$ret .= '<div class="hms-testimonial-container">
-						<div class="testimonial">'.$g['testimonial'].'</div>
-						<div class="author">'.nl2br($g['name']).'</div>';
+			$ret .= '<div class="hms-testimonial-container">';
+
+			$testimonial = '<div class="testimonial">'.nl2br($g['testimonial']).'</div>';
+			$author = '<div class="author">'.nl2br($g['name']).'</div>';
+
+			$url = '';
 			if ($g['url'] != '') {
 				if (substr($g['url'],0,4)!='http')
 					$href = 'http://'.$g['url'];
@@ -201,12 +210,14 @@ function hms_testimonials_show( $atts ) {
 					if ($settings['active_links_nofollow'] == 1)
 						$nofollow = 'rel="nofollow"';
 
-					$ret .= '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+					$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 				} else {
-					$ret .= '<div class="url">'.$href.'</div>';
+					$url = '<div class="url">'.$href.'</div>';
 				}
 
 			}
+
+			$ret .= HMS_Testimonials::template($template, $testimonial, $author, $url);
 
 			$ret .= '</div>';
 
@@ -228,6 +239,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	extract(shortcode_atts(
 		array(
 			'group' => 0,
+			'template' => 1,
 			'seconds' => 6,
 			'show_links' => false,
 			'link_prev' => '&laquo;',
@@ -252,10 +264,12 @@ function hms_testimonials_show_rotating( $atts ) {
 
 
 	$return = '<div id="hms-testimonial-sc-'.$random_string.'" class="hms-testimonials-rotator">';
-		$return .= '<div class="hms-testimonial-container">
-						<div class="testimonial">'.nl2br($get[0]['testimonial']).'</div>
-						<div class="author">'.nl2br($get[0]['name']).'</div>';
-		
+		$return .= '<div class="hms-testimonial-container">';
+						
+		$testimonial = '<div class="testimonial">'.nl2br($get[0]['testimonial']).'</div>';
+		$author = '<div class="author">'.nl2br($get[0]['name']).'</div>';
+		$url = '';
+
 		if ($get[0]['url']!='') {
 			if (substr($get[0]['url'],0,4)!='http')
 				$href = 'http://'.$get[0]['url'];
@@ -268,12 +282,14 @@ function hms_testimonials_show_rotating( $atts ) {
 				if ($settings['active_links_nofollow'] == 1)
 					$nofollow = 'rel="nofollow"';
 
-				$return .= '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+				$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 			} else {
-				$return .= '<div class="url">'.$href.'</div>';
+				$url = '<div class="url">'.$href.'</div>';
 			}
 
 		}
+
+		$return .= HMS_Testimonials::template($template, $testimonial, $author, $url);
 
 		$return .= '</div>';
 	if ($show_links && $show_links != "false")
@@ -285,9 +301,11 @@ function hms_testimonials_show_rotating( $atts ) {
 	$return .= '<div style="display:none;" id="hms-testimonial-sc-list-'.$random_string.'">';
 		
 	foreach($get as $g) {
-		$return .= '<div class="hms-testimonial-container">
-						<div class="testimonial">'.nl2br($g['testimonial']).'</div>
-						<div class="author">'.nl2br($g['name']).'</div>';
+		$return .= '<div class="hms-testimonial-container">';
+		$testimonial = '<div class="testimonial">'.nl2br($g['testimonial']).'</div>';
+		$author = '<div class="author">'.nl2br($g['name']).'</div>';
+
+		$url = '';
 		if ($g['url']!='') {
 			if (substr($g['url'],0,4)!='http')
 				$href = 'http://'.$g['url'];
@@ -300,12 +318,14 @@ function hms_testimonials_show_rotating( $atts ) {
 				if ($settings['active_links_nofollow'] == 1)
 					$nofollow = 'rel="nofollow"';
 
-				$return .= '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+				$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 			} else {
-				$return .= '<div class="url">'.$href.'</div>';
+				$url = '<div class="url">'.$href.'</div>';
 			}
 
 		}
+
+		$return .= HMS_Testimonials::template($template, $testimonial, $author, $url);
 		
 		$return .= '</div>';	
 	}
@@ -392,3 +412,4 @@ JS;
 
 	return $return;
 }
+

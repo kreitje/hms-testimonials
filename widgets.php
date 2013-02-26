@@ -17,6 +17,7 @@ class HMS_Testimonials_View extends WP_Widget {
 		$numshow = (isset($instance['numshow'])) ? $instance['numshow'] : 0;
 		$show = (isset($instance['show'])) ? $instance['show'] : 'all';
 		$show_value = (isset($instance['show_value'])) ? $instance['show_value'] : '';
+		$template = (isset($instance['template'])) ? $instance['template'] : '1';
 		
 		?>
 		<p>
@@ -24,11 +25,22 @@ class HMS_Testimonials_View extends WP_Widget {
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'show' ); ?>"><?php _e('Display:'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'show' ); ?>"><?php _e('Display:'); ?></label><br />
 			<select name="<?php echo $this->get_field_name( 'show' ); ?>" id="<?php echo $this->get_field_id( 'show' ); ?>">
 				<option value="all" <?php if (esc_attr( $show )=='all') echo ' selected="selected"'; ?>>All</option>
 				<option value="group" <?php if (esc_attr( $show )=='group') echo ' selected="selected"'; ?>>Group</option>
 				<option value="single" <?php if (esc_attr( $show )=='single') echo ' selected="selected"'; ?>>Single</option>
+			</select>
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template:'); ?></label><br />
+			<select name="<?php echo $this->get_field_name( 'template' ); ?>" id="<?php echo $this->get_field_id( 'template' ); ?>">
+				<option value="1" <?php if (esc_attr( $template )=='1') echo ' selected="selected"'; ?>>1 - Testimonial, Author, URL</option>
+				<option value="2" <?php if (esc_attr( $template )=='2') echo ' selected="selected"'; ?>>2 - Testimonial, URL, Author</option>
+				<option value="3" <?php if (esc_attr( $template )=='3') echo ' selected="selected"'; ?>>3 - Author, Testimonial, URL</option>
+				<option value="4" <?php if (esc_attr( $template )=='4') echo ' selected="selected"'; ?>>4 - Author, URL, Testimonial</option>
+				<option value="5" <?php if (esc_attr( $template )=='5') echo ' selected="selected"'; ?>>5 - URL, Author, Testimonial</option>
+				<option value="6" <?php if (esc_attr( $template )=='6') echo ' selected="selected"'; ?>>6 - URL, Testimonial, Author</option>
 			</select>
 		</p>
 		<p>
@@ -51,6 +63,7 @@ class HMS_Testimonials_View extends WP_Widget {
 		$instance['numshow'] = (int)$new_instance['numshow'];
 		$instance['show'] = (isset($new_instance['show'])) ? $new_instance['show'] : 'all';
 		$instance['show_value'] = @$new_instance['show_value'];
+		$instance['template'] = (isset($new_instance['template'])) ? $new_instance['template'] : 1;
 		return $instance;
 
 	}
@@ -93,8 +106,11 @@ class HMS_Testimonials_View extends WP_Widget {
 				echo $args['before_title'].$instance['title'].$args['after_title'];
 
 		if ($single==1) {
-			echo '<div class="hms-testimonial-container">
-				<div class="testimonial">'.nl2br($get['testimonial']).'</div><div class="author">'.nl2br($get['name']).'</div>';
+			echo '<div class="hms-testimonial-container">';
+				
+			$testimonial = '<div class="testimonial">'.nl2br($get['testimonial']).'</div>';
+			$author = '<div class="author">'.nl2br($get['name']).'</div>';
+			$url = '';
 
 			if ($get['url'] != '') {
 				if (substr($get['url'],0,4)!='http')
@@ -109,21 +125,46 @@ class HMS_Testimonials_View extends WP_Widget {
 					if ($settings['active_links_nofollow'] == 1)
 						$nofollow = 'rel="nofollow"';
 
-					echo '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+					$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 				} else {
-					echo '<div class="url">'.$href.'</div>';
+					$url = '<div class="url">'.$href.'</div>';
 				}
 
 			}
 
+			echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
 			echo '</div>';
 		} else {
 			$x = 1;
 			foreach($get as $g) {
 
-				echo '<div class="hms-testimonial-container hms-testimonial-counter-'.$x.'">
-				 <div class="testimonial">'.nl2br($g['testimonial']).'</div><div class="author">'.nl2br($g['name']).'</div>';
-				if ($g['url']!='') echo '<div class="url">'.$g['url'].'</div>';
+				echo '<div class="hms-testimonial-container hms-testimonial-counter-'.$x.'">';
+				
+				$testimonial = '<div class="testimonial">'.nl2br($g['testimonial']).'</div>';
+				$author = '<div class="author">'.nl2br($g['name']).'</div>';
+				$url = '';
+
+				if ($g['url'] != '') {
+					if (substr($g['url'],0,4)!='http')
+						$href = 'http://'.$g['url'];
+					else
+						$href = $g['url'];
+
+					if ($settings['show_active_links'] == 1) {
+						$nofollow = '';
+
+						if ($settings['active_links_nofollow'] == 1)
+							$nofollow = 'rel="nofollow"';
+
+						$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+					} else {
+						$url = '<div class="url">'.$href.'</div>';
+					}
+				}
+				
+
+				echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
+				
 				echo '</div>';
 				$x++;
 			}
@@ -151,6 +192,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		$link_prev = (isset($instance['link_prev'])) ? $instance['link_prev'] : '';
 		$link_pause = (isset($instance['link_pause'])) ? $instance['link_pause'] : '';
 		$link_play = (isset($instance['link_play'])) ? $instance['link_play'] : '';
+		$template = (isset($instance['template'])) ? $instance['template'] : '1';
 
 		
 		?>
@@ -159,7 +201,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'group' ); ?>"><?php _e('Group:'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'group' ); ?>"><?php _e('Group:'); ?></label><br />
 			<select name="<?php echo $this->get_field_name( 'group' ); ?>" id="<?php echo $this->get_field_id( 'group' ); ?>">
 				<option value="all" <?php if (esc_attr( $group )=='0') echo ' selected="selected"'; ?>>All</option>
 				<?php
@@ -168,6 +210,17 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 					echo '<option value="'.$g['id'].'"'; if ($group == $g['id']) echo ' selected="selected"';  echo '>'.$g['name'].'</option>';
 				endforeach;
 				?>
+			</select>
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template:'); ?></label><br />
+			<select name="<?php echo $this->get_field_name( 'template' ); ?>" id="<?php echo $this->get_field_id( 'template' ); ?>">
+				<option value="1" <?php if (esc_attr( $template )=='1') echo ' selected="selected"'; ?>>1 - Testimonial, Author, URL</option>
+				<option value="2" <?php if (esc_attr( $template )=='2') echo ' selected="selected"'; ?>>2 - Testimonial, URL, Author</option>
+				<option value="3" <?php if (esc_attr( $template )=='3') echo ' selected="selected"'; ?>>3 - Author, Testimonial, URL</option>
+				<option value="4" <?php if (esc_attr( $template )=='4') echo ' selected="selected"'; ?>>4 - Author, URL, Testimonial</option>
+				<option value="5" <?php if (esc_attr( $template )=='5') echo ' selected="selected"'; ?>>5 - URL, Author, Testimonial</option>
+				<option value="6" <?php if (esc_attr( $template )=='6') echo ' selected="selected"'; ?>>6 - URL, Testimonial, Author</option>
 			</select>
 		</p>
 		<p>
@@ -206,6 +259,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		$instance['group'] = (int)$new_instance['group'];
 		$instance['seconds'] = (int)$new_instance['seconds'];
 		$instance['show_links'] = (int)$new_instance['show_links'];
+		$instance['template'] = (isset($new_instance['template'])) ? $new_instance['template'] : 1;
 
 		$instance['link_next'] = $new_instance['link_next'];
 		$instance['link_prev'] = $new_instance['link_prev'];
@@ -241,9 +295,11 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		echo '<div id="hms-testimonial-'.$identifier.'">';
 
-			echo '<div class="hms-testimonial-container">
-				<div class="testimonial">'.nl2br($get[0]['testimonial']).'</div><div class="author">'.nl2br($get[0]['name']).'</div>';
-
+			echo '<div class="hms-testimonial-container">';
+			
+			$testimonial = '<div class="testimonial">'.nl2br($get[0]['testimonial']).'</div>';
+			$author = '<div class="author">'.nl2br($get[0]['name']).'</div>';
+			$url = '';
 			if ($get[0]['url'] != '') {
 				if (substr($get[0]['url'],0,4)!='http')
 					$href = 'http://'.$get[0]['url'];
@@ -257,13 +313,13 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 					if ($settings['active_links_nofollow'] == 1)
 						$nofollow = 'rel="nofollow"';
 
-					echo '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+					$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 				} else {
-					echo '<div class="url">'.$href.'</div>';
+					$url = '<div class="url">'.$href.'</div>';
 				}
 
 			}
-			
+			echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
 			echo '</div>';
 
 			if ($instance['show_links'] == 1)
@@ -275,10 +331,11 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 			<?php
 				foreach($get as $g) {
-					echo '<div class="hms-testimonial-container">
-							<div class="testimonial">'.nl2br($g['testimonial']).'</div>
-							<div class="author">'.nl2br($g['name']).'</div>';
+					echo '<div class="hms-testimonial-container">';
 					
+					$testimonial = '<div class="testimonial">'.nl2br($g['testimonial']).'</div>';
+					$author = '<div class="author">'.nl2br($g['name']).'</div>';
+					$url = '';
 					if ($g['url'] != '') {
 						if (substr($g['url'],0,4)!='http')
 							$href = 'http://'.$g['url'];
@@ -292,12 +349,14 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 							if ($settings['active_links_nofollow'] == 1)
 								$nofollow = 'rel="nofollow"';
 
-							echo '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
+							$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
 						} else {
-							echo '<div class="url">'.$href.'</div>';
+							$url = '<div class="url">'.$href.'</div>';
 						}
 
 					}
+
+					echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
 
 					echo '</div>';
 				} ?>
