@@ -19,6 +19,11 @@ Create groups to display specific testimonials on different pages. You can chang
 
 Use the settings to allow access for your users to write testimonials about your company.
     
+**BIG Changes**
+
+* Add/Edit screens of testimonials now have the full WordPress Editor at your disposal. You **cannot** use shortcodes inside these.
+* Added a testimonial date field
+* The [hms_testimonials] attribute now supports pagination.
 
 == Installation ==
 
@@ -68,6 +73,12 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 1.7 =
+* Added the TinyMCE editor to the testimonial textarea
+* Added a testimonial date field.
+* Added more templates to account for the date field
+* Added new options for the [hms_testimonials] shortcode to limit the results and paginate them. These are limit, start, next, prev, location.
 
 = 1.6.2 =
 * Fixed bug where new line breaks were not being added in some instances.

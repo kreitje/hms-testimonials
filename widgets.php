@@ -18,6 +18,7 @@ class HMS_Testimonials_View extends WP_Widget {
 		$show = (isset($instance['show'])) ? $instance['show'] : 'all';
 		$show_value = (isset($instance['show_value'])) ? $instance['show_value'] : '';
 		$template = (isset($instance['template'])) ? $instance['template'] : '1';
+		$showdate = (isset($instance['showdate']) && $instance['showdate'] === true) ? true : false;
 		
 		?>
 		<p>
@@ -33,14 +34,36 @@ class HMS_Testimonials_View extends WP_Widget {
 			</select>
 		</p>
 		<p>
+			<input type="checkbox" id="<?php echo $this->get_field_id( 'showdate' ); ?>" name="<?php echo $this->get_field_name( 'showdate' ); ?>" value="1" <?php if ($showdate) echo ' checked="checked"'; ?> /> &nbsp;&nbsp;
+			<label for="<?php echo $this->get_field_id('showdate'); ?>"><?php _e( 'Show Testimonial Date' ); ?></label>
+		</p>
+		<p>
 			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template:'); ?></label><br />
 			<select name="<?php echo $this->get_field_name( 'template' ); ?>" id="<?php echo $this->get_field_id( 'template' ); ?>">
-				<option value="1" <?php if (esc_attr( $template )=='1') echo ' selected="selected"'; ?>>1 - Testimonial, Author, URL</option>
-				<option value="2" <?php if (esc_attr( $template )=='2') echo ' selected="selected"'; ?>>2 - Testimonial, URL, Author</option>
-				<option value="3" <?php if (esc_attr( $template )=='3') echo ' selected="selected"'; ?>>3 - Author, Testimonial, URL</option>
-				<option value="4" <?php if (esc_attr( $template )=='4') echo ' selected="selected"'; ?>>4 - Author, URL, Testimonial</option>
-				<option value="5" <?php if (esc_attr( $template )=='5') echo ' selected="selected"'; ?>>5 - URL, Author, Testimonial</option>
-				<option value="6" <?php if (esc_attr( $template )=='6') echo ' selected="selected"'; ?>>6 - URL, Testimonial, Author</option>
+				<option value="1" <?php if (esc_attr( $template )=='1') echo ' selected="selected"'; ?>>1 - Testimonial, Author, URL, Date</option>
+				<option value="2" <?php if (esc_attr( $template )=='2') echo ' selected="selected"'; ?>>2 - Testimonial, URL, Author, Date</option>
+				<option value="3" <?php if (esc_attr( $template )=='3') echo ' selected="selected"'; ?>>3 - Author, Testimonial, URL, Date</option>
+				<option value="4" <?php if (esc_attr( $template )=='4') echo ' selected="selected"'; ?>>4 - Author, URL, Testimonial, Date</option>
+				<option value="5" <?php if (esc_attr( $template )=='5') echo ' selected="selected"'; ?>>5 - URL, Author, Testimonial, Date</option>
+				<option value="6" <?php if (esc_attr( $template )=='6') echo ' selected="selected"'; ?>>6 - URL, Testimonial, Author, Date</option>
+				<option value="7" <?php if (esc_attr( $template )=='7') echo ' selected="selected"'; ?>>7 - Testimonial, Author, Date, URL</option>
+				<option value="8" <?php if (esc_attr( $template )=='8') echo ' selected="selected"'; ?>>8 - Testimonial, URL, Date, Author</option>
+				<option value="9" <?php if (esc_attr( $template )=='9') echo ' selected="selected"'; ?>>9 - Testimonial, Date, Author, URL</option>
+				<option value="10" <?php if (esc_attr( $template )=='10') echo ' selected="selected"'; ?>>10 - Testimonial, Date, URL, Author</option>
+				<option value="11" <?php if (esc_attr( $template )=='11') echo ' selected="selected"'; ?>>11 - Author, Testimonial, Date, URL</option>
+				<option value="12" <?php if (esc_attr( $template )=='12') echo ' selected="selected"'; ?>>12 - Author, URL, Date, Testimonial</option>
+				<option value="13" <?php if (esc_attr( $template )=='13') echo ' selected="selected"'; ?>>13 - Author, Date, Testimonial, URL</option>
+				<option value="14" <?php if (esc_attr( $template )=='14') echo ' selected="selected"'; ?>>14 - Author, Date, URL, Testimonial</option>
+				<option value="15" <?php if (esc_attr( $template )=='15') echo ' selected="selected"'; ?>>15 - URL, Author, Date, Testimonial</option>
+				<option value="16" <?php if (esc_attr( $template )=='16') echo ' selected="selected"'; ?>>16 - URL, Testimonial, Date, Author</option>
+				<option value="17" <?php if (esc_attr( $template )=='17') echo ' selected="selected"'; ?>>17 - URL, Date, Author, Testimonial</option>
+				<option value="18" <?php if (esc_attr( $template )=='18') echo ' selected="selected"'; ?>>18 - URL, Date, Testimonial, Author</option>
+				<option value="19" <?php if (esc_attr( $template )=='19') echo ' selected="selected"'; ?>>19 - Date, Testimonial, Author, URL</option>
+				<option value="20" <?php if (esc_attr( $template )=='20') echo ' selected="selected"'; ?>>20 - Date, Testimonial, URL, Author</option>
+				<option value="21" <?php if (esc_attr( $template )=='21') echo ' selected="selected"'; ?>>21 - Date, Author, Testimonial, URL</option>
+				<option value="22" <?php if (esc_attr( $template )=='22') echo ' selected="selected"'; ?>>22 - Date, Author, URL, Testimonial</option>
+				<option value="23" <?php if (esc_attr( $template )=='23') echo ' selected="selected"'; ?>>23 - Date, URL, Author, Testimonial</option>
+				<option value="24" <?php if (esc_attr( $template )=='24') echo ' selected="selected"'; ?>>24 - Date, URL, Testimonial, AUthor</option>
 			</select>
 		</p>
 		<p>
@@ -64,6 +87,7 @@ class HMS_Testimonials_View extends WP_Widget {
 		$instance['show'] = (isset($new_instance['show'])) ? $new_instance['show'] : 'all';
 		$instance['show_value'] = @$new_instance['show_value'];
 		$instance['template'] = (isset($new_instance['template'])) ? $new_instance['template'] : 1;
+		$instance['showdate'] = (isset($new_instance['showdate']) && ($new_instance['showdate'] == '1')) ? true : false;
 		return $instance;
 
 	}
@@ -84,16 +108,16 @@ class HMS_Testimonials_View extends WP_Widget {
 
 		switch($instance['show']) {
 			case 'single':
-				$get = $wpdb->get_row("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `id` = ".(int)$instance['show_value']." AND `display` = 1 AND `blog_id` = ".(int)$blog_id, ARRAY_A);
+				$get = $wpdb->get_row("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `id` = ".(int)$instance['show_value']." AND `display` = 1 AND `blog_id` = ".(int)$blog_id, ARRAY_A);
 				$single = 1;
 			break;
 			case 'group':
-				$get = $wpdb->get_results("SELECT t.* FROM `".$wpdb->prefix."hms_testimonials` AS t INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m ON m.testimonial_id = t.id WHERE m.group_id = ".(int)$instance['show_value']." AND t.blog_id = ".$blog_id." AND t.display = 1 ORDER BY m.display_order ASC ".$limit, ARRAY_A);
+				$get = $wpdb->get_results("SELECT t.*, DATE_FORMAT(t.testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` AS t INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m ON m.testimonial_id = t.id WHERE m.group_id = ".(int)$instance['show_value']." AND t.blog_id = ".$blog_id." AND t.display = 1 ORDER BY m.display_order ASC ".$limit, ARRAY_A);
 				$single = 0;
 			break;
 			case 'all':
 			default:
-				$get = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `display` = 1 AND `blog_id` = ".(int)$blog_id." ORDER BY `display_order` ASC ".$limit, ARRAY_A);
+				$get = $wpdb->get_results("SELECT *, DATE_FORMAT(t.testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `display` = 1 AND `blog_id` = ".(int)$blog_id." ORDER BY `display_order` ASC ".$limit, ARRAY_A);
 				$single = 0;
 			break;
 		}
@@ -132,7 +156,11 @@ class HMS_Testimonials_View extends WP_Widget {
 
 			}
 
-			echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
+			$date = '';
+			if ($instance['showdate'] && $get['tdate'] != '0/0/0000')
+				$date = '<div class="date">'.$get['tdate'].'</div>';
+
+			echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url, $date);
 			echo '</div>';
 		} else {
 			$x = 1;
@@ -161,9 +189,13 @@ class HMS_Testimonials_View extends WP_Widget {
 						$url = '<div class="url">'.$href.'</div>';
 					}
 				}
+
+				$date = '';
+				if ($instance['showdate'] && $g['tdate'] != '0/0/0000')
+					$date = '<div class="date">'.$g['tdate'].'</div>';
 				
 
-				echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
+				echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url, $date);
 				
 				echo '</div>';
 				$x++;
@@ -193,7 +225,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		$link_pause = (isset($instance['link_pause'])) ? $instance['link_pause'] : '';
 		$link_play = (isset($instance['link_play'])) ? $instance['link_play'] : '';
 		$template = (isset($instance['template'])) ? $instance['template'] : '1';
-
+		$showdate = (isset($instance['showdate']) && $instance['showdate'] === true) ? true : false;
 		
 		?>
 		<p>
@@ -215,12 +247,30 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		<p>
 			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template:'); ?></label><br />
 			<select name="<?php echo $this->get_field_name( 'template' ); ?>" id="<?php echo $this->get_field_id( 'template' ); ?>">
-				<option value="1" <?php if (esc_attr( $template )=='1') echo ' selected="selected"'; ?>>1 - Testimonial, Author, URL</option>
-				<option value="2" <?php if (esc_attr( $template )=='2') echo ' selected="selected"'; ?>>2 - Testimonial, URL, Author</option>
-				<option value="3" <?php if (esc_attr( $template )=='3') echo ' selected="selected"'; ?>>3 - Author, Testimonial, URL</option>
-				<option value="4" <?php if (esc_attr( $template )=='4') echo ' selected="selected"'; ?>>4 - Author, URL, Testimonial</option>
-				<option value="5" <?php if (esc_attr( $template )=='5') echo ' selected="selected"'; ?>>5 - URL, Author, Testimonial</option>
-				<option value="6" <?php if (esc_attr( $template )=='6') echo ' selected="selected"'; ?>>6 - URL, Testimonial, Author</option>
+				<option value="1" <?php if (esc_attr( $template )=='1') echo ' selected="selected"'; ?>>1 - Testimonial, Author, URL, Date</option>
+				<option value="2" <?php if (esc_attr( $template )=='2') echo ' selected="selected"'; ?>>2 - Testimonial, URL, Author, Date</option>
+				<option value="3" <?php if (esc_attr( $template )=='3') echo ' selected="selected"'; ?>>3 - Author, Testimonial, URL, Date</option>
+				<option value="4" <?php if (esc_attr( $template )=='4') echo ' selected="selected"'; ?>>4 - Author, URL, Testimonial, Date</option>
+				<option value="5" <?php if (esc_attr( $template )=='5') echo ' selected="selected"'; ?>>5 - URL, Author, Testimonial, Date</option>
+				<option value="6" <?php if (esc_attr( $template )=='6') echo ' selected="selected"'; ?>>6 - URL, Testimonial, Author, Date</option>
+				<option value="7" <?php if (esc_attr( $template )=='7') echo ' selected="selected"'; ?>>7 - Testimonial, Author, Date, URL</option>
+				<option value="8" <?php if (esc_attr( $template )=='8') echo ' selected="selected"'; ?>>8 - Testimonial, URL, Date, Author</option>
+				<option value="9" <?php if (esc_attr( $template )=='9') echo ' selected="selected"'; ?>>9 - Testimonial, Date, Author, URL</option>
+				<option value="10" <?php if (esc_attr( $template )=='10') echo ' selected="selected"'; ?>>10 - Testimonial, Date, URL, Author</option>
+				<option value="11" <?php if (esc_attr( $template )=='11') echo ' selected="selected"'; ?>>11 - Author, Testimonial, Date, URL</option>
+				<option value="12" <?php if (esc_attr( $template )=='12') echo ' selected="selected"'; ?>>12 - Author, URL, Date, Testimonial</option>
+				<option value="13" <?php if (esc_attr( $template )=='13') echo ' selected="selected"'; ?>>13 - Author, Date, Testimonial, URL</option>
+				<option value="14" <?php if (esc_attr( $template )=='14') echo ' selected="selected"'; ?>>14 - Author, Date, URL, Testimonial</option>
+				<option value="15" <?php if (esc_attr( $template )=='15') echo ' selected="selected"'; ?>>15 - URL, Author, Date, Testimonial</option>
+				<option value="16" <?php if (esc_attr( $template )=='16') echo ' selected="selected"'; ?>>16 - URL, Testimonial, Date, Author</option>
+				<option value="17" <?php if (esc_attr( $template )=='17') echo ' selected="selected"'; ?>>17 - URL, Date, Author, Testimonial</option>
+				<option value="18" <?php if (esc_attr( $template )=='18') echo ' selected="selected"'; ?>>18 - URL, Date, Testimonial, Author</option>
+				<option value="19" <?php if (esc_attr( $template )=='19') echo ' selected="selected"'; ?>>19 - Date, Testimonial, Author, URL</option>
+				<option value="20" <?php if (esc_attr( $template )=='20') echo ' selected="selected"'; ?>>20 - Date, Testimonial, URL, Author</option>
+				<option value="21" <?php if (esc_attr( $template )=='21') echo ' selected="selected"'; ?>>21 - Date, Author, Testimonial, URL</option>
+				<option value="22" <?php if (esc_attr( $template )=='22') echo ' selected="selected"'; ?>>22 - Date, Author, URL, Testimonial</option>
+				<option value="23" <?php if (esc_attr( $template )=='23') echo ' selected="selected"'; ?>>23 - Date, URL, Author, Testimonial</option>
+				<option value="24" <?php if (esc_attr( $template )=='24') echo ' selected="selected"'; ?>>24 - Date, URL, Testimonial, AUthor</option>
 			</select>
 		</p>
 		<p>
@@ -228,8 +278,12 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			<input class="widefat" id="<?php echo $this->get_field_id( 'seconds' ); ?>" name="<?php echo $this->get_field_name( 'seconds' ); ?>" type="text" value="<?php echo esc_attr( $seconds ); ?>" style="width:25px;" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id('show_links'); ?>"><?php _e( 'Show Links:' ); ?></label>
-			<input type="checkbox" id="<?php echo $this->get_field_id( 'show_links' ); ?>" name="<?php echo $this->get_field_name( 'show_links' ); ?>" value="1" <?php if ($show_links == 1) echo ' checked="checked"'; ?> />
+			<input type="checkbox" id="<?php echo $this->get_field_id( 'showdate' ); ?>" name="<?php echo $this->get_field_name( 'showdate' ); ?>" value="1" <?php if ($showdate) echo ' checked="checked"'; ?> /> &nbsp;&nbsp;
+			<label for="<?php echo $this->get_field_id('showdate'); ?>"><?php _e( 'Show Testimonial Date' ); ?></label>
+		</p>
+		<p>
+			<input type="checkbox" id="<?php echo $this->get_field_id( 'show_links' ); ?>" name="<?php echo $this->get_field_name( 'show_links' ); ?>" value="1" <?php if ($show_links == 1) echo ' checked="checked"'; ?> /> &nbsp;&nbsp;
+			<label for="<?php echo $this->get_field_id('show_links'); ?>"><?php _e( 'Show Links' ); ?></label>
 		</p>
 
 		<p>
@@ -260,6 +314,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		$instance['seconds'] = (int)$new_instance['seconds'];
 		$instance['show_links'] = (int)$new_instance['show_links'];
 		$instance['template'] = (isset($new_instance['template'])) ? $new_instance['template'] : 1;
+		$instance['showdate'] = (isset($new_instance['showdate']) && ($new_instance['showdate'] == '1')) ? true : false;
 
 		$instance['link_next'] = $new_instance['link_next'];
 		$instance['link_prev'] = $new_instance['link_prev'];
@@ -277,9 +332,9 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			$instance['group'] = 0;
 
 		if ($instance['group'] == 0) {
-			$get = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `display` = 1 AND `blog_id` = ".(int)$blog_id." ORDER BY `display_order` ASC ", ARRAY_A);
+			$get = $wpdb->get_results("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `display` = 1 AND `blog_id` = ".(int)$blog_id." ORDER BY `display_order` ASC ", ARRAY_A);
 		} else {
-			$get = $wpdb->get_results("SELECT t.* FROM `".$wpdb->prefix."hms_testimonials` AS t INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m ON m.testimonial_id = t.id WHERE m.group_id = ".(int)$instance['group']." AND t.blog_id = ".$blog_id." AND t.display = 1 ORDER BY m.display_order ASC", ARRAY_A);
+			$get = $wpdb->get_results("SELECT t.*, DATE_FORMAT(t.testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` AS t INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m ON m.testimonial_id = t.id WHERE m.group_id = ".(int)$instance['group']." AND t.blog_id = ".$blog_id." AND t.display = 1 ORDER BY m.display_order ASC", ARRAY_A);
 		}
 
 		if (count($get)<1)
@@ -319,7 +374,12 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 				}
 
 			}
-			echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
+
+			$date = '';
+			if ($instance['showdate'] && $get[0]['tdate'] != '0/0/0000')
+				$date = '<div class="date">'.$get[0]['tdate'].'</div>';
+
+			echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url, $date, $date);
 			echo '</div>';
 
 			if ($instance['show_links'] == 1)
@@ -356,7 +416,11 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 					}
 
-					echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url);
+					$date = '';
+					if ($instance['showdate'] && $g['tdate'] != '0/0/0000')
+						$date = '<div class="date">'.$g['tdate'].'</div>';
+
+					echo HMS_Testimonials::template($instance['template'], $testimonial, $author, $url, $date);
 
 					echo '</div>';
 				} ?>

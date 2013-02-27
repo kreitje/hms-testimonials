@@ -335,7 +335,8 @@ JS;
 							?>
 						</tbody>
 					</table>
-					<p>Set the role order. Any dropdown on the left that you select, any user with that role or a higher role will be permitted taht action.</p>
+					<p>Set the role order. Any dropdown on the left that you select, any user with that role or a higher role will be permitted that action. This 
+						allows you to let non administrators have some control over the testimonials.</p>
 
 					<strong>Drag and drop to sort roles by importance.</strong>
 
@@ -375,6 +376,7 @@ JS;
 						<th>Name</th>
 						<th>Testimonial</th>
 						<th>URL</th>
+						<th>Testimonial Date</th>
 						<th>Shortcode</th>
 						<th>User</th>
 						<th>Display?</th>
@@ -387,6 +389,7 @@ JS;
 						<th>Name</th>
 						<th>Testimonial</th>
 						<th>URL</th>
+						<th>Testimonial Date</th>
 						<th>Shortcode</th>
 						<th>User</th>
 						<th>Display?</th>
@@ -418,14 +421,18 @@ JS;
 						foreach($get as $g) {
 							?>
 							<tr>
-								<td><input type="hidden" name="sort[]" value="<?php echo $g['id']; ?>" /><a href="<?php echo admin_url('admin.php?page=hms-testimonials-view&id='.$g['id']); ?>"><?php echo $g['id']; ?></td>
+								<td><input type="hidden" name="sort[]" value="<?php echo $g['id']; ?>" /><a href="<?php echo admin_url('admin.php?page=hms-testimonials-view&id='.$g['id']); ?>"><?php echo $g['id']; ?></a></td>
 								<td><?php echo nl2br($g['name']); ?></td>
-								<td><?php echo substr(nl2br($g['testimonial']),0,100).'...'; ?></td>
+								<td width="250"><?php echo substr(nl2br($g['testimonial']),0,100).'...'; ?></td>
 								<td><?php echo $g['url']; ?></td>
+								<td><?php if ($g['testimonial_date'] != '0000-00-00 00:00:00') echo date('m/d/Y', strtotime($g['testimonial_date'])); else echo 'Not Set'; ?></td>
 								<td>[hms_testimonials id="<?php echo $g['id']; ?>"]</td>
 								<td><?php if ($g['user_id'] == 0) echo 'Website Visitor'; else echo $g['user_login']; ?></td>
 								<td><?php echo ($g['display']==1) ? 'Yes' : 'No'; ?></td>
-								<td><a href="<?php echo admin_url('admin.php?page=hms-testimonials-delete&id='.$g['id'].'&noheader=true'); ?>" onclick="if (!confirm('Are you sure you want to delete this testimonial?')) return false;">Delete</a></td>
+								<td>
+									<a href="<?php echo admin_url('admin.php?page=hms-testimonials-view&id='.$g['id']); ?>">Edit</a> &nbsp;|&nbsp; 
+									<a href="<?php echo admin_url('admin.php?page=hms-testimonials-delete&id='.$g['id'].'&noheader=true'); ?>" onclick="if (!confirm('Are you sure you want to delete this testimonial?')) return false;">Delete</a>
+								</td>
 							</tr>
 							<?php
 						}
@@ -475,7 +482,11 @@ JS;
 				<li><strong>[hms_testimonials]</strong> &nbsp; Shows all of your testimonials that are set to be displayed.</li>
 				<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Shows all of your testimonials in a particular group defined by "group". In this case, group 1</li>
 				<li><strong>[hms_testimonials id="1"]</strong> &nbsp; Only shows 1 testimonial with the id specified. In this case, 1.</li>
-				<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).
+				<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).</li>
+				<li><strong>[hms_testimonials limit="15" start="1" next="&raquo;" prev="&laquo;" location="both"]</strong> &nbsp; If you want to limit the number of results shown and paginate them 
+					you can use the limit attribute. If you need to skip a few before starting change the start number. The next an prev attributes set the text for the next and previous link in the 
+					page numbers. Lastly, location sets where to display the page numbers. Both places it at the top and buttom, top places it only at the top, and bottom only at the bottom. The default 
+					for limit is -1 which will show all testimonials and not use any paging.
 			</ol>
 
 			<br /><br />
@@ -533,6 +544,23 @@ JS;
 					<td>Added to the hms-testimonial-container class if only 1 testimonial is shown.</td>
 				</tr>
 				<tr>
+					<td>paging</td>
+					<td>A div container for any pagination elements</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp; current-page</td>
+					<td>A span element that is the current page number.</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp; prev</td>
+					<td>The previous page link</td>
+				</tr>
+				<tr>
+					<td> &nbsp;&nbsp; next</td>
+					<td>The next page link</td>
+				</tr>
+
+				<tr>
 					<td>hms-testimonials-rotator</td>
 					<td>Added to the parent testimonial container for rotating testimonials</td>
 				</tr>
@@ -568,27 +596,99 @@ JS;
 			<table width="100%">
 				<tr>
 					<td>1</td>
-					<td>Testimonial, Author, URL</td>
+					<td>Testimonial, Author, URL, Date</td>
 				</tr>
 				<tr>
 					<td>2</td>
-					<td>Testimonial, URL, Author</td>
+					<td>Testimonial, URL, Author, Date</td>
 				</tr>
 				<tr>
 					<td>3</td>
-					<td>Author, Testimonial, URL</td>
+					<td>Author, Testimonial, URL, Date</td>
 				</tr>
 				<tr>
 					<td>4</td>
-					<td>Author, URL, Testimonial</td>
+					<td>Author, URL, Testimonial, Date</td>
 				</tr>
 				<tr>
 					<td>5</td>
-					<td>URL, Author, Testimonial</td>
+					<td>URL, Author, Testimonial, Date</td>
 				</tr>
 				<tr>
 					<td>6</td>
-					<td>URL, Testimonial, Author</td>
+					<td>URL, Testimonial, Author, Date</td>
+				</tr>
+				<tr>
+					<td>7</td>
+					<td>Testimonial, Author, Date, URL</td>
+				</tr>
+				<tr>
+					<td>8</td>
+					<td>Testimonial, URL, Date, Author</td>
+				</tr>
+				<tr>
+					<td>9</td>
+					<td>Testimonial, Date, Author, URL</td>
+				</tr>
+				<tr>
+					<td>10</td>
+					<td>Testimonial, Date, URL, Author</td>
+				</tr>
+				<tr>
+					<td>11</td>
+					<td>Author, Testimonial, Date, URL</td>
+				</tr>
+				<tr>
+					<td>12</td>
+					<td>Author, URL, Date, Testimonial</td>
+				</tr>
+				<tr>
+					<td>13</td>
+					<td>Author, Date, Testimonial, URL</td>
+				</tr>
+				<tr>
+					<td>14</td>
+					<td>Author, Date, URL, Testimonial</td>
+				</tr>
+				<tr>
+					<td>15</td>
+					<td>URL, Author, Date, Testimonial</td>
+				</tr>
+				<tr>
+					<td>16</td>
+					<td>URL, Testimonial, Date, Author</td>
+				</tr>
+				<tr>
+					<td>17</td>
+					<td>URL, Date, Author, Testimonial</td>
+				</tr>
+				<tr>
+					<td>18</td>
+					<td>URL, Date, Testimonial, Author</td>
+				</tr>
+				<tr>
+					<td>19</td>
+					<td>Date, Testimonial, Author, URL</td>
+				</tr>
+				<tr>
+					<td>20</td>
+					<td>Date, Testimonial, URL, Author</td>
+				</tr>
+				<tr>
+					<td>21</td>
+					<td>Date, Author, Testimonial, URL</td>
+				</tr>
+				<tr>
+					<td>22</td>
+					<td>Date, Author, URL, Testimonial</td>
+				</tr>
+				<tr>
+					<td>23</td>
+					<td>Date, URL, Author, Testimonial</td>
+				</tr>
+				<tr>
+					<td>24</td>
+					<td>Date, URL, Testimonial, Author</td>
 				</tr>
 			</table>
 
@@ -645,6 +745,13 @@ JS;
 					$url = $_POST['url'];
 			}
 
+			$testimonial_date = '0000-00-00 00:00:00';
+			if (isset($_POST['testimonial_date']) && ($_POST['testimonial_date'] != '')) {
+				$tdate = new DateTime($_POST['testimonial_date']);
+				if (($testimonial_date = $tdate->format('Y-m-d H:i:s')) === false)
+					$testimonial_date = '0000-00-00 00:00:00';
+			}
+
 
 			$display = 0;
 			if ($this->can_access('autoapprove')) {
@@ -662,7 +769,7 @@ JS;
 					array(
 						'blog_id' => $this->blog_id, 'user_id' => $this->current_user->ID, 'name' => trim($_POST['name']), 
 						'testimonial' => trim($_POST['testimonial']), 'display' => $display, 'display_order' => ($display_order+1),
-						'url' => $url, 'created_at' => date('Y-m-d h:i:s')));
+						'url' => $url, 'testimonial_date' => $testimonial_date, 'created_at' => date('Y-m-d h:i:s')));
 
 				$id = $this->wpdb->insert_id;
 				$added = 1;
@@ -682,6 +789,7 @@ JS;
 					$message .= 'Website: '.$url."\r\n";
 					$message .= 'Testimonial: '. trim($_POST['testimonial'])."\r\n";
 					$message .= 'Displayed: '. (($display==1) ? 'Yes' : 'No')."\r\n";
+					$message .= 'Testimonial Date: '.$testimonial_date."\r\n";
 					$message .= "\r\n\r\n";
 					$message .= 'View this testimonial at '.admin_url('admin.php?page=hms-testimonials-view&id='.$id);
 
@@ -725,6 +833,14 @@ JS;
 						</div>
 
 						<div class="stuffbox">
+							<h3><label for="testimonial_date">Testimonial Date:</label></h3>
+							<div class="inside">
+								<input type="text" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo @$_POST['testimonial_date']; ?>" />
+								<p>Example: <?php echo date('m/d/Y'); ?></p>
+							</div>
+						</div>
+
+						<div class="stuffbox">
 							<h3><label for="website">Website:</label></h3>
 							<div class="inside">
 								<input type="text" id="website" name="url" size="50" value="<?php echo @$_POST['url']; ?>" />
@@ -735,7 +851,7 @@ JS;
 						<div class="stuffbox">
 							<h3><label for="testimonial"><span style="color:red;">*</span> Testimonial:</label></h3>
 							<div class="inside">
-								<textarea id="testimonial" name="testimonial" style="width:99%;" rows="10"><?php echo @$_POST['testimonial']; ?></textarea>
+								<?php wp_editor(@$_POST['testimonial'], 'testimonial', array('textarea_name' => 'testimonial', 'textarea_rows' => 10) ); ?>
 								<br /><br />
 								<strong>HTML is allowed.</strong>
 							</div>
@@ -755,6 +871,8 @@ JS;
 									endforeach; ?>
 								</select><br /><br />
 								&nbsp;&nbsp; <a href="#" onclick="jQuery('#groups').val('');return false;" class="button">Clear Selected Groups</a>
+								<br /><br />
+								&nbsp;&nbsp; <strong>Hint:</strong> Hold down ctrl to select multiple groups.
 								<br /><br />
 							</div>
 						<?php } ?>
@@ -832,10 +950,18 @@ JS;
 			if (count($errors)<1) {
 				$_POST = stripslashes_deep($_POST);
 
+				$testimonial_date = '0000-00-00 00:00:00';
+				if (isset($_POST['testimonial_date']) && ($_POST['testimonial_date'] != '')) {
+					$tdate = new DateTime($_POST['testimonial_date']);
+					if (($testimonial_date = $tdate->format('Y-m-d H:i:s')) === false)
+						$testimonial_date = '0000-00-00 00:00:00';
+				}
+
 				$updates = array(
 					'name' => trim($_POST['name']), 
 					'testimonial' => trim($_POST['testimonial']), 
-					'url' => $url
+					'url' => $url,
+					'testimonial_date' => $testimonial_date
 				);
 
 				if ($this->can_access('autoapprove'))
@@ -950,6 +1076,14 @@ JS;
 						</div>
 
 						<div class="stuffbox">
+							<h3><label for="testimonial_date">Testimonial Date:</label></h3>
+							<div class="inside">
+								<input type="text" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo (!isset($_POST['testimonial_date']) ? $get_testimonial['testimonial_date'] : $_POST['testimonial_date']); ?>" />
+								<p>Example: <?php echo date('m/d/Y'); ?></p>
+							</div>
+						</div>
+
+						<div class="stuffbox">
 							<h3><label for="website">Website:</label></h3>
 							<div class="inside">
 								<input type="text" id="website" name="url" size="50" value="<?php echo (!isset($_POST['url']) ? $get_testimonial['url'] : $_POST['url']); ?>" />
@@ -960,7 +1094,7 @@ JS;
 						<div class="stuffbox">
 							<h3><label for="testimonial">Testimonial:</label></h3>
 							<div class="inside">
-								<textarea id="testimonial" name="testimonial" style="width:99%;" rows="10"><?php echo (!isset($_POST['testimonial']) ? $get_testimonial['testimonial'] : $_POST['testimonial']); ?></textarea>
+								<?php wp_editor((!isset($_POST['testimonial']) ? $get_testimonial['testimonial'] : $_POST['testimonial']), 'testimonial', array('textarea_name' => 'testimonial', 'textarea_rows' => 10) ); ?>
 								<br /><br />
 								<strong>HTML is allowed.</strong>
 							</div>
@@ -991,6 +1125,9 @@ JS;
 									?>
 								</select><br /><br />
 								&nbsp;&nbsp; <a href="#" onclick="jQuery('#groups').val('');return false;" class="button">Clear Selected Groups</a>
+								<br /><br />
+								&nbsp;&nbsp; <strong>Hint:</strong> Hold down ctrl to select multiple groups.
+								
 								<br /><br /><br />
 						</div>
 						<?php } ?>
@@ -1148,11 +1285,13 @@ JS;
 						foreach($get as $g) {
 							?>
 							<tr>
-								<td><a href="<?php echo admin_url('admin.php?page=hms-testimonials-viewgroup&id='.$g['id']); ?>"><?php echo $g['id']; ?></td>
+								<td><a href="<?php echo admin_url('admin.php?page=hms-testimonials-viewgroup&id='.$g['id']); ?>"><?php echo $g['id']; ?></a></td>
 								<td><?php echo $g['name']; ?></td>
 								<td><?php echo $g['testimonials']; ?></td>
 								<td>[hms_testimonials group="<?php echo $g['id']; ?>"]</td>
-								<td><a href="<?php echo admin_url('admin.php?page=hms-testimonials-deletegroup&groupid='.$g['id']); ?>" onclick="if (!confirm('Are you sure you want to delete <?php echo $g['name']; ?>?')) return false;">Delete</a></td>
+								<td>f
+									<a href="<?php echo admin_url('admin.php?page=hms-testimonials-deletegroup&groupid='.$g['id']); ?>" onclick="if (!confirm('Are you sure you want to delete <?php echo $g['name']; ?>?')) return false;">Delete</a>
+								</td>
 							</tr>
 							<?php
 						}
@@ -1378,15 +1517,16 @@ JS;
 				<h3 align="center">Shortcode: [hms_testimonials group="<?php echo $get_group['id']; ?>"]</h3>
 				<br /><br />
 
-				<h3>Testimonials Currently In This Group ( <?php echo $num_in_group; ?> )</h3>
+				<h3><a href="#" class="group-tables-toggle" style="text-decoration:none;font-size:12px;">(+ Click to show)</a> Testimonials Currently In This Group ( <?php echo $num_in_group; ?> )</h3>
 				<input type="hidden" name="type" value="group" />
-				<table class="wp-list-table widefat">
+				<table class="wp-list-table widefat collapsed" id="group-tables">
 					<thead>
 						<tr>
 							<th>ID</th>
 							<th>Name</th>
 							<th>Testimonial</th>
 							<th>URL</th>
+							<th>Testimonial Date</th>
 							<th>Shortcode</th>
 							<th>Display?</th>
 							<th>Action</th>
@@ -1398,12 +1538,13 @@ JS;
 							<th>Name</th>
 							<th>Testimonial</th>
 							<th>URL</th>
+							<th>Testimonial Date</th>
 							<th>Shortcode</th>
 							<th>Display?</th>
 							<th>Action</th>
 						</tr>
 					</tfoot>
-					<tbody>
+					<tbody style="display:none;">
 						<?php
 
 						if (count($get)<1) { ?>
@@ -1415,13 +1556,17 @@ JS;
 								
 								?>
 								<tr>
-									<td><input type="hidden" name="sort[]" value="<?php echo $g['id']; ?>" /><a href="<?php echo admin_url('admin.php?page=hms-testimonials-view&id='.$g['id']); ?>"><?php echo $g['id']; ?></td>
+									<td><input type="hidden" name="sort[]" value="<?php echo $g['id']; ?>" /><a href="<?php echo admin_url('admin.php?page=hms-testimonials-view&id='.$g['id']); ?>"><?php echo $g['id']; ?></a></td>
 									<td><?php echo nl2br($g['name']); ?></td>
 									<td><?php echo substr(nl2br($g['testimonial']),0,100).'...'; ?></td>
 									<td><?php echo $g['url']; ?></td>
+									<td><?php if ($g['testimonial_date'] != '0000-00-00 00:00:00') echo date('m/d/Y', strtotime($g['testimonial_date'])); else echo 'Not Set'; ?></td>
 									<td>[hms_testimonials id="<?php echo $g['id']; ?>"]</td>
 									<td><?php echo ($g['display']==1) ? 'Yes' : 'No'; ?></td>
-									<td><a href="<?php echo admin_url('admin.php?page=hms-testimonials-deletefg&id='.$g['id'].'&group_id='.$get_group['id'].'&noheader=true'); ?>" onclick="if (!confirm('Are you sure you want to delete this testimonial from this group?')) return false;">Delete</a></td>
+									<td>
+										<a href="<?php echo admin_url('admin.php?page=hms-testimonials-view&id='.$g['id']); ?>">Edit</a> &nbsp;|&nbsp;
+										<a href="<?php echo admin_url('admin.php?page=hms-testimonials-deletefg&id='.$g['id'].'&group_id='.$get_group['id'].'&noheader=true'); ?>" onclick="if (!confirm('Are you sure you want to delete this testimonial from this group?')) return false;">Delete</a>
+									</td>
 								</tr>
 								<?php
 							}
@@ -1476,6 +1621,22 @@ JS;
 
 				<p class="submit"><input type="submit" name="save" value="Save Group" class="button-primary" /></p>
 				</form>
+
+				<script type="text/javascript">
+					jQuery('a.group-tables-toggle').click(function() {
+						if (jQuery('#group-tables').hasClass('collapsed')) {
+							jQuery('#group-tables').removeClass('collapsed');
+							jQuery('#group-tables tbody').css('display', 'table-row-group');
+							jQuery(this).text('(- Click to hide)');
+						} else {
+							jQuery('#group-tables tbody').css('display', 'none');
+							jQuery('#group-tables').addClass('collapsed');
+							jQuery(this).text('(+ Click to show)');
+						}
+
+						return false;
+					});
+				</script>
 
 				<?php
 				echo $this->load_sortable();
@@ -1555,27 +1716,37 @@ JS;
 		}
 	}
 
-	public static function template($template, $testimonial, $author, $url) {
+	public static function template($template, $testimonial, $author, $url, $date) {
 		switch((int)$template) {
 			case 1:
-			default:
-				return $testimonial.$author.$url;
-			break;
-			case 2:
-				return $testimonial.$url.$author;
-			break;
-			case 3:
-				return $author.$testimonial.$url;
-			break;
-			case 4:
-				return $author.$url.$testimonial;
-			break;
-			case 5:
-				return $url.$author.$testimonial;
-			break;
-			case 6:
-				return $url.$testimonial.$author;
-			break;
+			default: return $testimonial.$author.$url.$date;break;
+			case 2:	return $testimonial.$url.$author.$date;break;
+			case 3:	return $author.$testimonial.$url.$date;break;
+			case 4:	return $author.$url.$testimonial.$date;break;
+			case 5: return $url.$author.$testimonial.$date;break;
+			case 6: return $url.$testimonial.$author.$date;break;
+
+			case 7:	return $testimonial.$author.$date.$url;break;
+			case 8: return $testimonial.$url.$date.$author;break; 
+			case 9: return $testimonial.$date.$author.$url;break;
+			case 10: return $testimonial.$date.$url.$author;break;
+
+			case 11: return $author.$testimonial.$date.$url;break;
+			case 12: return $author.$url.$date.$testimonial;break;
+			case 13: return $author.$date.$testimonial.$url;break;
+			case 14: return $author.$date.$url.$testimonial;break;
+
+			case 15: return $url.$author.$date.$testimonial;break;
+			case 16: return $url.$testimonial.$date.$author;break;
+			case 17: return $url.$date.$author.$testimonial;break;
+			case 18: return $url.$date.$testimonial.$author;break;
+
+			case 19: return $date.$testimonial.$author.$url;break;
+			case 20: return $date.$testimonial.$url.$author;break;
+			case 21: return $date.$author.$testimonial.$url;break;
+			case 22: return $date.$author.$url.$testimonial;break;
+			case 23: return $date.$url.$author.$testimonial;break;
+			case 24: return $date.$url.$testimonial.$author;break;
 		}
 	}
 }
