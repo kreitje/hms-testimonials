@@ -74,6 +74,11 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 1.7.1 =
+* Miscellaneous bug fixes
+* Added "order" and "direction" attributes to the [hms_testimonials] shortcode. Valid items for "order" are name,testimonial,url,testimonial_date, and display_order. Valid directions are ASC and DESC
+* Added row classes to the form.
+
 = 1.7 =
 * Added the TinyMCE editor to the testimonial textarea
 * Added a testimonial date field.

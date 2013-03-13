@@ -778,8 +778,11 @@ JS;
 				if ($this->is_moderator()) {
 					if (isset($_POST['groups']) && is_array($_POST['groups'])) {
 						foreach($_POST['groups'] as $gid) {
-							if (isset($groups[$gid]))
-								$this->wpdb->insert($this->wpdb->prefix."hms_testimonials_group_meta", array('testimonial_id' => $id, 'group_id' => $gid));
+							if (isset($groups[$gid])) {
+								$row_count = $this->wpdb->get_var("SELECT COUNT(*) FROM `".$this->wpdb->prefix."hms_testimonials_group_meta` WHERE `group_id` = ".(int)$gid);
+
+								$this->wpdb->insert($this->wpdb->prefix."hms_testimonials_group_meta", array('testimonial_id' => $id, 'group_id' => $gid, 'display_order' => ($row_count + 1)));
+							}
 						}
 					}
 				} else {
@@ -902,7 +905,7 @@ JS;
 	public function testimonial_view_page() {
 
 		if (!isset($_GET['id'])||!is_numeric($_GET['id'])) $_GET['id'] = 0;
-		$get_testimonial = $this->wpdb->get_row("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials` WHERE `id` = ".(int)$_GET['id']." AND `blog_id` = ".(int)$this->blog_id, ARRAY_A);
+		$get_testimonial = $this->wpdb->get_row("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS testimonial_date FROM `".$this->wpdb->prefix."hms_testimonials` WHERE `id` = ".(int)$_GET['id']." AND `blog_id` = ".(int)$this->blog_id, ARRAY_A);
 
 
 		if (!$this->is_moderator()) {
@@ -1078,6 +1081,9 @@ JS;
 						<div class="stuffbox">
 							<h3><label for="testimonial_date">Testimonial Date:</label></h3>
 							<div class="inside">
+								<?php if ($get_testimonial['testimonial_date'] == '0/0/0000')
+									$get_testimonial['testimonial_date'] = '';
+								?>
 								<input type="text" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo (!isset($_POST['testimonial_date']) ? $get_testimonial['testimonial_date'] : $_POST['testimonial_date']); ?>" />
 								<p>Example: <?php echo date('m/d/Y'); ?></p>
 							</div>

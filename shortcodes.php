@@ -90,15 +90,15 @@ function hms_testimonials_form( $atts ) {
 <form method="post">
 <input type="hidden" name="hms_testimonial" value="1" />
 	<table class="hms-testimonials-form">
-		<tr>
+		<tr class="name">
 			<td>Name</td>
 			<td><input type="text" name="hms_testimonials_name" value="{$name}" />
 		</tr>
-		<tr>
+		<tr class="website">
 			<td>Website</td>
 			<td><input type="text" name="hms_testimonials_website" value="{$website}" />
 		</tr>
-		<tr>
+		<tr class="testimonial">
 			<td valign="top">Testimonial</td>
 			<td><textarea name="hms_testimonials_testimonial" rows="5" style="width:99%;">{$testimonial}</textarea></td>
 		</tr>
@@ -126,6 +126,8 @@ HTML;
 function hms_testimonials_show( $atts ) {
 	global $wpdb, $blog_id;
 
+	$order_by = array('name','testimonial','url','testimonial_date','display_order');
+
 	$settings = get_option('hms_testimonials');
 
 	extract(shortcode_atts(
@@ -138,9 +140,16 @@ function hms_testimonials_show( $atts ) {
 			'prev' => '&laquo;',
 			'next' => '&raquo;',
 			'location' => 'both',
-			'showdate' => true
+			'showdate' => true,
+			'order' => 'display_order',
+			'direction' => 'ASC'
 		), $atts
 	));
+
+	if (!in_array($order, $order_by))
+		$order = 'display_order';
+	if ($direction != 'DESC')
+		$direction = 'ASC';
 
 	if ($start != 0)
 		$start = (int)$start - 1;
@@ -154,12 +163,13 @@ function hms_testimonials_show( $atts ) {
 	if ($limit != -1) {
 
 		if ($group != 0) {
+
 			$get_count = $wpdb->get_results("SELECT t.* FROM `".$wpdb->prefix."hms_testimonials` AS t 
 									INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m
 										ON m.testimonial_id = t.id
-									WHERE t.blog_id = ".(int)$blog_id." AND t.display = 1 AND m.group_id = ".(int)$group." ORDER BY m.display_order ASC", ARRAY_A);
+									WHERE t.blog_id = ".(int)$blog_id." AND t.display = 1 AND m.group_id = ".(int)$group, ARRAY_A);
 		} else {
-			$get_count = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `display` = 1 ORDER BY `display_order` ASC", ARRAY_A);
+			$get_count = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `display` = 1", ARRAY_A);
 		}
 
 		$total_results = count($get_count);
@@ -222,12 +232,17 @@ function hms_testimonials_show( $atts ) {
 	} else {
 
 		if ($group != 0) {
+			if ($order == 'display_order')
+				$order = 'm.display_order';
+			else
+				$order = 't.'.$order;
+
 			$get = $wpdb->get_results("SELECT t.*, DATE_FORMAT(t.testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` AS t 
 									INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m
 										ON m.testimonial_id = t.id
-									WHERE t.blog_id = ".(int)$blog_id." AND t.display = 1 AND m.group_id = ".(int)$group." ORDER BY m.display_order ASC ".$sql_limit, ARRAY_A);
+									WHERE t.blog_id = ".(int)$blog_id." AND t.display = 1 AND m.group_id = ".(int)$group." ORDER BY ".$order." ".$direction." ".$sql_limit, ARRAY_A);
 		} else {
-			$get = $wpdb->get_results("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `display` = 1 ORDER BY `display_order` ASC ".$sql_limit, ARRAY_A);
+			$get = $wpdb->get_results("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `display` = 1 ORDER BY ".$order." ".$direction." ".$sql_limit, ARRAY_A);
 		}
 
 

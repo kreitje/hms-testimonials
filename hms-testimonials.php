@@ -3,7 +3,7 @@
 Plugin Name: HMS Testimonials
 Plugin URI: http://hitmyserver.com
 Description: Displays your customer testimonials.
-Version: 1.7
+Version: 1.7.1
 Author: HitMyServer LLC
 Author URI: http://hitmyserver.com
 */
@@ -15,7 +15,7 @@ require_once HMS_TESTIMONIALS . 'shortcodes.php';
 require_once HMS_TESTIMONIALS . 'widgets.php';
 require_once HMS_TESTIMONIALS . 'admin.php';
 
-$hms_testimonials_db_version = 8;
+$hms_testimonials_db_version = 9;
 
 
 
