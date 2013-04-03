@@ -1,17 +1,23 @@
 === Plugin Name ===
 Contributors: kreitje
 Donate link: hitmyserver.com/wordpress-plugins/
-Tags: testimonials, client reviews
+Tags: testimonials, reviews, client reviews, what they are saying
 Requires at least: 3.0.1
 Tested up to: 3.5
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Display your customer testimonials on pages or posts. Our new rotating shortcode allows you to display 1 quote at a time and rotate them after x amount of seconds. Use our widgets to display them in your sidebars and even have them rotate through. Use the settings area to allow your users to write their own testimonials on your site.
+Display your customer testimonials on pages or posts. Use groups to organize and display specific testimonnials on specific pages.
 
 
 == Description ==
+
+** Mega Changes **
+
+* Templates have been redone. You now create your own templates using drag and drop.
+* Custom fields! You can now add additional fields to your testimonials.
+* You can now add an image to your testimonial. This allows you show a picture of the person who submitted the testimonial.
 
 HMS Testimonials offers you three shortcodes and two widgets. The first shortcode allows you to show all of your testimonials, a group of testimonials or just a single testimonial. The second shortcode allows you to show all or a group of testimonials that rotate through one at a time. Our third shortcode will display a form on a page or post to alow your visitors to submit testimonials. This shortcode can be placed inside a page or a blog post. If your theme uses sidebars you can use one or both of the widgets we offer. The first widget does the same as our shortcode. It shows all, a group or just one testimonial. Our second widget rotates through the selected testimonials one at a time. After a few seconds it will fade out the old and fade in the new testimonial.
 
@@ -19,11 +25,6 @@ Create groups to display specific testimonials on different pages. You can chang
 
 Use the settings to allow access for your users to write testimonials about your company.
     
-**BIG Changes**
-
-* Add/Edit screens of testimonials now have the full WordPress Editor at your disposal. You **cannot** use shortcodes inside these.
-* Added a testimonial date field
-* The [hms_testimonials] attribute now supports pagination.
 
 == Installation ==
 
@@ -34,7 +35,7 @@ Use the settings to allow access for your users to write testimonials about your
 
 == Upgrade Notice ==
 
-If upgrading from version 1.3 to a new version please go to the settings and resave them.
+Go into Testimonials -> Templates and create new templates.
 
 == Frequently Asked Questions ==
 
@@ -73,6 +74,15 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 2.0 =
+* Create custom fields
+* Create your own templates for displaying your testimonials
+* Add an image from the gallery to your testimonial
+* Added the ability to change the collation of the testimonial fields. Useful for languages that require UTF-8
+* Some settings moved to an advanced settings page
+* Miscellaneous bug fixes
+* Set the date format
 
 = 1.7.1 =
 * Miscellaneous bug fixes

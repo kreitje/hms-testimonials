@@ -18,4 +18,4 @@ if (is_multisite()) {
 }
 
 
-$wpdb->query("DROP TABLE `".$wpdb->prefix."hms_testimonials`, `".$wpdb->prefix."hms_testimonials_groups`, `".$wpdb->prefix."hms_testimonials_group_meta`");
+$wpdb->query("DROP TABLE `".$wpdb->prefix."hms_testimonials`, `".$wpdb->prefix."hms_testimonials_groups`, `".$wpdb->prefix."hms_testimonials_group_meta`, `".$wpdb->prefix."hms_testimonials_cf`,`".$wpdb->prefix."hms_testimonials_cf_meta`,`".$wpdb->prefix."hms_testimonials_templates`");

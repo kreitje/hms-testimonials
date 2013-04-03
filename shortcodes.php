@@ -6,6 +6,9 @@ function hms_testimonials_form( $atts ) {
 
 
 	$settings = get_option('hms_testimonials');
+	$fields = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials_cf` WHERE `blog_id` = ".$blog_id." ORDER BY `name` ASC");
+
+	$field_count = count($fields);
 
 	require_once HMS_TESTIMONIALS . 'recaptchalib.php';
 	
@@ -18,6 +21,26 @@ function hms_testimonials_form( $atts ) {
 
 		if (!isset($_POST['hms_testimonials_testimonial']) || (($testimonial = trim(@$_POST['hms_testimonials_testimonial'])) == ''))
 			$errors[] = 'Please enter your testimonial.';
+
+		if ($field_count>0) {
+			foreach($fields as $f) {
+
+				if ($f->isrequired == 1 && (!isset($_POST['hms_testimonials_cf'][$f->id]) || trim($_POST['hms_testimonials_cf'][$f->id])=='')) {
+					$errors[] = $f->name.' is a required field.';
+					continue;
+				}
+
+				switch($f->type) {
+					case 'email':
+						if (!filter_var($_POST['hms_testimonials_cf'][$f->id], FILTER_VALIDATE_EMAIL))
+							$errors[] = 'Please enter a valid email for the '.$f->name.' field.';
+					break;
+				}
+
+				$cf_{$f->id} = $_POST['hms_testimonials_cf'][$f->id];
+
+			}
+		}
 
 		$website = '';
 		if (isset($_POST['hms_testimonials_website']) && ($_POST['hms_testimonials_website'] != '')) {
@@ -46,6 +69,7 @@ function hms_testimonials_form( $atts ) {
 
 		if (count($errors)>0)
 			$ret .= '<div class="hms_testimonial_errors">'.join('<br />', $errors).'</div><br />';
+
 		else {
 
 			$display_order = $wpdb->get_var("SELECT `display_order` FROM `".$wpdb->prefix."hms_testimonials` ORDER BY `display_order` DESC LIMIT 1");
@@ -54,11 +78,28 @@ function hms_testimonials_form( $atts ) {
 				array(
 					'blog_id' => $blog_id, 'user_id' => $current_user->ID, 'name' => $name, 
 					'testimonial' => $testimonial, 'display' => 0, 'display_order' => ($display_order+1),
-					'url' => $website, 'created_at' => date('Y-m-d h:i:s')
+					'url' => $website, 'created_at' => date('Y-m-d h:i:s'), 'testimonial_date' => date('Y-m-d h:i:s')
 				)
 			);
 
 			$id = $wpdb->insert_id;
+
+			$e_message = '';
+			if ($field_count > 0) {
+				foreach($fields as $f) {
+
+					if (isset($_POST['hms_testimonials_cf'][$f->id])) {
+						$wpdb->insert($wpdb->prefix."hms_testimonials_cf_meta", 
+							array(
+								'testimonial_id' => $id, 'key_id' => $f->id, 'value' => trim($_POST['hms_testimonials_cf'][$f->id])
+							)
+						);
+					}
+					$e_message .= $f->name.': '.@$_POST['hms_testimonials_cf'][$f->id]."\r\n";
+				}
+
+			}
+
 
 			$visitor_name = 'A visitor ';
 			if ($current_user->ID != 0)
@@ -68,6 +109,9 @@ function hms_testimonials_form( $atts ) {
 			$message .= 'Name: '. $name."\r\n";
 			$message .= 'Website: '.$website."\r\n";
 			$message .= 'Testimonial: '. $testimonial."\r\n";
+
+			$message .= $e_message;
+
 			$message .= "\r\n\r\n";
 			$message .= 'View this testimonial at '.admin_url('admin.php?page=hms-testimonials-view&id='.$id);
 
@@ -83,6 +127,11 @@ function hms_testimonials_form( $atts ) {
 		$name = $current_user->user_firstname.' '.$current_user->user_lastname;
 		$testimonial = '';
 		$website = '';
+
+		if ($field_count>0) {
+			foreach($fields as $f)
+				$cf_{$f->id} = '';
+		}
 	}
 
 
@@ -90,7 +139,7 @@ function hms_testimonials_form( $atts ) {
 <form method="post">
 <input type="hidden" name="hms_testimonial" value="1" />
 	<table class="hms-testimonials-form">
-		<tr class="name">
+		<tr class="name required">
 			<td>Name</td>
 			<td><input type="text" name="hms_testimonials_name" value="{$name}" />
 		</tr>
@@ -98,11 +147,35 @@ function hms_testimonials_form( $atts ) {
 			<td>Website</td>
 			<td><input type="text" name="hms_testimonials_website" value="{$website}" />
 		</tr>
-		<tr class="testimonial">
+		<tr class="testimonial required">
 			<td valign="top">Testimonial</td>
 			<td><textarea name="hms_testimonials_testimonial" rows="5" style="width:99%;">{$testimonial}</textarea></td>
 		</tr>
 HTML;
+
+	
+	if ($field_count>0) {
+		foreach($fields as $f) {
+			$ret .= '
+			<tr class="cf-'.strtolower($f->name).(($f->isrequired == 1) ? ' required' : '').'">
+				<td valign="top">'.$f->name.'</td>
+				<td>';
+
+				switch($f->type) {
+					case 'email':
+					case 'text':
+						$ret .= '<input type="text" name="hms_testimonials_cf['.$f->id.']" value="'.$cf_{$f->id}.'" />';
+					break;
+					case 'textarea':
+						$ret .= '<textarea name="hms_testimonials_cf['.$f->id.']" rows="5" style="width:99%;">'.$cf_{$f->id}.'</textarea>';
+					break;
+				}
+
+			$ret .='	</td>
+			</tr>';
+		}
+	}
+
 
 	if ($settings['use_recaptcha'] == 1) { 
 		$ret .= '<tr>
@@ -126,7 +199,7 @@ HTML;
 function hms_testimonials_show( $atts ) {
 	global $wpdb, $blog_id;
 
-	$order_by = array('name','testimonial','url','testimonial_date','display_order');
+	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand');
 
 	$settings = get_option('hms_testimonials');
 
@@ -140,19 +213,15 @@ function hms_testimonials_show( $atts ) {
 			'prev' => '&laquo;',
 			'next' => '&raquo;',
 			'location' => 'both',
-			'showdate' => true,
 			'order' => 'display_order',
-			'direction' => 'ASC'
+			'direction' => 'ASC',
 		), $atts
 	));
 
-	if (!in_array($order, $order_by))
-		$order = 'display_order';
-	if ($direction != 'DESC')
-		$direction = 'ASC';
-
-	if ($start != 0)
-		$start = (int)$start - 1;
+	if (!in_array($order, $order_by)) $order = 'display_order';
+	if ($order == 'rand') $order = 'RAND()';
+	if ($direction != 'DESC') $direction = 'ASC';
+	if ($start != 0) $start = (int)$start - 1;
 
 	$sql_limit = '';
 	
@@ -192,39 +261,12 @@ function hms_testimonials_show( $atts ) {
 
 	if ($id != 0) {
 
-		$get = $wpdb->get_row("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `id` = ".(int)$id." AND `display` = 1 LIMIT 1", ARRAY_A);
+		$get = $wpdb->get_row("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `id` = ".(int)$id." AND `display` = 1 LIMIT 1", ARRAY_A);
 		if (count($get)<1)
 			return '';
 
-		$ret = '<div class="hms-testimonial-container hms-testimonial-single">';
-
-		$testimonial = '<div class="testimonial">'.nl2br($get['testimonial']).'</div>';
-		$author = '<div class="author">'.nl2br($get['name']).'</div>';
-		$url = '';
-		if ($get['url'] != '') {
-			if (substr($get['url'],0,4)!='http')
-				$href = 'http://'.$get['url'];
-			else
-				$href = $get['url'];
-
-			if ($settings['show_active_links'] == 1) {
-				$nofollow = '';
-
-				if ($settings['active_links_nofollow'] == 1)
-					$nofollow = 'rel="nofollow"';
-
-				$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
-			} else {
-				$url = '<div class="url">'.$href.'</div>';
-			}
-		}
-
-		$date = '';
-		if ($showdate && $get['tdate'] != '0/0/0000')
-			$date = '<div class="date">'.$get['tdate'].'</div>';
-
-		$ret .= HMS_Testimonials::template($template, $testimonial, $author, $url, $date);
-
+		$ret = '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].' hms-testimonial-template-'.$template.'">';
+			$ret .= HMS_Testimonials::template($template, $get);
 		$ret .= '</div>';
 		
 
@@ -234,15 +276,15 @@ function hms_testimonials_show( $atts ) {
 		if ($group != 0) {
 			if ($order == 'display_order')
 				$order = 'm.display_order';
-			else
+			elseif ($order != 'RAND()')
 				$order = 't.'.$order;
-
-			$get = $wpdb->get_results("SELECT t.*, DATE_FORMAT(t.testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` AS t 
+			
+			$get = $wpdb->get_results("SELECT t.* FROM `".$wpdb->prefix."hms_testimonials` AS t 
 									INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m
 										ON m.testimonial_id = t.id
 									WHERE t.blog_id = ".(int)$blog_id." AND t.display = 1 AND m.group_id = ".(int)$group." ORDER BY ".$order." ".$direction." ".$sql_limit, ARRAY_A);
 		} else {
-			$get = $wpdb->get_results("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `display` = 1 ORDER BY ".$order." ".$direction." ".$sql_limit, ARRAY_A);
+			$get = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `blog_id` = ".(int)$blog_id." AND `display` = 1 ORDER BY ".$order." ".$direction." ".$sql_limit, ARRAY_A);
 		}
 
 
@@ -253,46 +295,17 @@ function hms_testimonials_show( $atts ) {
 
 		$paging = '';
 		if ($pages > 1)
-			$paging = hms_tesitmonials_build_pagination($current_page, $pages, $prev, $next);
+			$paging = hms_testimonials_build_pagination($current_page, $pages, $prev, $next);
 
 		if ($paging != '' && ($location == 'top' || $location == 'both'))
 				$ret .= '<div class="paging top">'.$paging.'</div>';
 
 		foreach($get as $g) {
 
-			$ret .= '<div class="hms-testimonial-container">';
+			$ret .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'">';
 
+				$ret .= HMS_Testimonials::template($template, $g);
 
-
-			$testimonial = '<div class="testimonial">'.nl2br($g['testimonial']).'</div>';
-			$author = '<div class="author">'.nl2br($g['name']).'</div>';
-
-			$url = '';
-			if ($g['url'] != '') {
-				if (substr($g['url'],0,4)!='http')
-					$href = 'http://'.$g['url'];
-				else
-					$href = $g['url'];
-
-
-				if ($settings['show_active_links'] == 1) {
-					$nofollow = '';
-
-					if ($settings['active_links_nofollow'] == 1)
-						$nofollow = 'rel="nofollow"';
-
-					$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
-				} else {
-					$url = '<div class="url">'.$href.'</div>';
-				}
-
-			}
-
-			$date = '';
-			if ($showdate && $g['tdate'] != '0/0/0000')
-				$date = '<div class="date">'.$g['tdate'].'</div>';
-
-			$ret .= HMS_Testimonials::template($template, $testimonial, $author, $url, $date);
 			$ret .= '</div>';
 
 
@@ -311,6 +324,7 @@ function hms_testimonials_show( $atts ) {
 function hms_testimonials_show_rotating( $atts ) {
 	global $wpdb, $blog_id;
 
+	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand');
 	$settings = get_option('hms_testimonials');
 
 	extract(shortcode_atts(
@@ -323,9 +337,16 @@ function hms_testimonials_show_rotating( $atts ) {
 			'link_next' => '&raquo;',
 			'link_pause' => 'Pause',
 			'link_play' => 'Play',
-			'showdate' => true
+			'order' => 'display_order',
+			'direction' => 'ASC',
+			
 		), $atts
 	));
+
+	if (!in_array($order, $order_by)) $order = 'display_order';
+	if ($order == 'rand') $order = 'RAND()';
+	if ($direction != 'DESC') $direction = 'ASC';
+
 
 	$random_string = '';
 	$characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -335,45 +356,26 @@ function hms_testimonials_show_rotating( $atts ) {
 
 
     if ($group == 0)
-		$get = $wpdb->get_results("SELECT *, DATE_FORMAT(testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` WHERE `display` = 1 AND `blog_id` = ".(int)$blog_id." ORDER BY `display_order` ASC ", ARRAY_A);
-	else
-		$get = $wpdb->get_results("SELECT t.*, DATE_FORMAT(t.testimonial_date, '%c/%e/%Y') AS tdate FROM `".$wpdb->prefix."hms_testimonials` AS t INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m ON m.testimonial_id = t.id WHERE m.group_id = ".(int)$group." AND t.blog_id = ".$blog_id." AND t.display = 1 ORDER BY m.display_order ASC", ARRAY_A);
+		$get = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials` WHERE `display` = 1 AND `blog_id` = ".(int)$blog_id." ORDER BY ".$order." ".$direction, ARRAY_A);
+	else {
+		if ($order == 'display_order')
+			$order = 'm.display_order';
+		elseif ($order != 'RAND()')
+			$order = 't.'.$order;
+
+		$get = $wpdb->get_results("SELECT t.* FROM `".$wpdb->prefix."hms_testimonials` AS t INNER JOIN `".$wpdb->prefix."hms_testimonials_group_meta` AS m ON m.testimonial_id = t.id WHERE m.group_id = ".(int)$group." AND t.blog_id = ".$blog_id." AND t.display = 1 ORDER BY ".$order." ".$direction, ARRAY_A);
+	}
+		
 
 
 
 	$return = '<div id="hms-testimonial-sc-'.$random_string.'" class="hms-testimonials-rotator">';
-		$return .= '<div class="hms-testimonial-container">';
+		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$get[0]['id'].' hms-testimonial-template-'.$template.'"">';
 						
-		$testimonial = '<div class="testimonial">'.nl2br($get[0]['testimonial']).'</div>';
-		$author = '<div class="author">'.nl2br($get[0]['name']).'</div>';
-		$url = '';
-
-		if ($get[0]['url']!='') {
-			if (substr($get[0]['url'],0,4)!='http')
-				$href = 'http://'.$get[0]['url'];
-			else
-				$href = $get['url'];
-
-			if ($settings['show_active_links'] == 1) {
-				$nofollow = '';
-
-				if ($settings['active_links_nofollow'] == 1)
-					$nofollow = 'rel="nofollow"';
-
-				$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
-			} else {
-				$url = '<div class="url">'.$href.'</div>';
-			}
-
-		}
-
-		$date = '';
-		if ($showdate && $get[0]['tdate'] != '0/0/0000')
-			$date = '<div class="date">'.$get[0]['tdate'].'</div>';
-
-		$return .= HMS_Testimonials::template($template, $testimonial, $author, $url, $date);
+		$return .= HMS_Testimonials::template($template, $get[0]);
 
 		$return .= '</div>';
+
 	if ($show_links && $show_links != "false")
 		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause pause">'.$link_pause.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
 	
@@ -383,36 +385,10 @@ function hms_testimonials_show_rotating( $atts ) {
 	$return .= '<div style="display:none;" id="hms-testimonial-sc-list-'.$random_string.'">';
 		
 	foreach($get as $g) {
-		$return .= '<div class="hms-testimonial-container">';
-		$testimonial = '<div class="testimonial">'.nl2br($g['testimonial']).'</div>';
-		$author = '<div class="author">'.nl2br($g['name']).'</div>';
-
-		$url = '';
-		if ($g['url']!='') {
-			if (substr($g['url'],0,4)!='http')
-				$href = 'http://'.$g['url'];
-			else
-				$href = $g['url'];
-
-			if ($settings['show_active_links'] == 1) {
-				$nofollow = '';
-
-				if ($settings['active_links_nofollow'] == 1)
-					$nofollow = 'rel="nofollow"';
-
-				$url = '<div class="url"><a '.$nofollow.' href="'.$href.'" target="_blank">'.$href.'</a></div>';
-			} else {
-				$url = '<div class="url">'.$href.'</div>';
-			}
-
-		}
-
-		$date = '';
-		if ($showdate && $g['tdate'] != '0/0/0000')
-			$date = '<div class="date">'.$g['tdate'].'</div>';
-
-		$return .= HMS_Testimonials::template($template, $testimonial, $author, $url, $date);
+		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'"">';
 		
+			$return .= HMS_Testimonials::template($template, $g);
+
 		$return .= '</div>';	
 	}
 	
@@ -499,7 +475,7 @@ JS;
 	return $return;
 }
 
-function hms_tesitmonials_build_pagination($current_page, $total_pages, $prev, $next) {
+function hms_testimonials_build_pagination($current_page, $total_pages, $prev, $next) {
 	$url = explode('?', $_SERVER['REQUEST_URI']);
 
 	if ($current_page > 1)
