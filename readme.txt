@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.1 =
+* Fixed a bug with templates not saving correctly
+
 = 2.0 =
 * Create custom fields
 * Create your own templates for displaying your testimonials

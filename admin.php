@@ -2426,7 +2426,7 @@ JS;
 
 	public function template_page() {
 
-		$templates = $this->wpdb->get_results("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials_templates` WHERE `blog_id` = ".(int)$this->blog_id, ARRAY_A);
+		$templates = $this->wpdb->get_results("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials_templates` WHERE `blog_id` = ".(int)$this->blog_id." ORDER BY `name` ASC", ARRAY_A);
 
 		?>
 		<div class="wrap">
@@ -2501,7 +2501,7 @@ JS;
 			foreach($fields as $f)
 				$user_fields[$f->id] = $f->name;	
 		}
-		
+		$id = 0;
 		
 
 		if (isset($_POST) && (count($_POST)>0)) {
@@ -2537,6 +2537,8 @@ JS;
 					$this->wpdb->insert($this->wpdb->prefix."hms_testimonials_templates", 
 						array('blog_id' => $this->blog_id, 'name' => $_POST['name'], 'data' => $saved_ar));
 
+					$id = $this->wpdb->insert_id;
+					
 					$_POST = array();
 					$added = 1;
 				}
@@ -2545,10 +2547,21 @@ JS;
 			}
 
 		}
-		$unused_fields = array_merge($system_fields, $user_fields);
-	
+
+		$unused_fields = array();
+		if (count($system_fields)>0) {
+			foreach($system_fields as $k => $v)
+				$unused_fields[$k] = $v;
+
+		}
+		if (count($user_fields)>0) {
+			foreach($user_fields as $i => $j)
+				$unused_fields[$i] = $j;
+
+		}
+
+
 		if (isset($added) && ($added == 1)) {
-			$unused_fields = array_merge($unused_fields, $used_fields);
 			$used_fields = array();
 		}
 
@@ -2573,7 +2586,7 @@ JS;
 				<div id="message" class="updated"><p><?php echo strip_tags(urldecode($_GET['message'])); ?></p></div>
 			<?php } ?>
 			<?php if (isset($added)) {
-				echo '<div id="message" class="updated"><p>Your testimonial has been saved.</p></div>';
+				echo '<div id="message" class="updated"><p>Your testimonial has been saved. <a href="'.admin_url('admin.php?page=hms-testimonials-templates-edit&id='.$id).'">View it here</a></p></div>';
 			}
 			if (count($errors)>0) {
 				echo '<div class="error"><p><strong>The following errors occured:</strong></p><ol>';
@@ -2744,7 +2757,7 @@ JS;
 				$submitted = 1;
 			}
 
-			$unused_fields = array_merge($system_fields, $user_fields);
+			
 		} else {
 			$data = array();
 			if ($template['data'] != '')
@@ -2768,9 +2781,21 @@ JS;
 				}				
 			}
 
-			$unused_fields = array_merge($system_fields, $user_fields);
 			$_POST['name'] = $template['name'];
 		}
+
+		$unused_fields = array();
+		if (count($system_fields)>0) {
+			foreach($system_fields as $k => $v)
+				$unused_fields[$k] = $v;
+		}
+
+		if (count($user_fields)>0) {
+			foreach($user_fields as $i => $j)
+				$unused_fields[$i] = $j;
+		}
+
+		
 
 		?>
 		<style type="text/css">
