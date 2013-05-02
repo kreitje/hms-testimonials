@@ -75,6 +75,10 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.2 =
+* Now Catches an exception thrown on the testimonial date field when using a date format that DateTime doesn't like. A friendlier message is now shown.
+* Added the jQuery UI datepicker to the testimonial date.
+
 = 2.0.1 =
 * Fixed a bug with templates not saving correctly
 

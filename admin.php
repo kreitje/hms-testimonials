@@ -138,6 +138,13 @@ class HMS_Testimonials {
 	public static function enqueue_scripts() {
 		wp_enqueue_script('jquery-ui-sortable');
 		wp_enqueue_script('jquery-ui-droppable');
+		wp_enqueue_script('jquery-ui-datepicker');
+
+		wp_enqueue_style('plugin_name-admin-ui-css',
+                'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/smoothness/jquery-ui.css',
+                false,
+                '2.0.1',
+                false);
 	}
 
 	public function admin_head() {
@@ -981,9 +988,13 @@ JS;
 
 			$testimonial_date = '0000-00-00 00:00:00';
 			if (isset($_POST['testimonial_date']) && ($_POST['testimonial_date'] != '')) {
-				$tdate = new DateTime($_POST['testimonial_date']);
-				if (($testimonial_date = $tdate->format('Y-m-d H:i:s')) === false)
-					$testimonial_date = '0000-00-00 00:00:00';
+				try {
+					$tdate = new DateTime($_POST['testimonial_date']);
+					if (($testimonial_date = $tdate->format('Y-m-d H:i:s')) === false)
+						$testimonial_date = '0000-00-00 00:00:00';
+				} catch(Exception $e) {
+					$errors[] = 'Please enter a valid testimonial date. Use the format mm/dd/YYYY such as '.date('m/d/Y');
+				}
 			}
 
 			$image_url = '';
@@ -1113,7 +1124,7 @@ JS;
 						<div class="stuffbox">
 							<h3><label for="testimonial_date">Testimonial Date:</label></h3>
 							<div class="inside">
-								<input type="text" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo @$_POST['testimonial_date']; ?>" />
+								<input type="text" class="datepicker" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo @$_POST['testimonial_date']; ?>" />
 								<p>Example: <?php echo date('m/d/Y'); ?></p>
 							</div>
 						</div>
@@ -1202,6 +1213,11 @@ JS;
 			</form>
 		</div>
 
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+				jQuery('.datepicker').datepicker({changeMonth: true, changeYear: true});
+			});
+		</script>
 		
 		<?php
 		echo $this->load_media_frame();
@@ -1279,6 +1295,18 @@ JS;
 					$url = $_POST['url'];
 			}
 
+			$testimonial_date = '0000-00-00 00:00:00';
+			if (isset($_POST['testimonial_date']) && ($_POST['testimonial_date'] != '')) {
+				try {
+					$tdate = new DateTime($_POST['testimonial_date']);
+					if (($testimonial_date = $tdate->format('Y-m-d H:i:s')) === false)
+						$testimonial_date = '0000-00-00 00:00:00';
+				} catch(Exception $e) {
+					$errors[] = 'Please enter a valid testimonial date. Use the format mm/dd/YYYY such as '.date('m/d/Y');
+				}
+			}
+
+
 			$new_groups = array();
 			$display = 0;
 			
@@ -1288,12 +1316,6 @@ JS;
 			if (count($errors)<1) {
 				$_POST = stripslashes_deep($_POST);
 
-				$testimonial_date = '0000-00-00 00:00:00';
-				if (isset($_POST['testimonial_date']) && ($_POST['testimonial_date'] != '')) {
-					$tdate = new DateTime($_POST['testimonial_date']);
-					if (($testimonial_date = $tdate->format('Y-m-d H:i:s')) === false)
-						$testimonial_date = '0000-00-00 00:00:00';
-				}
 
 				if (isset($_POST['image']) && ($_POST['image'] != 0)) {
 					$image_url = wp_get_attachment_url($_POST['image']);
@@ -1474,7 +1496,7 @@ JS;
 								<?php if ($get_testimonial['testimonial_date'] == '0/0/0000')
 									$get_testimonial['testimonial_date'] = '';
 								?>
-								<input type="text" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo (!isset($_POST['testimonial_date']) ? $get_testimonial['testimonial_date'] : $_POST['testimonial_date']); ?>" />
+								<input type="text" class="datepicker" id="testimonial_date" name="testimonial_date" size="50" value="<?php echo (!isset($_POST['testimonial_date']) ? $get_testimonial['testimonial_date'] : $_POST['testimonial_date']); ?>" />
 								<p>Example: <?php echo date('m/d/Y'); ?></p>
 							</div>
 						</div>
@@ -1585,6 +1607,11 @@ JS;
 			}
 			?>
 		</div>
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+				jQuery('.datepicker').datepicker({changeMonth: true, changeYear: true});
+			});
+		</script>
 		<?php
 		echo $this->load_media_frame();
 	}
