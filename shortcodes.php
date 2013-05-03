@@ -134,21 +134,25 @@ function hms_testimonials_form( $atts ) {
 		}
 	}
 
+	$name_text = apply_filters('hms_testimonials_sc_name', 'Name');
+	$website_text = apply_filters('hms_testimonials_sc_website', 'Website');
+	$testimonial_text = apply_filters('hms_testimonials_sc_testimonial', 'Testimonial');
+	$submit_text = apply_filters('hms_testimonials_sc_submit', 'Submit Testimonial');
 
 	$ret .= <<<HTML
 <form method="post">
 <input type="hidden" name="hms_testimonial" value="1" />
 	<table class="hms-testimonials-form">
 		<tr class="name required">
-			<td>Name</td>
+			<td>{$name_text}</td>
 			<td><input type="text" name="hms_testimonials_name" value="{$name}" />
 		</tr>
 		<tr class="website">
-			<td>Website</td>
+			<td>{$website_text}</td>
 			<td><input type="text" name="hms_testimonials_website" value="{$website}" />
 		</tr>
 		<tr class="testimonial required">
-			<td valign="top">Testimonial</td>
+			<td valign="top">{$testimonial_text}</td>
 			<td><textarea name="hms_testimonials_testimonial" rows="5" style="width:99%;">{$testimonial}</textarea></td>
 		</tr>
 HTML;
@@ -187,7 +191,7 @@ HTML;
 	$ret .= <<<HTML
 		<tr>
 			<td>&nbsp;</td>
-			<td><input type="submit" value="Submit Testimonial" /></td>
+			<td><input type="submit" value="{$submit_text}" /></td>
 		</tr>
 	</table>
 </form>
@@ -423,7 +427,6 @@ function hms_testimonials_show_rotating( $atts ) {
 					if (new_index < 0) {
 						new_index = (jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").length - 1);
 					}
-					console.log(new_index);
 
 					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(new_index);
 					if (nextitem == undefined) {

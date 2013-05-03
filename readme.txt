@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.3 =
+* Added filters to change the text for the public testimonial form fields.  hms_testimonials_sc_name, hms_testimonials_sc_website, hms_testimonials_sc_testimonial and hms_testimonials_sc_submit
+
 = 2.0.2 =
 * Now Catches an exception thrown on the testimonial date field when using a date format that DateTime doesn't like. A friendlier message is now shown.
 * Added the jQuery UI datepicker to the testimonial date.

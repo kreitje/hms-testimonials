@@ -748,7 +748,8 @@ JS;
 				<a href="#hms_testimonials_widgets">Widgets</a> | 
 				<a href="#hms_testimonials_css">CSS Classes</a> | 
 				<a href="#hms_testimonials_templates">Templates</a> | 
-				<a href="#date_format">Date Format</a>
+				<a href="#date_format">Date Format</a> | 
+				<a href="#form_shortcode">Form Short Code</a>
 			<br /><br />
 
 			
@@ -907,7 +908,33 @@ JS;
 					<td><?php echo date('M d, Y'); ?>
 				</tr>
 			</table>
+			<br />
 
+			<h3 id="form_shortcode">Form Shortcode</h3>
+			<p>The [hms_testimonials_form] shortcode allows you to have visitors submit testimonials to you. 
+				When they do, you will receive an email and can go approve the testimonial.</p>
+
+			<p>At times you may want to change the text on the form fields.  We have built in 4 filters for the default fields.</p>
+			<ol>
+				<li>hms_testimonials_sc_name - Changes the "Name" text.</li>
+				<li>hms_testimonials_sc_website - Changes the "Website" text.</li>
+				<li>hms_testimonials_sc_testimonial - Changes the "Testimonial" text.</li>
+				<li>hms_testimonials_sc_submit - Changes the text for the submit button.</li>
+			</ol>
+
+			<p>You can add these filters into your themes functions.php file.</p>
+			<br />
+
+			<strong>Example to change "Name" to "Please Enter Your Name":</strong>
+			<pre style="color:red;">
+function hms_name_override($text) {
+	return 'Please Enter Your Name';
+}
+add_filter('hms_testimonials_sc_name', 'hms_name_override');
+			</pre>
+
+
+			</pre>
 
 			<br /><br />
 
