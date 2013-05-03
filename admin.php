@@ -75,8 +75,8 @@ class HMS_Testimonials {
 			update_option('hms_testimonials', $this->options);
 		}
 
-
-		self::enqueue_scripts();
+		if (is_admin())
+			self::enqueue_scripts();
 
 	}
 
@@ -140,14 +140,11 @@ class HMS_Testimonials {
 		wp_enqueue_script('jquery-ui-droppable');
 		wp_enqueue_script('jquery-ui-datepicker');
 
-		wp_enqueue_style('plugin_name-admin-ui-css',
-                'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/smoothness/jquery-ui.css',
-                false,
-                '2.0.1',
-                false);
+		wp_enqueue_style('plugin_name-admin-ui-css', plugins_url( '/jquery-ui.css' , __FILE__ ), false, '2.0.3', false);
 	}
 
 	public function admin_head() {
+		
 		?>
 		<style type="text/css">
 			.hms-testimonials-notice {
