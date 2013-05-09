@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.4 =
+* Fixed a few issues noticed by Brit Albritton on the forums.
+
 = 2.0.3 =
 * Added filters to change the text for the public testimonial form fields.  hms_testimonials_sc_name, hms_testimonials_sc_website, hms_testimonials_sc_testimonial and hms_testimonials_sc_submit
 

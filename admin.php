@@ -89,7 +89,7 @@ class HMS_Testimonials {
 
 	public function admin_menus() {
 		
-		if ($this->user_role_num >= $this->options['roleorder'][$this->options['role']]) {
+		if ($this->user_role_num >= $this->options['roleorders'][$this->options['role']]) {
 			$hook = add_menu_page('HMS Testimonials', 'Testimonials', $this->user_role, 'hms-testimonials', array($this, 'admin_page'));
 
 			add_submenu_page('hms-testimonials', 'Add New Testimonial', '&nbsp;&nbsp;Add New', $this->user_role, 'hms-testimonials-addnew', array($this, 'testimonial_new_page'));
@@ -949,6 +949,7 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 
 	public function testimonial_new_page() {
 
+		$image_url = '';
 
 		if (!$this->is_moderator() && $this->options['num_users_can_create']>=0) {
 			$get_count = $this->wpdb->get_results("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials` WHERE `user_id` = ".(int)$this->current_user->ID);
@@ -1021,7 +1022,6 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 				}
 			}
 
-			$image_url = '';
 			if (isset($_POST['image']) && ($_POST['image'] != 0))
 				$image_url = wp_get_attachment_url($_POST['image']);
 			
