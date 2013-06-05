@@ -3294,18 +3294,18 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 		foreach(self::$template_cache[$template_id] as $k) {
 			switch($k) {
 				case 'system_id':
-					$builder .= '<div class="id">'.$testimonial['id'].'</div>';
+					$builder .= '<div class="id">'.apply_filters('hms_testimonials_system_id', $testimonial['id'], $testimonial).'</div>';
 				break;
 				case 'system_testimonial':
-					$builder .= '<div class="testimonial">'.nl2br($testimonial['testimonial']).'</div>';
+					$builder .= '<div class="testimonial">'.apply_filters('hms_testimonials_system_testimonial', nl2br($testimonial['testimonial']), $testimonial).'</div>';
 				break;
 				case 'system_source':
-					$builder .= '<div class="author">'.nl2br($testimonial['name']).'</div>';
+					$builder .= '<div class="author">'.apply_filters('hms_testimonials_system_source', nl2br($testimonial['name']), $testimonial).'</div>';
 				break;
 				case 'system_date':
 					$date = strtotime($testimonial['testimonial_date']);
 					$show_date = date(HMS_Testimonials::getInstance()->options['date_format'], $date);
-					$builder .= '<div class="date">'.(($testimonial['testimonial_date'] == '0000-00-00 00:00:00') ? '' : $show_date).'</div>';
+					$builder .= '<div class="date">'.apply_filters('hms_testimonials_system_date', (($testimonial['testimonial_date'] == '0000-00-00 00:00:00') ? '' : $show_date), $testimonial).'</div>';
 				break;
 				case 'system_url':
 					$url = '';
@@ -3329,7 +3329,7 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 
 					}
 
-					$builder .= '<div class="url">'.$url.'</div>';
+					$builder .= '<div class="url">'.apply_filters('hms_testimonials_system_url', $url, $testimonial).'</div>';
 					
 				break;
 				case 'system_image':
@@ -3340,13 +3340,16 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 					$height = HMS_Testimonials::getInstance()->options['image_height'].'px';
 					$width = HMS_Testimonials::getInstance()->options['image_width'].'px';
 
-					$builder .= '<img class="image" src="'.$image_url.'" style="height:'.$height.';width:'.$width.';" />';
+					$builder .= apply_filters('hms_testimonials_system_image', '<img class="image" src="'.$image_url.'" style="height:'.$height.';width:'.$width.';" />', $testimonial);
 
 				break;
 				default:
 
-					if (isset($custom_fields[(int)$k]))
-						$builder .= '<div class="cf-'.strtolower($custom_fields_names[$k]).'">'.$custom_fields[$k].'</div>';
+					if (isset($custom_fields[(int)$k])) {
+						$lower = strtolower($custom_fields_names[$k]);
+						$builder .= '<div class="cf-' . $lower . '">'.apply_filters('hms_testimonials_cf_' . $lower, $custom_fields[$k], $testimonial).'</div>';
+
+					}
 
 				break;
 			}

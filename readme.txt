@@ -75,6 +75,23 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.6 =
+* Added filters to the templates. hms_testimonials_system_id, hms_testimonials_system_testimonial, hms_testimonials_system_source, hms_testimonials_system_date, hms_testimonials_system_url, hms_testimonials_system_image, and all custom fields fall under hms_testimonials_cf_ with their name lower cased.
+
+An example to limit a testimonial to 100 characters:
+
+function testimonial_go($text) {
+	return substr($text, 0, 100);
+}
+add_filter('hms_testimonials_system_testimonial', 'testimonial_go');
+
+If you change the code to the following, you can get access to the testimonial array:
+
+function testimonial_go($text, $testimonial) {
+	return substr($text, 0, 100);
+}
+add_filter('hms_testimonials_system_testimonial', 'testimonial_go', 10, 2);
+
 = 2.0.5 =
 * Fixed a bug with pagination when not using permalinks. This also fixes an issue if you had any other query arguments in your url as well.
 
