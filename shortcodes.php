@@ -134,6 +134,10 @@ function hms_testimonials_form( $atts ) {
 		}
 	}
 
+	/**
+	 * Adding filters to the default fields. Their value defaults to the second parameter
+	 **/
+
 	$name_text = apply_filters('hms_testimonials_sc_name', 'Name');
 	$website_text = apply_filters('hms_testimonials_sc_website', 'Website');
 	$testimonial_text = apply_filters('hms_testimonials_sc_testimonial', 'Testimonial');
@@ -478,22 +482,35 @@ JS;
 	return $return;
 }
 
+/**
+ * Create pagination links
+ **/
+
 function hms_testimonials_build_pagination($current_page, $total_pages, $prev, $next) {
 	$url = explode('?', $_SERVER['REQUEST_URI']);
 
+	if (isset($_GET['hms_testimonials_page']))
+		unset($_GET['hms_testimonials_page']);
+
+	if (count($_GET)>0)
+		$url[0] .= '?'. http_build_query($_GET) . '&';
+	else
+		$url[0] .= '?';
+
+
 	if ($current_page > 1)
-		$return .= '<a href="'.$url[0].'?hms_testimonials_page='.($current_page - 1).'" class="prev">'.$prev.'</a> ';
+		$return .= '<a href="' . $url[0] . 'hms_testimonials_page='.($current_page - 1).'" class="prev">'.$prev.'</a> ';
 
 	for($x = 1; $x <= $total_pages; $x++) {
 
 		if ($x == $current_page)
 			$return .= '<span class="current-page">'.$x.'</span> ';
 		else
-			$return .= '<a href="'.$url[0].'?hms_testimonials_page='.$x.'">'.$x.'</a> ';
+			$return .= '<a href="'.$url[0] . 'hms_testimonials_page='.$x.'">'.$x.'</a> ';
 	}
 
 	if ($current_page < $total_pages)
-		$return .= '<a href="'.$url[0].'?hms_testimonials_page='.($current_page + 1).'" class="next">'.$next.'</a> ';
+		$return .= '<a href="'.$url[0] . 'hms_testimonials_page='.($current_page + 1).'" class="next">'.$next.'</a> ';
 
 	return $return;
 }

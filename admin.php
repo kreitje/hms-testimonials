@@ -3133,6 +3133,9 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 		<?php
 	}
 
+	/**
+	 * Save the sort order in the background as an ajax call
+	 **/
 
 	public function ajax_sort_save() {
 
@@ -3192,6 +3195,11 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 		die;
 	}
 
+	/**
+	 * Loads the WordPress media frame for uploading images to testimonials.
+	 * Why do it ourselves when WordPress does a great job of it.
+	 **/
+
 	public function load_media_frame() {
 		?>
 		<script type="text/javascript">
@@ -3240,6 +3248,11 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 		</script>
 		<?php
 	}
+
+	/**
+	 * Takes the template id and loads the testimonial in it.
+	 * If the template does not exist it shows the source (name) and testimonial as a fall back.
+	 **/
 
 	public static function template($template_id, $testimonial) {
 		global $wpdb, $blog_id;

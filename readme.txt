@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.5 =
+* Fixed a bug with pagination when not using permalinks. This also fixes an issue if you had any other query arguments in your url as well.
+
 = 2.0.4 =
 * Fixed a few issues noticed by Brit Albritton on the forums.
 
