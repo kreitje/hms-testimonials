@@ -17,23 +17,23 @@ function hms_testimonials_form( $atts ) {
 		$errors = array();
 
 		if (!isset($_POST['hms_testimonials_name']) || (($name = trim(@$_POST['hms_testimonials_name'])) == ''))
-			$errors[] = 'Please enter your name.';
+			$errors[] = __('Please enter your name.', 'hms-testimonials' );
 
 		if (!isset($_POST['hms_testimonials_testimonial']) || (($testimonial = trim(@$_POST['hms_testimonials_testimonial'])) == ''))
-			$errors[] = 'Please enter your testimonial.';
+			$errors[] = __('Please enter your testimonial.', 'hms-testimonials' );
 
 		if ($field_count>0) {
 			foreach($fields as $f) {
 
 				if ($f->isrequired == 1 && (!isset($_POST['hms_testimonials_cf'][$f->id]) || trim($_POST['hms_testimonials_cf'][$f->id])=='')) {
-					$errors[] = $f->name.' is a required field.';
+					$errors[] = sprintf( __('%1$s is a required field.', 'hms-testimonials' ), $f->name );
 					continue;
 				}
 
 				switch($f->type) {
 					case 'email':
 						if (!filter_var($_POST['hms_testimonials_cf'][$f->id], FILTER_VALIDATE_EMAIL))
-							$errors[] = 'Please enter a valid email for the '.$f->name.' field.';
+							$errors[] = sprintf( __('Please enter a valid email for the %1$s field.', 'hms-testimonials'), $f->name );
 					break;
 				}
 
@@ -47,7 +47,7 @@ function hms_testimonials_form( $atts ) {
 			$website = $_POST['hms_testimonials_website'];
 
 			if (!filter_var($website, FILTER_VALIDATE_URL))
-				$errors[] = 'Please enter a valid URL.';
+				$errors[] = __('Please enter a valid URL.', 'hms-testimonials' );
 			
 		}
 
@@ -57,10 +57,10 @@ function hms_testimonials_form( $atts ) {
         	if (!$resp->is_valid) {
         		switch($resp->error) {
         			case 'incorrect-captcha-sol':
-        				$errors[] = 'You entered an incorrect captcha. Please try again.';
+        				$errors[] = __('You entered an incorrect captcha. Please try again.', 'hms-testimonials' );
         			break;
         			default:
-        				$errors[] = 'An error occured with your captcha. ( '.$resp->error.' )';
+        				$errors[] = sprintf( __('An error occured with your captcha. ( %1$s )', 'hms-testimonials' ), $resp->error );
         			break;
         		}
         	}
@@ -101,24 +101,24 @@ function hms_testimonials_form( $atts ) {
 			}
 
 
-			$visitor_name = 'A visitor ';
+			$visitor_name = __('A visitor', 'hms-testimonials' ) .' ';
 			if ($current_user->ID != 0)
 				$visitor_name = $current_user->user_login.' ';
 
-			$message = $visitor_name.' has added a testimonial to your site '.get_bloginfo('name')."\r\n\r\n";
-			$message .= 'Name: '. $name."\r\n";
-			$message .= 'Website: '.$website."\r\n";
-			$message .= 'Testimonial: '. $testimonial."\r\n";
+			$message = sprintf( __('%1$s as added a testimonial to your site %2$s', 'hms-testimonials' ), $visitor_name, get_bloginfo('name'))."\r\n\r\n";
+			$message .= sprintf( __('Name: %1$s', 'hms-testimonials' ), $name)."\r\n";
+			$message .= sprintf( __('Website: %1$s', 'hms-testimonials' ), $website)."\r\n";
+			$message .= sprintf( __('Testimonial: %1$s', 'hms-testimonials' ), $testimonial)."\r\n";
 
 			$message .= $e_message;
 
 			$message .= "\r\n\r\n";
-			$message .= 'View this testimonial at '.admin_url('admin.php?page=hms-testimonials-view&id='.$id);
+			$message .= sprintf( __('View this testimonial at %1$s', 'hms-testimonials' ), admin_url('admin.php?page=hms-testimonials-view&id='.$id));
 
-			wp_mail(get_bloginfo('admin_email'), 'New Visitor Testimonial Added to '.get_bloginfo('name'), $message);
+			wp_mail(get_bloginfo('admin_email'), sprintf( __('New Visitor Testimonial Added to %1$s', 'hms-testimonials' ), get_bloginfo('name') ), $message);
 				
 			if (!isset($settings['guest_submission_redirect']) || ($settings['guest_submission_redirect'] == ''))
-				return '<div class="hms_testimonial_success">Your testimonial has been submitted.</div>';
+				return '<div class="hms_testimonial_success">' . __('Your testimonial has been submitted.', 'hms-testimonials' ) . '</div>';
 			else
 				die(header('Location: '.$settings['guest_submission_redirect']));
 		}
@@ -138,10 +138,10 @@ function hms_testimonials_form( $atts ) {
 	 * Adding filters to the default fields. Their value defaults to the second parameter
 	 **/
 
-	$name_text = apply_filters('hms_testimonials_sc_name', 'Name');
-	$website_text = apply_filters('hms_testimonials_sc_website', 'Website');
-	$testimonial_text = apply_filters('hms_testimonials_sc_testimonial', 'Testimonial');
-	$submit_text = apply_filters('hms_testimonials_sc_submit', 'Submit Testimonial');
+	$name_text = apply_filters('hms_testimonials_sc_name', __('Name', 'hms-testimonials' ));
+	$website_text = apply_filters('hms_testimonials_sc_website', __('Website', 'hms-testimonials' ));
+	$testimonial_text = apply_filters('hms_testimonials_sc_testimonial', __('Testimonial', 'hms-testimonials' ));
+	$submit_text = apply_filters('hms_testimonials_sc_submit', __('Submit Testimonial', 'hms-testimonials' ));
 
 	$ret .= <<<HTML
 <form method="post">
@@ -341,6 +341,8 @@ function hms_testimonials_show_rotating( $atts ) {
 			'template' => 1,
 			'seconds' => 6,
 			'show_links' => false,
+			'autostart' => true,
+			'link_position' => 'bottom',
 			'link_prev' => '&laquo;',
 			'link_next' => '&raquo;',
 			'link_pause' => 'Pause',
@@ -354,6 +356,20 @@ function hms_testimonials_show_rotating( $atts ) {
 	if (!in_array($order, $order_by)) $order = 'display_order';
 	if ($order == 'rand') $order = 'RAND()';
 	if ($direction != 'DESC') $direction = 'ASC';
+	if ($link_position != 'top' && $link_position != 'both') $link_position = 'bottom';
+
+	$start = false;
+	$start_int = 0;
+	if ($autostart) {
+		if (is_bool($autostart) || (is_string($autostart) && ($autostart != 'false'))) {
+			$start = true;
+			$start_int = 1;
+		}
+	}
+
+
+	$play_pause_init = ($start) ? __($link_pause) : __($link_play);
+	$play_pause_class = ($start) ? 'pause' : 'play';
 
 
 	$random_string = '';
@@ -378,14 +394,18 @@ function hms_testimonials_show_rotating( $atts ) {
 
 
 	$return = '<div id="hms-testimonial-sc-'.$random_string.'" class="hms-testimonials-rotator">';
+
+	if ($show_links && $show_links != "false" && ($link_position == 'top' || $link_position == 'both'))
+		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$play_pause_init.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
+
 		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$get[0]['id'].' hms-testimonial-template-'.$template.'"">';
 						
 		$return .= HMS_Testimonials::template($template, $get[0]);
 
 		$return .= '</div>';
 
-	if ($show_links && $show_links != "false")
-		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause pause">'.$link_pause.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
+	if ($show_links && $show_links != "false" && ($link_position == 'bottom' || $link_position == 'both'))
+		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$play_pause_init.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
 	
 	$return .= '</div>';
 
@@ -406,10 +426,14 @@ function hms_testimonials_show_rotating( $atts ) {
 	<script type="text/javascript">
 		var index_{$random_string} = 1;
 		var timeout_{$random_string} = null;
-		var play_{$random_string} = 1;
+		var play_{$random_string} = $start_int;
 		jQuery(document).ready(function() {
-				si_{$random_string}();
+JS;
+		if ($start)
+			$return .= 'si_'.$random_string.'();';
+		
 
+	$return .= <<<JS
 				jQuery("#hms-testimonial-sc-{$random_string} .controls .playpause").click(function() {
 					if (play_{$random_string} == 1) {
 						jQuery(this).text('{$link_play}').removeClass('pause').addClass('play');

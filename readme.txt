@@ -75,6 +75,12 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.7 =
+* Fixed a bug with WordPress MultiSite not showing testimonials in wp-admin
+* Fixed a few bugs with SQL queries regarding multisite functionality
+* Added new option to hms_testimonials_show_rotating and rotating widget to not automatically start rotating. For the shortcode add autostart="false"  For the widget there is a checkbox.
+* Added new option to hms_testimonials_show_rotating and rotating widget to change the position of the Prev, Pause/Play and Next links. Options are top, bottom, or both. It defaults to bottom. For the shortcode use link_position="top" or any of the 3 options. The widget now has a drop down to select the position.
+
 = 2.0.6 =
 * Added filters to the templates. hms_testimonials_system_id, hms_testimonials_system_testimonial, hms_testimonials_system_source, hms_testimonials_system_date, hms_testimonials_system_url, hms_testimonials_system_image, and all custom fields fall under hms_testimonials_cf_ with their name lower cased.
 

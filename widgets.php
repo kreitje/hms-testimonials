@@ -8,7 +8,7 @@ function hms_testimonials_widgets() {
 class HMS_Testimonials_View extends WP_Widget {
 
 	public function __construct() {
-		parent::__construct('hms_testimonial_view', 'HMS Testimonals', array('description' => __('Show 1 or several testimonials')));
+		parent::__construct('hms_testimonial_view', __('HMS Testimonals', 'hms-testimonials' ), array('description' => __('Show 1 or several testimonials', 'hms-testimonials' )));
 	}
 
 	public function form($instance) {
@@ -24,11 +24,11 @@ class HMS_Testimonials_View extends WP_Widget {
 
 		?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title', 'hms-testimonials' ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'show' ); ?>"><?php _e('Display:'); ?></label><br />
+			<label for="<?php echo $this->get_field_id( 'show' ); ?>"><?php _e('Display', 'hms-testimonials' ); ?>:</label><br />
 			<select name="<?php echo $this->get_field_name( 'show' ); ?>" id="<?php echo $this->get_field_id( 'show' ); ?>">
 				<option value="all" <?php if (esc_attr( $show )=='all') echo ' selected="selected"'; ?>>All</option>
 				<option value="group" <?php if (esc_attr( $show )=='group') echo ' selected="selected"'; ?>>Group</option>
@@ -36,12 +36,12 @@ class HMS_Testimonials_View extends WP_Widget {
 			</select>
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'show_value' ); ?>"><?php _e('Group ID or Testimonial ID if applicable:'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'show_value' ); ?>"><?php _e('Group ID or Testimonial ID if applicable', 'hms-testimonials' ); ?>:</label>
 			<input type="text" id="<?php echo $this->get_field_id( 'show_value' ); ?>" name="<?php echo $this->get_field_name( 'show_value' ); ?>" value="<?php echo esc_attr( $show_value ); ?>" />
 		</p>
 		
 		<p>
-			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template:'); ?></label><br />
+			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template', 'hms-testimonials' ); ?>:</label><br />
 			<select name="<?php echo $this->get_field_name( 'template' ); ?>" id="<?php echo $this->get_field_id( 'template' ); ?>">
 				<?php
 				$get_templates = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials_templates` WHERE `blog_id` = ".(int)$blog_id." ORDER BY `name` ASC", ARRAY_A);
@@ -53,7 +53,7 @@ class HMS_Testimonials_View extends WP_Widget {
 		</p>
 
 		<?php $sort_by = esc_attr($sortby); ?>
-		<p><label for="<?php echo $this->get_field_id( 'sortby' ); ?>"><?php _e('Sort By:'); ?></label><br />
+		<p><label for="<?php echo $this->get_field_id( 'sortby' ); ?>"><?php _e('Sort By', 'hms-testimonials' ); ?>:</label><br />
 			<select name="<?php echo $this->get_field_name( 'sortby' ); ?>" id="<?php echo $this->get_field_id( 'sortby' ); ?>">
 				<option value="display_order">display order*</option>
 				<option value="id" <?php if ($sort_by == 'id') echo 'selected="selected"'; ?>>id</option>
@@ -73,10 +73,10 @@ class HMS_Testimonials_View extends WP_Widget {
 			</select>
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'numshow' ); ?>"><?php _e( 'Number to Show:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'numshow' ); ?>"><?php _e( 'Number to Show', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'numshow' ); ?>" name="<?php echo $this->get_field_name( 'numshow' ); ?>" type="text" value="<?php echo esc_attr( $numshow ); ?>" style="width:25px;" />
 		</p>
-		<p>Set to 0 to show all</p>
+		<p><?php _e('Set to 0 to show all', 'hms-testimonials' ); ?></p>
 		
 		<?php 
 	}
@@ -179,7 +179,7 @@ class HMS_Testimonials_View extends WP_Widget {
 class HMS_Testimonials_Rotator extends WP_Widget {
 
 	public function __construct() {
-		parent::__construct('hms_testimonial_rotator', 'HMS Testimonial Rotator', array('description' => __('Rotates your testimonials')));
+		parent::__construct('hms_testimonial_rotator', __('HMS Testimonial Rotator', 'hms-testimonials' ), array('description' => __('Rotates your testimonials', 'hms-testimonials' )));
 	}
 
 	public function form($instance) {
@@ -197,14 +197,17 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		$sortby = (isset($instance['sortby'])) ? $instance['sortby'] : 'display_order';
 		$order = (isset($instance['order'])) ? $instance['order'] : 'ASC';
+
+		$autostart = (isset($instance['autostart'])) ? $instance['autostart'] : 1;
+		$link_position = (isset($instance['link_position'])) ? $instance['link_position'] : 'bottom';
 		
 		?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'group' ); ?>"><?php _e('Group:'); ?></label><br />
+			<label for="<?php echo $this->get_field_id( 'group' ); ?>"><?php _e('Group', 'hms-testimonials' ); ?>:</label><br />
 			<select name="<?php echo $this->get_field_name( 'group' ); ?>" id="<?php echo $this->get_field_id( 'group' ); ?>">
 				<option value="all" <?php if (esc_attr( $group )=='0') echo ' selected="selected"'; ?>>All</option>
 				<?php
@@ -216,7 +219,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			</select>
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template:'); ?></label><br />
+			<label for="<?php echo $this->get_field_id( 'template' ); ?>"><?php _e('Template', 'hms-testimonials' ); ?>:</label><br />
 			<select name="<?php echo $this->get_field_name( 'template' ); ?>" id="<?php echo $this->get_field_id( 'template' ); ?>">
 				<?php
 				$get_templates = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials_templates` WHERE `blog_id` = ".(int)$blog_id." ORDER BY `name` ASC", ARRAY_A);
@@ -227,7 +230,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			</select>
 		</p>
 		<?php $sort_by = esc_attr($sortby); ?>
-		<p><label for="<?php echo $this->get_field_id( 'sortby' ); ?>"><?php _e('Sort By:'); ?></label><br />
+		<p><label for="<?php echo $this->get_field_id( 'sortby' ); ?>"><?php _e('Sort By', 'hms-testimonials' ); ?>:</label><br />
 			<select name="<?php echo $this->get_field_name( 'sortby' ); ?>" id="<?php echo $this->get_field_id( 'sortby' ); ?>">
 				<option value="display_order">display order*</option>
 				<option value="id" <?php if ($sort_by == 'id') echo 'selected="selected"'; ?>>id</option>
@@ -248,29 +251,43 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'seconds' ); ?>"><?php _e( 'Seconds Between:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'seconds' ); ?>"><?php _e( 'Seconds Between', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'seconds' ); ?>" name="<?php echo $this->get_field_name( 'seconds' ); ?>" type="text" value="<?php echo esc_attr( $seconds ); ?>" style="width:25px;" />
+		</p>
+
+
+		<p>
+			<input type="checkbox" id="<?php echo $this->get_field_id( 'autostart' ); ?>" name="<?php echo $this->get_field_name( 'autostart' ); ?>" value="1" <?php if ($autostart == 1) echo ' checked="checked"'; ?> /> &nbsp;&nbsp;
+			<label for="<?php echo $this->get_field_id('autostart'); ?>"><?php _e( 'Automatically Start Rotating', 'hms-testimonials'  ); ?></label>
 		</p>
 
 		<p>
 			<input type="checkbox" id="<?php echo $this->get_field_id( 'show_links' ); ?>" name="<?php echo $this->get_field_name( 'show_links' ); ?>" value="1" <?php if ($show_links == 1) echo ' checked="checked"'; ?> /> &nbsp;&nbsp;
-			<label for="<?php echo $this->get_field_id('show_links'); ?>"><?php _e( 'Show Links' ); ?></label>
+			<label for="<?php echo $this->get_field_id('show_links'); ?>"><?php _e( 'Show Links', 'hms-testimonials'  ); ?></label>
+		</p>
+
+		<p><label for="<?php echo $this->get_field_id( 'link_position' ); ?>"><?php _e('Links Position', 'hms-testimonials' ); ?>:</label><br />
+			<select name="<?php echo $this->get_field_name( 'link_position' ); ?>" id="<?php echo $this->get_field_id( 'link_position' ); ?>">
+				<option value="bottom" <?php if ($link_position == 'bottom') echo 'selected="selected"'; ?>>Bottom*</option>
+				<option value="top" <?php if ($link_position == 'top') echo 'selected="selected"'; ?>>Top</option>
+				<option value="both" <?php if ($link_position == 'both') echo 'selected="selected"'; ?>>Both</option>
+			</select>
 		</p>
 
 		<p>
-			<label for="<?php echo $this->get_field_id( 'link_next' ); ?>"><?php _e( 'Next Text:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'link_next' ); ?>"><?php _e( 'Next Text', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'link_next' ); ?>" name="<?php echo $this->get_field_name( 'link_next' ); ?>" type="text" value="<?php echo esc_attr( $link_next ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'link_prev' ); ?>"><?php _e( 'Previous Text:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'link_prev' ); ?>"><?php _e( 'Previous Text', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'link_prev' ); ?>" name="<?php echo $this->get_field_name( 'link_prev' ); ?>" type="text" value="<?php echo esc_attr( $link_prev ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'link_play' ); ?>"><?php _e( 'Play Text:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'link_play' ); ?>"><?php _e( 'Play Text', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'link_play' ); ?>" name="<?php echo $this->get_field_name( 'link_play' ); ?>" type="text" value="<?php echo esc_attr( $link_play ); ?>" />
 		</p>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'link_pause' ); ?>"><?php _e( 'Pause Text:' ); ?></label> 
+			<label for="<?php echo $this->get_field_id( 'link_pause' ); ?>"><?php _e( 'Pause Text', 'hms-testimonials'  ); ?>:</label> 
 			<input class="widefat" id="<?php echo $this->get_field_id( 'link_pause' ); ?>" name="<?php echo $this->get_field_name( 'link_pause' ); ?>" type="text" value="<?php echo esc_attr( $link_pause ); ?>" />
 		</p>
 		
@@ -293,6 +310,11 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		
 		$instance['sortby'] = (isset($new_instance['sortby'])) ? $new_instance['sortby'] : 'display_order';
 		$instance['order'] = (isset($new_instance['order']) && $new_instance['order']=='DESC') ? 'DESC' : 'ASC';
+
+		$valid = array('top', 'bottom', 'both');
+
+		$instance['link_position'] = (isset($new_instance['link_position']) && in_array($new_instance['link_position'], $valid)) ? $new_instance['link_position'] : 'bottom';
+		$instance['autostart'] = (isset($new_instance['autostart']) && $new_instance['autostart']=='1') ? 1 : 0;
 
 		return $instance;
 	}
@@ -333,6 +355,8 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		$identifier = $this->_randomstring();
 
+		$link_text = ($instance['autostart'] == 1) ? $instance['link_pause'] : $instance['link_play'];
+		$play_pause_class = ($instance['autostart'] == 1) ? 'pause' : 'play';
 
 
 		echo $args['before_widget'];
@@ -341,12 +365,15 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		echo '<div id="hms-testimonial-'.$identifier.'">';
 
+			if ($instance['show_links'] == 1 && ($instance['link_position'] == 'top' || $instance['link_position'] == 'both'))
+				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$link_text.'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
+
 			echo '<div class="hms-testimonial-container">';
 				echo HMS_Testimonials::template($instance['template'], $get[0]);
 			echo '</div>';
 
-			if ($instance['show_links'] == 1)
-				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause pause">'.$instance['link_pause'].'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
+			if ($instance['show_links'] == 1 && ($instance['link_position'] == 'bottom' || $instance['link_position'] == 'both'))
+				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$link_text.'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
 		echo '</div>';
 		?>
 
@@ -363,11 +390,13 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		<script type="text/javascript">
 			var index_<?php echo $identifier; ?> = 1;
 			var timeout_<?php echo $identifier; ?> = null;
-			var play_<?php echo $identifier; ?> = 1;
+			var play_<?php echo $identifier; ?> = <?php if ($instance['autostart'] == 1) echo '1'; else echo '0'; ?>;
 
 			jQuery(document).ready(function() {
 
-				si_<?php echo $identifier; ?>();
+				<?php if ($instance['autostart'] == 1) { ?>
+					si_<?php echo $identifier; ?>();
+				<?php } ?>
 
 				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .pause").click(function() {
 					if (play_<?php echo $identifier; ?> == 1) {

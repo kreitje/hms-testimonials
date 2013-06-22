@@ -649,13 +649,13 @@ JS;
 					if ($this->is_moderator()) {
 						$get = $this->wpdb->get_results("SELECT t.*, u.user_login 
 													FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
-													LEFT JOIN `".$this->wpdb->prefix."users` AS u 
+													LEFT JOIN `".$this->wpdb->users."` AS u 
 														ON u.ID = t.user_id
 													WHERE t.blog_id = ".(int)$this->blog_id." ORDER BY t.display_order ASC", ARRAY_A);
 					} else {
 						$get = $this->wpdb->get_results("SELECT t.*, u.user_login 
 														FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
-														LEFT JOIN `".$this->wpdb->prefix."users` AS u
+														LEFT JOIN `".$this->wpdb->users."` AS u
 															ON u.ID = t.user_id
 														WHERE t.blog_id = ".(int)$this->blog_id." AND t.user_id = ".(int)$this->current_user->ID." ORDER BY t.display_order ASC", ARRAY_A);
 					}
@@ -1910,7 +1910,7 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 
 
 			$get = $this->wpdb->get_results("SELECT t.*, m.display_order AS group_display_order, u.user_login FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
-								LEFT JOIN `".$this->wpdb->prefix."users` AS u 
+								LEFT JOIN `".$this->wpdb->users."` AS u 
 									ON u.ID = t.user_id
 								INNER JOIN `".$this->wpdb->prefix."hms_testimonials_group_meta` AS m 
 									ON m.testimonial_id = t.id 

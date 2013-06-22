@@ -1,0 +1,177 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: HMS Testimonials\n"
+"POT-Creation-Date: 2013-06-11 17:42-0700\n"
+"PO-Revision-Date: 2013-06-11 17:43-0700\n"
+"Last-Translator: \n"
+"Language-Team: HitMyServer LLC <support@hitmyserver.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: ..\n"
+
+#: ../shortcodes.php:20
+msgid "Please enter your name."
+msgstr ""
+
+#: ../shortcodes.php:23
+msgid "Please enter your testimonial."
+msgstr ""
+
+#: ../shortcodes.php:29
+#, php-format
+msgid "%1$s is a required field."
+msgstr ""
+
+#: ../shortcodes.php:36
+#, php-format
+msgid "Please enter a valid email for the %1$s field."
+msgstr ""
+
+#: ../shortcodes.php:50
+msgid "Please enter a valid URL."
+msgstr ""
+
+#: ../shortcodes.php:60
+msgid "You entered an incorrect captcha. Please try again."
+msgstr ""
+
+#: ../shortcodes.php:63
+#, php-format
+msgid "An error occured with your captcha. ( %1$s )"
+msgstr ""
+
+#: ../shortcodes.php:104
+msgid "A visitor"
+msgstr ""
+
+#: ../shortcodes.php:108
+#, php-format
+msgid "%1$s as added a testimonial to your site %2$s"
+msgstr ""
+
+#: ../shortcodes.php:109
+#, php-format
+msgid "Name: %1$s"
+msgstr ""
+
+#: ../shortcodes.php:110
+#, php-format
+msgid "Website: %1$s"
+msgstr ""
+
+#: ../shortcodes.php:111
+#, php-format
+msgid "Testimonial: %1$s"
+msgstr ""
+
+#: ../shortcodes.php:116
+#, php-format
+msgid "View this testimonial at %1$s"
+msgstr ""
+
+#: ../shortcodes.php:118
+#, php-format
+msgid "New Visitor Testimonial Added to %1$s"
+msgstr ""
+
+#: ../shortcodes.php:121
+msgid "Your testimonial has been submitted."
+msgstr ""
+
+#: ../shortcodes.php:141
+msgid "Name"
+msgstr ""
+
+#: ../shortcodes.php:142
+msgid "Website"
+msgstr ""
+
+#: ../shortcodes.php:143
+msgid "Testimonial"
+msgstr ""
+
+#: ../shortcodes.php:144
+msgid "Submit Testimonial"
+msgstr ""
+
+#: ../widgets.php:11
+msgid "HMS Testimonals"
+msgstr ""
+
+#: ../widgets.php:11
+msgid "Show 1 or several testimonials"
+msgstr ""
+
+#: ../widgets.php:17 ../widgets.php:188
+msgid "Testimonials"
+msgstr ""
+
+#: ../widgets.php:27 ../widgets.php:203
+msgid "Title"
+msgstr ""
+
+#: ../widgets.php:31
+msgid "Display"
+msgstr ""
+
+#: ../widgets.php:39
+msgid "Group ID or Testimonial ID if applicable"
+msgstr ""
+
+#: ../widgets.php:44 ../widgets.php:219
+msgid "Template"
+msgstr ""
+
+#: ../widgets.php:56 ../widgets.php:230
+msgid "Sort By"
+msgstr ""
+
+#: ../widgets.php:76
+msgid "Number to Show"
+msgstr ""
+
+#: ../widgets.php:79
+msgid "Set to 0 to show all"
+msgstr ""
+
+#: ../widgets.php:182
+msgid "HMS Testimonial Rotator"
+msgstr ""
+
+#: ../widgets.php:182
+msgid "Rotates your testimonials"
+msgstr ""
+
+#: ../widgets.php:207
+msgid "Group"
+msgstr ""
+
+#: ../widgets.php:251
+msgid "Seconds Between"
+msgstr ""
+
+#: ../widgets.php:257
+msgid "Show Links"
+msgstr ""
+
+#: ../widgets.php:261
+msgid "Next Text"
+msgstr ""
+
+#: ../widgets.php:265
+msgid "Previous Text"
+msgstr ""
+
+#: ../widgets.php:269
+msgid "Play Text"
+msgstr ""
+
+#: ../widgets.php:273
+msgid "Pause Text"
+msgstr ""
