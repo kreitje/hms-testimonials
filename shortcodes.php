@@ -223,6 +223,8 @@ function hms_testimonials_show( $atts ) {
 			'location' => 'both',
 			'order' => 'display_order',
 			'direction' => 'ASC',
+			'word_limit' => 0,
+			'char_limit' => 0
 		), $atts
 	));
 
@@ -274,7 +276,7 @@ function hms_testimonials_show( $atts ) {
 			return '';
 
 		$ret = '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].' hms-testimonial-template-'.$template.'">';
-			$ret .= HMS_Testimonials::template($template, $get);
+			$ret .= HMS_Testimonials::template($template, $get, (int)$word_limit, (int)$char_limit);
 		$ret .= '</div>';
 		
 
@@ -312,7 +314,7 @@ function hms_testimonials_show( $atts ) {
 
 			$ret .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'">';
 
-				$ret .= HMS_Testimonials::template($template, $g);
+				$ret .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit);
 
 			$ret .= '</div>';
 
@@ -349,7 +351,8 @@ function hms_testimonials_show_rotating( $atts ) {
 			'link_play' => 'Play',
 			'order' => 'display_order',
 			'direction' => 'ASC',
-			
+			'word_limit' => 0,
+			'char_limit' => 0
 		), $atts
 	));
 
@@ -400,7 +403,7 @@ function hms_testimonials_show_rotating( $atts ) {
 
 		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$get[0]['id'].' hms-testimonial-template-'.$template.'"">';
 						
-		$return .= HMS_Testimonials::template($template, $get[0]);
+		$return .= HMS_Testimonials::template($template, $get[0], (int)$word_limit, (int)$char_limit);
 
 		$return .= '</div>';
 
@@ -415,7 +418,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	foreach($get as $g) {
 		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'"">';
 		
-			$return .= HMS_Testimonials::template($template, $g);
+			$return .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit);
 
 		$return .= '</div>';	
 	}

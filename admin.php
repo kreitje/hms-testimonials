@@ -46,7 +46,8 @@ class HMS_Testimonials {
 			'image_width' => 100,
 			'image_height' => 100,
 			'date_format' => 'm/d/Y',
-			'display_rows' => array('id','name','testimonial','url','testimonial_date','shortcode','user','display')
+			'display_rows' => array('id','name','testimonial','url','testimonial_date','shortcode','user','display'),
+			'js_load' => 0
 		);
 
 		$this->options = array_merge($defaults, $current_options);
@@ -85,6 +86,10 @@ class HMS_Testimonials {
 			self::$instance = new HMS_Testimonials();
 
 		return self::$instance;
+	}
+
+	public function get_options() {
+		return $this->options;
 	}
 
 	public function admin_menus() {
@@ -139,8 +144,9 @@ class HMS_Testimonials {
 		wp_enqueue_script('jquery-ui-sortable');
 		wp_enqueue_script('jquery-ui-droppable');
 		wp_enqueue_script('jquery-ui-datepicker');
+		wp_enqueue_script('jquery-ui-accordion');
 
-		wp_enqueue_style('plugin_name-admin-ui-css', plugins_url( '/jquery-ui.css' , __FILE__ ), false, '2.0.3', false);
+		wp_enqueue_style('plugin_name-admin-ui-css', plugins_url( '/jquery-ui.css' , __FILE__ ), false, '2.0.8', false);
 	}
 
 	public function admin_head() {
@@ -411,7 +417,7 @@ JS;
 			$options['autoapprove'] = $_POST['autoapprove'];
 			$options['resetapproval'] = (isset($_POST['resetapproval']) && $_POST['resetapproval'] == '1') ? 1 : 0;
 			$options['moderators_can_access_settings'] = (isset($_POST['moderators_can_access_settings']) && $_POST['moderators_can_access_settings'] == '1') ? 1 : 0;
-
+			$options['js_load'] = (isset($_POST['js_load'])) && ($_POST['js_load'] == 1) ? 1 : 0;
 
 			$x = count($_POST['roleorder']);
 			$order = array();
@@ -537,6 +543,14 @@ JS;
 									} ?>
 									</select>
 								</td>
+							</tr>
+							<tr>
+								<th scope="row">
+									8. Allow the use of loading testimonials via<br />
+									<strong><?php echo plugins_url( '/js.php' , __FILE__ ); ?></strong>?<br />
+									<a href="<?php echo admin_url('admin.php?page=hms-testimonials-help&active=5'); ?>">Read About It</a>
+								</th>
+								<td><input type="checkbox" name="js_load" value="1" <?php if ($this->options['js_load']==1) echo ' checked="checked"'; ?> /></td>
 							</tr>
 							
 						</tbody>
@@ -740,206 +754,261 @@ JS;
 
 			<p>This plugin allows you to add customer testimonials to your site in an easy to manage way. HMS Testimonials offers 2 shortcodes with multiple options and 2 widgets.</p>
 			<br />
-			<strong>Jump To:</strong> <a href="#hms_testimonials_features">Features</a> | 
-				<a href="#hms_testimonials_shortcodes">Shortcodes</a> | 
-				<a href="#hms_testimonials_widgets">Widgets</a> | 
-				<a href="#hms_testimonials_css">CSS Classes</a> | 
-				<a href="#hms_testimonials_templates">Templates</a> | 
-				<a href="#date_format">Date Format</a> | 
-				<a href="#form_shortcode">Form Short Code</a>
-			<br /><br />
-
-			
-			<h3 id="hms_testimonials_features">Features</h3>
-
-			<ol>
-				<li>Set permissiosn based on user roles to allow your users to add testimonials</li>
-				<li>Drag and Drop to set the display order for all testimonials even in groups</li>
-				<li>Hide items by unchecking their Display checkbox</li>
-				<li>Add a testimonial to 1 or more groups</li>
-				<li>Use our shortcodes to show all, a group or just 1 testimonial</li>
-				<li>Use our widgets to display your testimonials in the sidebar</li>
-			</ol>
-
-			<br /><br />
-
-			<h3 id="hms_testimonials_shortcodes">Shortcodes</h3>
-
-			<p>Our shortcode <strong>[hms_testimonials]</strong> offers a few options.</p>
-			<ol>
-				<li><strong>[hms_testimonials]</strong> &nbsp; Shows all of your testimonials that are set to be displayed.</li>
-				<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Shows all of your testimonials in a particular group defined by "group". In this case, group 1</li>
-				<li><strong>[hms_testimonials id="1"]</strong> &nbsp; Only shows 1 testimonial with the id specified. In this case, 1.</li>
-				<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).</li>
-				<li><strong>[hms_testimonials limit="15" start="1" next="&raquo;" prev="&laquo;" location="both"]</strong> &nbsp; If you want to limit the number of results shown and paginate them 
-					you can use the limit attribute. If you need to skip a few before starting change the start number. The next an prev attributes set the text for the next and previous link in the 
-					page numbers. Lastly, location sets where to display the page numbers. Both places it at the top and buttom, top places it only at the top, and bottom only at the bottom. The default 
-					for limit is -1 which will show all testimonials and not use any paging.
-			</ol>
-
-			<br /><br />
-			<p>We also offer <strong>[hms_testimonials_rotating]</strong> to rotate your testimonials inside of a page or post.</p>
-			<ol>
-				<li><strong>[hms_testimonials_rotating]</strong> &nbsp; Rotates through all of your testimonials that are set to be displayed</li>
-				<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Rotates through all of your testimonials in a particular group defined by "group". In this case, group 1</li>
-				<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).
-				<li><strong>[hms_testimonials seconds="6"]</strong> &nbsp; Sets the interval in seconds for how often the testimonials are rotated.</li>
-				<li><strong>[hms_testimonials show_links="true"]</strong> &nbsp; Show Prev,Pause(Play) and Next links. Defaults to false</li>
-				<li><strong>[hms_testimonials link_prev="Previous"]</strong> &nbsp; Text for the previous link. Defaults to &laquo;</li>
-				<li><strong>[hms_testimonials link_next="Next"]</strong> &nbsp; Text for the next link. Defaults to &raquo;</li>
-				<li><strong>[hms_testimonials link_pause="Pause"]</strong> &nbsp; Text for the pause link. Defaults to Pause</li>
-				<li><strong>[hms_testimonials link_next="Play"]</strong> &nbsp; Text for the play link. Defaults to Play</li>
-			</ol>
-
-			<br /><br />
-
-			<p>Use <strong>[hms_testimonials_form]</strong> to allow your visitors to submit testimonials.  To help combat spam you can enable reCAPTCHA in the settings.</p>
-
-			<p>Place these shortcodes in your posts or pages. If you prefer to stick them in your sidebar see below for the widgets we offer.</p>
-
-			<br /><br />
-			<h3 id="hms_testimonials_widgets">Widgets</h3>
-			<p>We offer a standard widget called HMS Testimonials where you can display all, a group or a single testimonial. We also offer a rotating widget called 
-				HMS Testimonial Rotator that will show 1 at a time of the entire list or a group and swap them out after x amount of seconds</p>
-
-
-			<br /><br />
-			<h3 id="hms_testimonials_css">CSS Classes</h3>
-			<p>We have added some classes to different parts of the testimonial to allow you better styling.</p>
-			<table width="100%">
-				<tr>
-					<td>hms-testimonial-container</td>
-					<td>A div container that the testimonial sits in</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; testimonial</td>
-					<td>A div container that the testimonial text is wrapped in</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; author</td>
-					<td>A div container that the author/name is wrapped in</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; url</td>
-					<td>A div container that the URL if entered is wrapped in</td>
-				</tr>
-				<tr>
-					<td>hms-testimonial-group</td>
-					<td>A div container that contains all the testimonials. Only applicable when all or a group of testimonials are shown.</td>
-				</tr>
-				<tr>
-					<td>hms-testimonial-single</td>
-					<td>Added to the hms-testimonial-container class if only 1 testimonial is shown.</td>
-				</tr>
-				<tr>
-					<td>paging</td>
-					<td>A div container for any pagination elements</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; current-page</td>
-					<td>A span element that is the current page number.</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; prev</td>
-					<td>The previous page link</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; next</td>
-					<td>The next page link</td>
-				</tr>
-
-				<tr>
-					<td>hms-testimonials-rotator</td>
-					<td>Added to the parent testimonial container for rotating testimonials</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp; controls</td>
-					<td>A div container for the previous, pause/play and next links</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp;&nbsp;&nbsp; prev</td>
-					<td>The previous link</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp;&nbsp;&nbsp; next</td>
-					<td>The next link</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp;&nbsp;&nbsp; playpause</td>
-					<td>The play/pause link</td>
-				</tr>
-
-				<tr>
-					<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; play</td>
-					<td>A class added to the play/pause link when showing the play text</td>
-				</tr>
-				<tr>
-					<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pause</td>
-					<td>A class added to the play/pause link when showing the pause text</td>
-				</tr>
-			</table>
-
-			<h3 id="date_format">Date Format</h3>
-			<p>You can set the format of the date when showing it in your testimonials. The format is based on the way <a href="http://www.php.net/manual/en/function.date.php" target="_blank">PHP</a> does it.</p>
-
-			<strong>Common Formats</strong>
-			<table width="50%">
-				<tr>
-					<td>USA</td>
-					<td>m/d/Y</td>
-					<td><?php echo date('m/d/Y'); ?></td>
-				</tr>
-				<tr>
-					<td>European</td>
-					<td>d/m/Y</td>
-					<td><?php echo date('d/m/Y'); ?>
-				</tr>
-				<tr>
-					<td>Month Name</td>
-					<td>F d, Y</td>
-					<td><?php echo date('F d, Y'); ?>
-				</tr>
-				<tr>
-					<td>Month Name Short</td>
-					<td>M d, Y</td>
-					<td><?php echo date('M d, Y'); ?>
-				</tr>
-			</table>
+			<h4 align="center"><strong>Do you enjoy this plugin?</strong> <a style="color:red;" href="https://portal.hitmyserver.com/clients/cart.php?a=add&pid=12" target="_blank">Consider purchasing a thank you license!</a></h4>
 			<br />
 
-			<h3 id="form_shortcode">Form Shortcode</h3>
-			<p>The [hms_testimonials_form] shortcode allows you to have visitors submit testimonials to you. 
-				When they do, you will receive an email and can go approve the testimonial.</p>
+			<div id="accordion">
+				<h3 id="hms_testimonials_features">Features</h3>
+				<div>
 
-			<p>At times you may want to change the text on the form fields.  We have built in 4 filters for the default fields.</p>
-			<ol>
-				<li>hms_testimonials_sc_name - Changes the "Name" text.</li>
-				<li>hms_testimonials_sc_website - Changes the "Website" text.</li>
-				<li>hms_testimonials_sc_testimonial - Changes the "Testimonial" text.</li>
-				<li>hms_testimonials_sc_submit - Changes the text for the submit button.</li>
-			</ol>
+					<ol>
+						<li>Set permissiosn based on user roles to allow your users to add testimonials</li>
+						<li>Drag and Drop to set the display order for all testimonials even in groups</li>
+						<li>Hide items by unchecking their Display checkbox</li>
+						<li>Add a testimonial to 1 or more groups</li>
+						<li>Use our shortcodes to show all, a group or just 1 testimonial</li>
+						<li>Use our widgets to display your testimonials in the sidebar</li>
+					</ol>
 
-			<p>You can add these filters into your themes functions.php file.</p>
-			<br />
+					<br /><br />
+				</div>
 
-			<strong>Example to change "Name" to "Please Enter Your Name":</strong>
-			<pre style="color:red;">
-function hms_name_override($text) {
-	return 'Please Enter Your Name';
-}
-add_filter('hms_testimonials_sc_name', 'hms_name_override');
-			</pre>
+				<h3 id="hms_testimonials_shortcodes">Shortcodes</h3>
+
+				<div>
+					<p>Our shortcode <strong>[hms_testimonials]</strong> offers a few options.</p>
+					<ol>
+						<li><strong>[hms_testimonials]</strong> &nbsp; Shows all of your testimonials that are set to be displayed.</li>
+						<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Shows all of your testimonials in a particular group defined by "group". In this case, group 1</li>
+						<li><strong>[hms_testimonials id="1"]</strong> &nbsp; Only shows 1 testimonial with the id specified. In this case, 1.</li>
+						<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).</li>
+						<li><strong>[hms_testimonials word_limit=5]</strong> &nbsp; Limit the number of words shown to 5.</li>
+						<li><strong>[hms_testimonials char_limit=5]</strong> &nbsp; Limit the number of characters shown to 5.</li>
+						<li><strong>[hms_testimonials limit="15" start="1" next="&raquo;" prev="&laquo;" location="both"]</strong> &nbsp; If you want to limit the number of results shown and paginate them 
+							you can use the limit attribute. If you need to skip a few before starting change the start number. The next an prev attributes set the text for the next and previous link in the 
+							page numbers. Lastly, location sets where to display the page numbers. Both places it at the top and buttom, top places it only at the top, and bottom only at the bottom. The default 
+							for limit is -1 which will show all testimonials and not use any paging.
+					</ol>
+
+					<br /><br />
+					<p>We also offer <strong>[hms_testimonials_rotating]</strong> to rotate your testimonials inside of a page or post.</p>
+					<ol>
+						<li><strong>[hms_testimonials_rotating]</strong> &nbsp; Rotates through all of your testimonials that are set to be displayed</li>
+						<li><strong>[hms_testimonials group="1"]</strong> &nbsp; Rotates through all of your testimonials in a particular group defined by "group". In this case, group 1</li>
+						<li><strong>[hms_testimonials template="1"]</strong> &nbsp; Sets which template to use. By default it uses 1 (Testimonial, Author, URL).
+						<li><strong>[hms_testimonials word_limit=5]</strong> &nbsp; Limit the number of words shown to 5.</li>
+						<li><strong>[hms_testimonials char_limit=5]</strong> &nbsp; Limit the number of characters shown to 5.</li>
+						<li><strong>[hms_testimonials seconds="6"]</strong> &nbsp; Sets the interval in seconds for how often the testimonials are rotated.</li>
+						<li><strong>[hms_testimonials show_links="true"]</strong> &nbsp; Show Prev,Pause(Play) and Next links. Defaults to false</li>
+						<li><strong>[hms_testimonials link_prev="Previous"]</strong> &nbsp; Text for the previous link. Defaults to &laquo;</li>
+						<li><strong>[hms_testimonials link_next="Next"]</strong> &nbsp; Text for the next link. Defaults to &raquo;</li>
+						<li><strong>[hms_testimonials link_pause="Pause"]</strong> &nbsp; Text for the pause link. Defaults to Pause</li>
+						<li><strong>[hms_testimonials link_next="Play"]</strong> &nbsp; Text for the play link. Defaults to Play</li>
+					</ol>
+
+					<br /><br />
+
+					<p>Use <strong>[hms_testimonials_form]</strong> to allow your visitors to submit testimonials.  To help combat spam you can enable reCAPTCHA in the settings.</p>
+
+					<p>Place these shortcodes in your posts or pages. If you prefer to stick them in your sidebar see below for the widgets we offer.</p>
+
+					<br /><br />
+				</div>
+
+				<h3 id="hms_testimonials_widgets">Widgets</h3>
+				<div>
+					<p>We offer a standard widget called HMS Testimonials where you can display all, a group or a single testimonial. We also offer a rotating widget called 
+						HMS Testimonial Rotator that will show 1 at a time of the entire list or a group and swap them out after x amount of seconds</p>
 
 
-			</pre>
+					<br /><br />
+				</div>
 
-			<br /><br />
+				<h3 id="hms_testimonials_css">CSS Classes</h3>
+				<div>
+					<p>We have added some classes to different parts of the testimonial to allow you better styling.</p>
+					<table width="100%">
+						<tr>
+							<td>hms-testimonial-container</td>
+							<td>A div container that the testimonial sits in</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; testimonial</td>
+							<td>A div container that the testimonial text is wrapped in</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; author</td>
+							<td>A div container that the author/name is wrapped in</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; url</td>
+							<td>A div container that the URL if entered is wrapped in</td>
+						</tr>
+						<tr>
+							<td>hms-testimonial-group</td>
+							<td>A div container that contains all the testimonials. Only applicable when all or a group of testimonials are shown.</td>
+						</tr>
+						<tr>
+							<td>hms-testimonial-single</td>
+							<td>Added to the hms-testimonial-container class if only 1 testimonial is shown.</td>
+						</tr>
+						<tr>
+							<td>paging</td>
+							<td>A div container for any pagination elements</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; current-page</td>
+							<td>A span element that is the current page number.</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; prev</td>
+							<td>The previous page link</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; next</td>
+							<td>The next page link</td>
+						</tr>
+
+						<tr>
+							<td>hms-testimonials-rotator</td>
+							<td>Added to the parent testimonial container for rotating testimonials</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp; controls</td>
+							<td>A div container for the previous, pause/play and next links</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp;&nbsp;&nbsp; prev</td>
+							<td>The previous link</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp;&nbsp;&nbsp; next</td>
+							<td>The next link</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp;&nbsp;&nbsp; playpause</td>
+							<td>The play/pause link</td>
+						</tr>
+
+						<tr>
+							<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; play</td>
+							<td>A class added to the play/pause link when showing the play text</td>
+						</tr>
+						<tr>
+							<td> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pause</td>
+							<td>A class added to the play/pause link when showing the pause text</td>
+						</tr>
+					</table>
+				</div>
+
+				<h3 id="date_format">Date Format</h3>
+				<div>
+					<p>You can set the format of the date when showing it in your testimonials. The format is based on the way <a href="http://www.php.net/manual/en/function.date.php" target="_blank">PHP</a> does it.</p>
+
+					<strong>Common Formats</strong>
+					<table width="50%">
+						<tr>
+							<td>USA</td>
+							<td>m/d/Y</td>
+							<td><?php echo date('m/d/Y'); ?></td>
+						</tr>
+						<tr>
+							<td>European</td>
+							<td>d/m/Y</td>
+							<td><?php echo date('d/m/Y'); ?>
+						</tr>
+						<tr>
+							<td>Month Name</td>
+							<td>F d, Y</td>
+							<td><?php echo date('F d, Y'); ?>
+						</tr>
+						<tr>
+							<td>Month Name Short</td>
+							<td>M d, Y</td>
+							<td><?php echo date('M d, Y'); ?>
+						</tr>
+					</table>
+					<br />
+				</div>
+
+				<h3 id="js_load">Loading from Javascript</h3>
+				<div>
+					<p>
+						You can also load testimonials directly into your page using javascript. This feature is useful for users to who use WordPress for 
+						some backend items but have a static site. To use this feature you <strong>MUST</strong> enable it in the <a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings-advanced'); ?>" style="color:red;">advanced settings</a> page.
+					</p>
+
+					<p>
+						Add the following line to your HTML where the testimonials should go. 
+					</p>
+					<pre>
+&lt;script type="text/javascript" src="<?php echo plugins_url( '/js.php' , __FILE__ ); ?>"&gt;&lt;/script&gt;
+					</pre>
+
+					<p>
+						All of the options for the hms_testimonial shortcode are available as query arguments.
+					</p>
+
+					<strong>Ex.</strong>
+					<pre>
+&lt;script type="text/javascript" src="<?php echo plugins_url( '/js.php?group=1' , __FILE__ ); ?>"&gt;&lt;/script&gt;
+					</pre>
+
+					<p>
+						After the first query argument any additional arguments should be proceeded by an ampersand ( &amp; ).
+					</p>
+
+					<strong>Ex.</strong>
+					<pre>
+&lt;script type="text/javascript" src="<?php echo plugins_url( '/js.php?group=1&template=4' , __FILE__ ); ?>"&gt;&lt;/script&gt;
+					</pre>
+				</div>
+
+				<h3 id="form_shortcode">Form Shortcode</h3>
+				<div>
+					<p>The [hms_testimonials_form] shortcode allows you to have visitors submit testimonials to you. 
+						When they do, you will receive an email and can go approve the testimonial.</p>
+
+					<p>At times you may want to change the text on the form fields.  We have built in 4 filters for the default fields.</p>
+					<ol>
+						<li>hms_testimonials_sc_name - Changes the "Name" text.</li>
+						<li>hms_testimonials_sc_website - Changes the "Website" text.</li>
+						<li>hms_testimonials_sc_testimonial - Changes the "Testimonial" text.</li>
+						<li>hms_testimonials_sc_submit - Changes the text for the submit button.</li>
+					</ol>
+
+					<p>You can add these filters into your themes functions.php file.</p>
+					<br />
+
+					<strong>Example to change "Name" to "Please Enter Your Name":</strong>
+					<pre style="color:red;">
+		function hms_name_override($text) {
+			return 'Please Enter Your Name';
+		}
+		add_filter('hms_testimonials_sc_name', 'hms_name_override');
+					</pre>
+
+					<br /><br />
+				</div>
+			</div>
 
 			<br /><br />
 			<div align="center">
-				<a href="http://hitmyserver.com" target="_blank"><img src="<?php echo plugin_dir_url(__FILE__); ?>images/logo.gif" alt="HitMyServer LLC" /></a>
+				<a href="http://hitmyserver.com" target="_blank"><img src="<?php echo plugin_dir_url(__FILE__); ?>images/logo.png" alt="HitMyServer LLC" /></a>
 			</div>
 		</div>
+
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+				jQuery('#accordion').accordion({
+					collapsible: true,
+					heightStyle: "content"
+					<?php if (isset($_GET['active'])) {
+						echo ', active: '.(int)$_GET['active'];
+					} ?>
+				});
+			});
+		</script>
 		<?php
 	}
 
@@ -3252,9 +3321,11 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 	/**
 	 * Takes the template id and loads the testimonial in it.
 	 * If the template does not exist it shows the source (name) and testimonial as a fall back.
+	 * Word limit sets the number of words to show. If NOT -1 limit it
+	 * Word limit sets the number of characters to show. If NOT -1 limit it.
 	 **/
 
-	public static function template($template_id, $testimonial) {
+	public static function template($template_id, $testimonial, $word_limit = 0, $char_limit = 0) {
 		global $wpdb, $blog_id;
 
 
@@ -3297,7 +3368,29 @@ add_filter('hms_testimonials_sc_name', 'hms_name_override');
 					$builder .= '<div class="id">'.apply_filters('hms_testimonials_system_id', $testimonial['id'], $testimonial).'</div>';
 				break;
 				case 'system_testimonial':
-					$builder .= '<div class="testimonial">'.apply_filters('hms_testimonials_system_testimonial', nl2br($testimonial['testimonial']), $testimonial).'</div>';
+					if ($word_limit > 0) {
+
+						$word_limit++;
+						$exp = explode(' ', strip_tags($testimonial['testimonial']), $word_limit);
+
+						/**
+						 * If there are more words than we actually want (see line 3304) then the last item should be ...
+						 **/
+						if (count($exp) == $word_limit)
+							$exp[ $word_limit - 1 ] = '...';
+
+						$testimonial['testimonial'] = implode(' ', $exp);
+
+					} elseif ($char_limit > 0) {
+						
+						if (strlen($testimonial['testimonial']) > $char_limit)
+							$testimonial['testimonial'] = substr($testimonial['testimonial'], 0, $char_limit).'...';
+
+					} else {
+						$testimonial['testimonial'] = nl2br($testimonial['testimonial']);
+					}
+
+					$builder .= '<div class="testimonial">'.apply_filters('hms_testimonials_system_testimonial', $testimonial['testimonial'], $testimonial).'</div>';
 				break;
 				case 'system_source':
 					$builder .= '<div class="author">'.apply_filters('hms_testimonials_system_source', nl2br($testimonial['name']), $testimonial).'</div>';

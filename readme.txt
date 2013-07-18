@@ -13,9 +13,7 @@ Display your customer testimonials on pages or posts. Use groups to organize and
 
 == Description ==
 
-** Mega Changes **
-
-* Templates have been redone. You now create your own templates using drag and drop.
+* Create your own templates using drag and drop allowing you to display testimonials in different ways through your site.
 * Custom fields! You can now add additional fields to your testimonials.
 * You can now add an image to your testimonial. This allows you show a picture of the person who submitted the testimonial.
 
@@ -35,7 +33,7 @@ Use the settings to allow access for your users to write testimonials about your
 
 == Upgrade Notice ==
 
-Go into Testimonials -> Templates and create new templates.
+For version 1.x to 2.x, go into Testimonials -> Templates and create new templates.
 
 == Frequently Asked Questions ==
 
@@ -74,6 +72,12 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 2.0.8 =
+* Added word_limit to shortcodes and widgets. This limits the number of words shown on a testimonial.
+* Added char_limit to shortcodes and widgets. This limits the number of characters shown on a testimonial.
+* Allow loading testimonials through javascript. You MUST enable this option in the advanced settings area before using it.
+* Updated documentation
 
 = 2.0.7 =
 * Fixed a bug with WordPress MultiSite not showing testimonials in wp-admin

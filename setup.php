@@ -134,7 +134,8 @@ function hms_testimonials_install() {
 			update_option('hms_testimonials', 
 				array('role' => 'administrator', 'autoapprove' => 'administrator', 'moderator' => 'administrator', 'resetapproval' => 1, 'num_users_can_create' => 1, 
 					  'show_active_links' => 0, 'active_links_nofollow' => 1, 'moderators_can_access_settings' => 1, 'collation' => $collation,
-					  'use_recaptcha' => 0, 'recaptcha_privatekey' => '', 'recaptcha_publickey' => '', 'image_width' => 100, 'image_height' => 100
+					  'use_recaptcha' => 0, 'recaptcha_privatekey' => '', 'recaptcha_publickey' => '', 'image_width' => 100, 'image_height' => 100,
+					  'js_load' => 0
 				));
 		}
 	}
