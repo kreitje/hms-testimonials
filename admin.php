@@ -47,7 +47,8 @@ class HMS_Testimonials {
 			'image_height' => 100,
 			'date_format' => 'm/d/Y',
 			'display_rows' => array('id','name','testimonial','url','testimonial_date','shortcode','user','display'),
-			'js_load' => 0
+			'js_load' => 0,
+			'testimonial_container' => 'div'
 		);
 
 		$this->options = array_merge($defaults, $current_options);
@@ -314,6 +315,8 @@ JS;
 			$options['image_height'] = (isset($_POST['image_height'])) ? (int)$_POST['image_height'] : 100;
 			$options['date_format'] = (isset($_POST['date_format'])) ? $_POST['date_format'] : 'm/d/Y';
 
+			$options['testimonial_container'] = (isset($_POST['testimonial_container']) && ($_POST['testimonial_container'] == 'blockquote')) ? 'blockquote' : 'div';
+
 			update_option('hms_testimonials', $options);
 			$this->options = $options;
 			$updated = 1;
@@ -365,6 +368,14 @@ JS;
 							<tr>
 								<th scope="row">5. Date format</th>
 								<td><input type="text" name="date_format" value="<?php echo $this->options['date_format']; ?>" size="10" /> <a href="<?php echo admin_url('admin.php?page=hms-testimonials-help'); ?>#date_format" target="_blank">Read More</a></td>
+							</tr>
+							<tr>
+								<th scope="row">6. Use the following as a container for the testimonial text</th>
+								<td><select name="testimonial_container">
+										<option value="div" <?php if ($this->options['testimonial_container'] == 'div') echo ' selected="selected"'; ?>>Div</option>
+										<option value="blockquote" <?php if ($this->options['testimonial_container'] == 'blockquote') echo ' selected="selected"'; ?>>Blockquote</option>
+									</select>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -752,7 +763,7 @@ JS;
 			<div id="icon-options-general" class="icon32"></div>
 			<h2>Documentation</h2>
 
-			<p>This plugin allows you to add customer testimonials to your site in an easy to manage way. HMS Testimonials offers 2 shortcodes with multiple options and 2 widgets.</p>
+			<p>This plugin allows you to add customer testimonials to your site in an easy to manage way. HMS Testimonials offers 3 shortcodes with multiple options and 2 widgets.</p>
 			<br />
 			<h4 align="center"><strong>Do you enjoy this plugin?</strong> <a style="color:red;" href="https://portal.hitmyserver.com/clients/cart.php?a=add&pid=12" target="_blank">Consider purchasing a thank you license!</a></h4>
 			<br />
@@ -3390,7 +3401,12 @@ JS;
 						$testimonial['testimonial'] = nl2br($testimonial['testimonial']);
 					}
 
-					$builder .= '<div class="testimonial">'.apply_filters('hms_testimonials_system_testimonial', $testimonial['testimonial'], $testimonial).'</div>';
+					$container = HMS_Testimonials::getInstance()->options['testimonial_container'];
+
+					if ($container == 'div')
+						$builder .= '<div class="testimonial">'.apply_filters('hms_testimonials_system_testimonial', $testimonial['testimonial'], $testimonial).'</div>';
+					elseif ($container == 'blockquote')
+						$builder .= '<blockquote class="testimonial">'.apply_filters('hms_testimonials_system_testimonial', $testimonial['testimonial'], $testimonial).'</blockquote>';
 				break;
 				case 'system_source':
 					$builder .= '<div class="author">'.apply_filters('hms_testimonials_system_source', nl2br($testimonial['name']), $testimonial).'</div>';

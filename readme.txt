@@ -73,6 +73,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.0.9 =
+* Added the ability to toggle between using a div or a blockquote for the testimonial text
+
 = 2.0.8 =
 * Added word_limit to shortcodes and widgets. This limits the number of words shown on a testimonial.
 * Added char_limit to shortcodes and widgets. This limits the number of characters shown on a testimonial.
