@@ -14,6 +14,8 @@ function hms_testimonials_form( $atts ) {
 	
 	$ret = '';
 	if (isset($_POST) && isset($_POST['hms_testimonial']) && ($_POST['hms_testimonial'] == 1)) {
+		if (! wp_verify_nonce(@$_REQUEST['_wpnonce'], 'hms-testimonials-form') ) die('Security check stopped this request. Not all required fields were entered. <a href="'.$_SERVER['REQUEST_URI'].'">Go back and try again.</a>');
+
 		$errors = array();
 
 		if (!isset($_POST['hms_testimonials_name']) || (($name = trim(@$_POST['hms_testimonials_name'])) == ''))
@@ -76,8 +78,8 @@ function hms_testimonials_form( $atts ) {
 
 			$wpdb->insert($wpdb->prefix."hms_testimonials", 
 				array(
-					'blog_id' => $blog_id, 'user_id' => $current_user->ID, 'name' => $name, 
-					'testimonial' => $testimonial, 'display' => 0, 'display_order' => ($display_order+1),
+					'blog_id' => $blog_id, 'user_id' => $current_user->ID, 'name' => strip_tags($name), 
+					'testimonial' => strip_tags($testimonial), 'display' => 0, 'display_order' => ($display_order+1),
 					'url' => $website, 'created_at' => date('Y-m-d h:i:s'), 'testimonial_date' => date('Y-m-d h:i:s')
 				)
 			);
@@ -142,9 +144,11 @@ function hms_testimonials_form( $atts ) {
 	$website_text = apply_filters('hms_testimonials_sc_website', __('Website', 'hms-testimonials' ));
 	$testimonial_text = apply_filters('hms_testimonials_sc_testimonial', __('Testimonial', 'hms-testimonials' ));
 	$submit_text = apply_filters('hms_testimonials_sc_submit', __('Submit Testimonial', 'hms-testimonials' ));
+	$nf = wp_nonce_field('hms-testimonials-form', '_wpnonce', true, false);
 
 	$ret .= <<<HTML
 <form method="post">
+{$nf}
 <input type="hidden" name="hms_testimonial" value="1" />
 	<table class="hms-testimonials-form">
 		<tr class="name required">
@@ -224,7 +228,9 @@ function hms_testimonials_show( $atts ) {
 			'order' => 'display_order',
 			'direction' => 'ASC',
 			'word_limit' => 0,
-			'char_limit' => 0
+			'char_limit' => 0,
+			'readmore_link' => HMS_Testimonials::getInstance()->getOption('readmore_link', ''),
+			'readmore_text' => HMS_Testimonials::getInstance()->getOption('readmore_text', '...'),
 		), $atts
 	));
 
@@ -232,6 +238,11 @@ function hms_testimonials_show( $atts ) {
 	if ($order == 'rand') $order = 'RAND()';
 	if ($direction != 'DESC') $direction = 'ASC';
 	if ($start != 0) $start = (int)$start - 1;
+
+	$options = array(
+		'readmore_link' => $readmore_link,
+		'readmore_text' => $readmore_text
+	);
 
 	$sql_limit = '';
 	
@@ -262,8 +273,6 @@ function hms_testimonials_show( $atts ) {
 			$new_start = (($current_page * $limit) - $limit) + $start;
 		}
 
-
-
 		$sql_limit = 'LIMIT '.intval($new_start).', '.intval($limit);
 	}
 
@@ -276,7 +285,7 @@ function hms_testimonials_show( $atts ) {
 			return '';
 
 		$ret = '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].' hms-testimonial-template-'.$template.'">';
-			$ret .= HMS_Testimonials::template($template, $get, (int)$word_limit, (int)$char_limit);
+			$ret .= HMS_Testimonials::template($template, $get, (int)$word_limit, (int)$char_limit, $options);
 		$ret .= '</div>';
 		
 
@@ -314,7 +323,7 @@ function hms_testimonials_show( $atts ) {
 
 			$ret .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'">';
 
-				$ret .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit);
+				$ret .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit, $options);
 
 			$ret .= '</div>';
 
@@ -352,7 +361,9 @@ function hms_testimonials_show_rotating( $atts ) {
 			'order' => 'display_order',
 			'direction' => 'ASC',
 			'word_limit' => 0,
-			'char_limit' => 0
+			'char_limit' => 0,
+			'readmore_link' => HMS_Testimonials::getInstance()->getOption('readmore_link', ''),
+			'readmore_text' => HMS_Testimonials::getInstance()->getOption('readmore_text', '...'),
 		), $atts
 	));
 
@@ -360,6 +371,11 @@ function hms_testimonials_show_rotating( $atts ) {
 	if ($order == 'rand') $order = 'RAND()';
 	if ($direction != 'DESC') $direction = 'ASC';
 	if ($link_position != 'top' && $link_position != 'both') $link_position = 'bottom';
+
+	$options = array(
+		'readmore_link' => $readmore_link,
+		'readmore_text' => $readmore_text
+	);
 
 	$start = false;
 	$start_int = 0;
@@ -403,7 +419,7 @@ function hms_testimonials_show_rotating( $atts ) {
 
 		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$get[0]['id'].' hms-testimonial-template-'.$template.'"">';
 						
-		$return .= HMS_Testimonials::template($template, $get[0], (int)$word_limit, (int)$char_limit);
+		$return .= HMS_Testimonials::template($template, $get[0], (int)$word_limit, (int)$char_limit, $options);
 
 		$return .= '</div>';
 
@@ -418,7 +434,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	foreach($get as $g) {
 		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'"">';
 		
-			$return .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit);
+			$return .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit, $options);
 
 		$return .= '</div>';	
 	}
