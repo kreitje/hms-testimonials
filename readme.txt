@@ -73,6 +73,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.1.1 =
+* Moved the rotating javascript to the footer
+
 = 2.1.0 =
 * Added Read More settings
 * Added a new field to testimonials to specify your own read more link on an indvidual basis.

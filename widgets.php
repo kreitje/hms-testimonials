@@ -355,7 +355,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 	}
 
 	public function widget($args, $instance) {
-		global $wpdb, $blog_id;
+		global $wpdb, $blog_id, $hms_testimonials_random_strings;
 		$settings = get_option('hms_testimonials');
 
 		if (!isset($instance['group']))
@@ -422,88 +422,96 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 				} ?>
 		</div>
 
+		<?php
+		$autostart = ($instance['autostart'] == 1) ? 1 : 0;
+		$link_pause = $instance['link_pause'];
+		$link_play = $instance['link_play'];
+		$seconds = $instance['seconds'].'000';
+
+		$hms_testimonials_random_strings .= <<<JS
 		<script type="text/javascript">
-			var index_<?php echo $identifier; ?> = 1;
-			var timeout_<?php echo $identifier; ?> = null;
-			var play_<?php echo $identifier; ?> = <?php if ($instance['autostart'] == 1) echo '1'; else echo '0'; ?>;
+			var index_$identifier = 1;
+			var timeout_$identifier = null;
+			var play_$identifier = $autostart;
 
 			jQuery(document).ready(function() {
-
-				<?php if ($instance['autostart'] == 1) { ?>
-					si_<?php echo $identifier; ?>();
-				<?php } ?>
-
-				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .pause").click(function() {
-					if (play_<?php echo $identifier; ?> == 1) {
-						jQuery(this).text('<?php echo $instance['link_play']; ?>').removeClass('pause').addClass('play');
-						clearInterval(timeout_<?php echo $identifier; ?>);
-						play_<?php echo $identifier; ?> = 0;
+JS;
+			if ($instance['autostart'] == 1)
+				$hms_testimonials_random_strings .= 'si_'.$identifier.'();';
+				
+		$hms_testimonials_random_strings .= <<<JS
+				jQuery("#hms-testimonial-$identifier .controls .pause").click(function() {
+					if (play_$identifier == 1) {
+						jQuery(this).text('$link_play').removeClass('pause').addClass('play');
+						clearInterval(timeout_$identifier);
+						play_$identifier = 0;
 					} else {
-						jQuery(this).text('<?php echo $instance['link_pause']; ?>').removeClass('play').addClass('pause');
-						si_<?php echo $identifier; ?>();
-						play_<?php echo $identifier; ?> = 1;
+						jQuery(this).text('$link_pause').removeClass('play').addClass('pause');
+						si_$identifier();
+						play_$identifier = 1;
 					}
 
 					return false;
 				});
 
-				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .prev").click(function() {
+				jQuery("#hms-testimonial-$identifier .controls .prev").click(function() {
 
-					var new_index = (index_<?php echo $identifier; ?> - 2);
+					var new_index = (index_$identifier - 2);
 					
 					if (new_index < 0) {
-						new_index = (jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").length - 1);
+						new_index = (jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").length - 1);
 					}
 					
 
-					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(new_index);
+					var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(new_index);
 					if (nextitem == undefined) {
-						index_<?php echo $identifier; ?> = 0;
-						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
+						index_$identifier = 0;
+						var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(0);
 					}
-					jQuery("#hms-testimonial-<?php echo $identifier; ?> .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_<?php echo $identifier; ?> = new_index + 1;
+					jQuery("#hms-testimonial-$identifier .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					index_$identifier = new_index + 1;
 
-					if (play_<?php echo $identifier; ?> == 1) {
-						clearInterval(timeout_<?php echo $identifier; ?>);
-						si_<?php echo $identifier; ?>();
+					if (play_$identifier == 1) {
+						clearInterval(timeout_$identifier);
+						si_$identifier();
 					}
 					return false;
 
 				});
-				jQuery("#hms-testimonial-<?php echo $identifier; ?> .controls .next").click(function() {
-					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(index_<?php echo $identifier; ?>);
+				jQuery("#hms-testimonial-$identifier .controls .next").click(function() {
+					var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(index_$identifier);
 					if (nextitem == undefined) {
-						index_<?php echo $identifier; ?> = 0;
-						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
+						index_$identifier = 0;
+						var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(0);
 					}
-					jQuery("#hms-testimonial-<?php echo $identifier; ?> .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_<?php echo $identifier; ?> = index_<?php echo $identifier; ?> + 1;
+					jQuery("#hms-testimonial-$identifier .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					index_$identifier = index_$identifier + 1;
 
-					if (play_<?php echo $identifier; ?> == 1) {
-						clearInterval(timeout_<?php echo $identifier; ?>);
-						si_<?php echo $identifier; ?>();
+					if (play_$identifier == 1) {
+						clearInterval(timeout_$identifier);
+						si_$identifier();
 					}
 					return false;
 				});
 				
 			});
 
-			function si_<?php echo $identifier; ?>() {
+			function si_$identifier() {
 
-				timeout_<?php echo $identifier; ?> = setInterval(function() {
-					var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(index_<?php echo $identifier; ?>);
+				timeout_$identifier = setInterval(function() {
+					var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(index_$identifier);
 					if (nextitem == undefined) {
-						index_<?php echo $identifier; ?> = 0;
-						var nextitem = jQuery("#hms-testimonial-list-<?php echo $identifier; ?> .hms-testimonial-container").get(0);
+						index_$identifier = 0;
+						var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(0);
 					}
-					jQuery("#hms-testimonial-<?php echo $identifier; ?> .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_<?php echo $identifier; ?> = index_<?php echo $identifier; ?> + 1;
-				}, <?php echo $instance['seconds']; ?>000);
+					jQuery("#hms-testimonial-$identifier .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
+					index_$identifier = index_$identifier + 1;
+				}, $seconds);
 			}
 			
 		</script>
-		<?php
+JS;
+		
 		
 		echo $args['after_widget'];
 	}

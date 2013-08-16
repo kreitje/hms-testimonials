@@ -341,7 +341,7 @@ function hms_testimonials_show( $atts ) {
 }
 
 function hms_testimonials_show_rotating( $atts ) {
-	global $wpdb, $blog_id;
+	global $wpdb, $blog_id, $hms_testimonials_random_strings;
 
 	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand');
 	$settings = get_option('hms_testimonials');
@@ -440,8 +440,9 @@ function hms_testimonials_show_rotating( $atts ) {
 	}
 	
 	$return .= '</div>';
+ 
 
-	$return .= <<<JS
+	$hms_testimonials_random_strings .= <<<JS
 	<script type="text/javascript">
 		var index_{$random_string} = 1;
 		var timeout_{$random_string} = null;
@@ -449,10 +450,10 @@ function hms_testimonials_show_rotating( $atts ) {
 		jQuery(document).ready(function() {
 JS;
 		if ($start)
-			$return .= 'si_'.$random_string.'();';
+			$hms_testimonials_random_strings .= 'si_'.$random_string.'();';
 		
 
-	$return .= <<<JS
+	$hms_testimonials_random_strings .= <<<JS
 				jQuery("#hms-testimonial-sc-{$random_string} .controls .playpause").click(function() {
 					if (play_{$random_string} == 1) {
 						jQuery(this).text('{$link_play}').removeClass('pause').addClass('play');
@@ -523,6 +524,12 @@ JS;
 JS;
 
 	return $return;
+}
+
+function hms_testimonial_footer_js() {
+	global $hms_testimonials_random_strings;
+
+	echo $hms_testimonials_random_strings;
 }
 
 /**
