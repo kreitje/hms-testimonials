@@ -24,7 +24,7 @@ $hms_testimonials_db_version = 13;
  * This is populated from the rotating shortcode and widget.
  * It is used for the wp_footer action to load the javascript there
  **/
-$hms_testimonials_random_strings = array();
+$hms_testimonials_random_strings = '';
 
 
 add_action('wp_enqueue_scripts', create_function('', 'wp_enqueue_script(\'jquery\');'));
