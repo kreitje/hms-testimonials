@@ -534,7 +534,7 @@ JS;
 		$characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     	$randstring = '';
     	for ($i = 0; $i < 5; $i++)
-            $randstring .= $characters[rand(0, strlen($characters))];
+            $randstring .= $characters[rand(0, 51)];
         
     	return $randstring;
 	}

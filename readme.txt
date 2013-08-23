@@ -73,6 +73,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.1.5 =
+* Fixed a bug when generating a random string in the widgets and shortcodes
+
 = 2.1.4 =
 * Fixed a bug with pagination and determining the current page
 * Fixed some notices / deperaction messages in HTMLPurifier

@@ -409,7 +409,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	$characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     
     for ($i = 0; $i < 5; $i++)
-    	$random_string .= $characters[rand(0, strlen($characters))];
+    	$random_string .= $characters[rand(0, 51)];
 
 
     if ($group == 0)
