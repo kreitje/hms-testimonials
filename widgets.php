@@ -347,7 +347,6 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		$instance['link_position'] = (isset($new_instance['link_position']) && in_array($new_instance['link_position'], $valid)) ? $new_instance['link_position'] : 'bottom';
 		$instance['autostart'] = (isset($new_instance['autostart']) && $new_instance['autostart']=='1') ? 1 : 0;
-
 		$instance['word_limit'] = (isset($new_instance['word_limit'])) ? (int)$new_instance['word_limit'] : 0;
 		$instance['char_limit'] = (isset($new_instance['char_limit'])) ? (int)$new_instance['char_limit'] : 0;
 
@@ -360,6 +359,21 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 		if (!isset($instance['group']))
 			$instance['group'] = 0;
+
+		if (!isset($instance['autostart']))
+			$instance['autostart'] = 0;
+
+		if (!isset($instance['word_limit']))
+			$instance['word_limit'] = 0;
+
+		if (!isset($instance['char_limit']))
+			$instance['char_limit'] = 0;
+
+		if (!isset($instance['show_links']))
+			$instance['show_links'] = 0;
+
+		if (!isset($instance['seconds']))
+			$instance['seconds'] = 10;
 
 		$order = ($instance['order'] == 'DESC') ? 'DESC' : 'ASC';
 		$sort = $instance['sortby'];

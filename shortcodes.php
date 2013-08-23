@@ -265,9 +265,23 @@ function hms_testimonials_show( $atts ) {
 		$total_results = count($get_count);
 		$pages = ceil($total_results/$limit);
 
-		if (!isset($_GET['hms_testimonials_page']) || !is_numeric($_GET['hms_testimonials_page']) || $_GET['hms_testimonials_page'] > $pages || $_GET['hms_testimonials_page'] < 1) {
+		/**
+		 * If not set or is an invalid value make it the first page
+		 **/
+		if (!isset($_GET['hms_testimonials_page']) || (int)$_GET['hms_testimonials_page'] <= 1) {
 			$current_page = 1;
 			$new_start = $start;
+
+		/**
+		 * If the page number is set but greater than the number of pages, set it to the last page
+		 **/
+		} elseif ((int)$_GET['hms_testimonials_page'] > $pages) {
+			$current_page = $pages;
+			$new_start = (($current_page * $limit) - $limit) + $start;
+
+		/**
+		 * We are inbetween 1 and the maximum number of pages
+		 **/
 		} else {
 			$current_page = (int)$_GET['hms_testimonials_page'];
 			$new_start = (($current_page * $limit) - $limit) + $start;
@@ -547,7 +561,8 @@ function hms_testimonials_build_pagination($current_page, $total_pages, $prev, $
 	else
 		$url[0] .= '?';
 
-
+	$return = '';
+	
 	if ($current_page > 1)
 		$return .= '<a href="' . $url[0] . 'hms_testimonials_page='.($current_page - 1).'" class="prev">'.$prev.'</a> ';
 

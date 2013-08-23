@@ -215,7 +215,7 @@ class HMS_Testimonials {
 	}
 
 
-	public function settings_link($links, $file = '') {
+	public static function settings_link($links, $file = '') {
 
 		if ($file == plugin_basename(dirname(__FILE__).'/hms-testimonials.php')){
 			$settings_link = '<a href="'.admin_url('admin.php?page=hms-testimonials-settings').'">Settings</a>';
@@ -1112,7 +1112,7 @@ JS;
 
 					switch($f->type) {
 						case 'email':
-							if (!filter_var($_POST['cf'][$f->id], FILTER_VALIDATE_EMAIL))
+							if (( isset($_POST['cf'][$f->id]) && ($_POST['cf'][$f->id])) && !filter_var($_POST['cf'][$f->id], FILTER_VALIDATE_EMAIL))
 								$errors[] = 'Please enter a valid email for the '.$f->name.' field.';
 						break;
 					}
@@ -1159,8 +1159,8 @@ JS;
 				/**
 				 * Purify the testimonial field
 				 **/
-				if (!class_exists(HTMLPurifier)) {
-					require_once HMS_TESTIMONIALS . 'HTMLPurifier/HTMLPurifier.auto.php';
+				if (!class_exists('HTMLPurifier')) {
+					require_once HMS_TESTIMONIALS . 'HTMLPurifier/HTMLPurifier.standalone.php';
 				}
 
 				$config = HTMLPurifier_Config::createDefault();
@@ -1168,8 +1168,8 @@ JS;
 				/**
 				 * Just in case some users can't use the cache, kill it for all
 				 **/
-				$config->set('Core', 'DefinitionCache', null);
-				$config->set('URI', 'AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true));
+				$config->set('Cache.DefinitionImpl', null);
+				$config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true));
 				$purifier = new HTMLPurifier($config);
 
 				$testimonial = $purifier->purify(trim($_POST['testimonial']));
@@ -1275,8 +1275,8 @@ JS;
 									<p>Example:<br /> &nbsp;&nbsp;John Doe<br />&nbsp;&nbsp;ACME LLC</p>
 								</div>
 								<div style="float:right;width:49%;">
-									<p><a href="#" class="upload_image_button" class="button">Upload/Attach an image</a> <?php if ($image_url != '') { ?> &nbsp; / &nbsp;<a href="#" class="remove_image_button">Remove Image</a> <?php } ?></p>
-									<div class="image-container"><?php if ($image_url != '') echo '<img src="'.$image_url.'" class="testimonial-image" />'; ?>
+									<p><a href="#" class="upload_image_button" class="button">Upload/Attach an image</a> <?php if (isset($image_url) && $image_url != '') { ?> &nbsp; / &nbsp;<a href="#" class="remove_image_button">Remove Image</a> <?php } ?></p>
+									<div class="image-container"><?php if (isset($image_url) && $image_url != '') echo '<img src="'.$image_url.'" class="testimonial-image" />'; ?>
 									</div>
 									<input type="hidden" name="image" id="attachment_id" value="<?php if (isset($_POST['image'])&&($_POST['image']!=0)) echo $_POST['image']; ?>" />
 								</div>
@@ -1452,7 +1452,7 @@ JS;
 
 					switch($f->type) {
 						case 'email':
-							if (!filter_var($_POST['cf'][$f->id], FILTER_VALIDATE_EMAIL))
+							if ( ( isset($_POST['cf'][$f->id]) && ($_POST['cf'][$f->id])) && !filter_var($_POST['cf'][$f->id], FILTER_VALIDATE_EMAIL))
 								$errors[] = 'Please enter a valid email for the '.$f->name.' field.';
 						break;
 					}
@@ -1504,8 +1504,8 @@ JS;
 				/**
 				 * Purify the testimonial field
 				 **/
-				if (!class_exists(HTMLPurifier)) {
-					require_once HMS_TESTIMONIALS . 'HTMLPurifier/HTMLPurifier.auto.php';
+				if (!class_exists('HTMLPurifier')) {
+					require_once HMS_TESTIMONIALS . 'HTMLPurifier/HTMLPurifier.standalone.php';
 				}
 
 				$config = HTMLPurifier_Config::createDefault();
@@ -1513,8 +1513,8 @@ JS;
 				/**
 				 * Just in case some users can't use the cache, kill it for all
 				 **/
-				$config->set('Core', 'DefinitionCache', null);
-				$config->set('URI', 'AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true));
+				$config->set('Cache.DefinitionImpl', null);
+				$config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true));
 				$purifier = new HTMLPurifier($config);
 
 				$testimonial = $purifier->purify(trim($_POST['testimonial']));
@@ -3462,8 +3462,8 @@ JS;
 		/**
 		 * Purify the testimonial field
 		 **/
-		if (!class_exists(HTMLPurifier)) {
-			require_once HMS_TESTIMONIALS . 'HTMLPurifier/HTMLPurifier.auto.php';
+		if (!class_exists('HTMLPurifier')) {
+			require_once HMS_TESTIMONIALS . 'HTMLPurifier/HTMLPurifier.standalone.php';
 		}
 
 		$config = HTMLPurifier_Config::createDefault();
@@ -3471,8 +3471,8 @@ JS;
 		/**
 		 * Just in case some users can't use the cache, kill it for all
 		 **/
-		$config->set('Core', 'DefinitionCache', null);
-		$config->set('URI', 'AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true));
+		$config->set('Cache.DefinitionImpl', null);
+		$config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'nntp' => true, 'news' => true));
 		$purifier = new HTMLPurifier($config);
 
 
