@@ -2389,12 +2389,12 @@ JS;
 	* Custom Fields
 	**/
 	public function customfields_page() {
+		$errors = array();
 
 		if (isset($_POST) && count($_POST)>0) {
 			check_admin_referer('hms-testimonials-new-cf');
 
-			$errors = array();
-
+			
 			$_POST = stripslashes_deep($_POST);
 
 			if (!isset($_POST['name']) || empty($_POST['name']))
@@ -2580,6 +2580,7 @@ JS;
 
 		$id = (isset($_GET['id'])) ? (int)$_GET['id'] : 0;
 		$field = $this->wpdb->get_row("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials_cf` WHERE `id` = ".(int)$id." AND `blog_id` = ".(int)$this->blog_id, ARRAY_A);
+		$errors = array();
 		
 		if (count($field) < 1) {
 			?>
@@ -2595,7 +2596,7 @@ JS;
 
 		if (isset($_POST) && (count($_POST)>0)) {
 			check_admin_referer('hms-testimonials-edit-cf');
-			$errors = array();
+			
 			$_POST = stripslashes_deep($_POST);
 
 			if (!isset($_POST['name']) || empty($_POST['name']))

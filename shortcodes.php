@@ -34,7 +34,7 @@ function hms_testimonials_form( $atts ) {
 
 				switch($f->type) {
 					case 'email':
-						if (!filter_var($_POST['hms_testimonials_cf'][$f->id], FILTER_VALIDATE_EMAIL))
+						if (isset($_POST['hms_testimonials_cf'][$f->id]) && ($_POST['hms_testimonials_cf'][$f->id] != '') && !filter_var($_POST['hms_testimonials_cf'][$f->id], FILTER_VALIDATE_EMAIL))
 							$errors[] = sprintf( __('Please enter a valid email for the %1$s field.', 'hms-testimonials'), $f->name );
 					break;
 				}
@@ -47,6 +47,11 @@ function hms_testimonials_form( $atts ) {
 		$website = '';
 		if (isset($_POST['hms_testimonials_website']) && ($_POST['hms_testimonials_website'] != '')) {
 			$website = $_POST['hms_testimonials_website'];
+
+			$website_parts = parse_url($website);
+			if ($website_parts !== false && !isset($website_parts['scheme']))
+				$website = 'http://' . $website;
+			
 
 			if (!filter_var($website, FILTER_VALIDATE_URL))
 				$errors[] = __('Please enter a valid URL.', 'hms-testimonials' );
