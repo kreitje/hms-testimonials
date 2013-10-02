@@ -1,4 +1,6 @@
 <?php
+$hms_testimonials_random_strings = '';
+
 require_once '../../../wp-load.php';
 require_once './admin.php';
 require_once './shortcodes.php';
@@ -23,7 +25,11 @@ if ($settings['js_load'] == 0)
 /**
  * Piggy back off of the hms_testimonials shortcode function to generate the output
  **/
-$ret = hms_testimonials_show($_GET);
+
+if (isset($_GET['rotating']))
+	$ret = hms_testimonials_show_rotating($_GET) . $hms_testimonials_random_strings;
+else
+	$ret = hms_testimonials_show($_GET);
 
 /**
  * Write it to the page. JSON encode to escape for javascript.

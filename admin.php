@@ -5,7 +5,7 @@ class HMS_Testimonials {
 	private $roles = array();
 	private $user_role = null;
 	private $user_role_num = 0;
-
+	
 	private $options = array();
 
 	private $current_user = null;
@@ -151,30 +151,37 @@ class HMS_Testimonials {
 	}
 
 	public static function enqueue_scripts() {
-		wp_enqueue_script('jquery-ui-sortable');
-		wp_enqueue_script('jquery-ui-droppable');
-		wp_enqueue_script('jquery-ui-datepicker');
-		wp_enqueue_script('jquery-ui-accordion');
 
-		wp_enqueue_style('plugin_name-admin-ui-css', plugins_url( '/jquery-ui.css' , __FILE__ ), false, '2.0.8', false);
+		if (isset($_GET['page']) && (substr( $_GET['page'], 0, 16) == 'hms-testimonials')) {
+			
+			wp_enqueue_script('jquery-ui-sortable');
+			wp_enqueue_script('jquery-ui-droppable');
+			wp_enqueue_script('jquery-ui-datepicker');
+			wp_enqueue_script('jquery-ui-accordion');
+
+			wp_enqueue_style('plugin_name-admin-ui-css', plugins_url( '/jquery-ui.css' , __FILE__ ), false, '2.0.8', false);
+
+		}
 	}
 
 	public function admin_head() {
 		
-		?>
-		<style type="text/css">
-			.hms-testimonials-notice {
-				background-color:#e0f5ff;
-				border-color:#55a0e6;
-				padding:0 .6em;
-				margin:5px 0 15px;
-				-webkit-border-radius: 3px;
-				border-radius: 3px;
-				border-width: 1px;
-				border-style: solid;
-			}
-		</style>
-		<?php
+		if (isset($_GET['page']) && (substr( $_GET['page'], 0, 16) == 'hms-testimonials')) {
+			?>
+			<style type="text/css">
+				.hms-testimonials-notice {
+					background-color:#e0f5ff;
+					border-color:#55a0e6;
+					padding:0 .6em;
+					margin:5px 0 15px;
+					-webkit-border-radius: 3px;
+					border-radius: 3px;
+					border-width: 1px;
+					border-style: solid;
+				}
+			</style>
+			<?php
+		}
 
 		$screen = get_current_screen();
 
@@ -275,6 +282,24 @@ JS;
 		return $return;
 	}
 
+	private function check_akismet() {
+
+		$use_akismet = false;
+		if ( function_exists( 'akismet_verify_key' ) && function_exists( 'akismet_get_key')) {
+			
+			$key = akismet_get_key();
+			if ($key !== false && $key != '') {
+				$response = akismet_verify_key($key);
+				if ($response == 'valid')
+					return 1;
+			}
+
+			return 0;
+		}
+
+		return -1;
+	}
+
 	public function new_in_20() {
 		?>
 		<div class="wrap">
@@ -352,92 +377,109 @@ JS;
 			.form-table th { width:auto !important;}
 			</style>
 
-			<form method="post" action="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">
-				<?php wp_nonce_field('hms-testimonials-settings'); ?>
-				<div style="float:left;width:50%;">
-					<h3>Settings</h3>
-					<table class="form-table">
-						<tbody>
-							<tr>
-								<th scope="row">1. If a testimonial has a url, show it as an active link?</th>
-								<td><input type="checkbox" name="show_active_links" value="1" <?php if ($this->options['show_active_links']==1) echo ' checked="checked"'; ?> /></td>
-							</tr>
+			<div style="float:left;width:60%;">
 
-							<tr>
-								<th scope="row">2. Add a nofollow relationship to the active link of a testimonial?</th>
-								<td><input type="checkbox" name="active_links_nofollow" value="1" <?php if ($this->options['active_links_nofollow']==1) echo ' checked="checked"'; ?> /></td>
-							</tr>
+				<form method="post" action="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">
+					<?php wp_nonce_field('hms-testimonials-settings'); ?>
+					<div style="float:left;width:70%;">
+						<h3>Settings</h3>
+						<table class="form-table" width="100%">
+							<tbody>
+								<tr>
+									<th scope="row">1. If a testimonial has a url, show it as an active link?</th>
+									<td><input type="checkbox" name="show_active_links" value="1" <?php if ($this->options['show_active_links']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
 
-							<tr>
-								<td colspan="2"><strong>Adding an image to your testimonials? Set the dimensions here.</strong></td>
-							</tr>
-							<tr>
-								<th scope="row">3. Width of the image</th>
-								<td><input type="text" name="image_width" value="<?php echo $this->options['image_width']; ?>" size="3" />px</td>
-							</tr>
-							<tr>
-								<th scope="row">4. Height of the image</th>
-								<td><input type="text" name="image_height" value="<?php echo $this->options['image_height']; ?>" size="3" />px</td>
-							</tr>
-							<tr>
-								<th scope="row">5. Date format</th>
-								<td><input type="text" name="date_format" value="<?php echo $this->options['date_format']; ?>" size="10" /> <a href="<?php echo admin_url('admin.php?page=hms-testimonials-help'); ?>#date_format" target="_blank">Read More</a></td>
-							</tr>
-							<tr>
-								<th scope="row">6. Use the following as a container for the testimonial text</th>
-								<td><select name="testimonial_container">
-										<option value="div" <?php if ($this->options['testimonial_container'] == 'div') echo ' selected="selected"'; ?>>Div</option>
-										<option value="blockquote" <?php if ($this->options['testimonial_container'] == 'blockquote') echo ' selected="selected"'; ?>>Blockquote</option>
-									</select>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="2">
-									<br />
-									<strong>The Read More link is a URL to a page that shows testimonials. This is useful if you are using character or word limits as it will show a "Read More" 
-										link at the end.</strong>
-								</td>
-							</tr>
-							<tr>
-								<th scope="row">7. "Read More" link</th>
-								<td><input type="text" name="readmore_link" value="<?php echo $this->options['readmore_link']; ?>" /></td>
-							</tr>
-							<tr>
-								<th scope="row">5. "Read More" text</th>
-								<td><input type="text" name="readmore_text" value="<?php echo $this->options['readmore_text']; ?>" size="10" /></td>
-							</tr>
-						</tbody>
-					</table>
-					<br />
+								<tr>
+									<th scope="row">2. Add a nofollow relationship to the active link of a testimonial?</th>
+									<td><input type="checkbox" name="active_links_nofollow" value="1" <?php if ($this->options['active_links_nofollow']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
 
-					<h3>reCAPTCHA Settings</h3>
-					<p>We offer a shortcode to allow your visitors to submit testimonials. If you would like to use reCAPTCHA for spam measures, enter those settings here.</p>
-					<table class="form-table">
-						<tbody>
-							<tr>
-								<th scope="row">Use reCAPTCHA?</th>
-								<td><input type="checkbox" name="use_recaptcha" value="1" <?php if ($this->options['use_recaptcha']==1) echo ' checked="checked"'; ?> /></td>
-							</tr>
-							<tr>
-								<th scope="row">Public Key</th>
-								<td><input type="text" name="recaptcha_publickey" value="<?php echo $this->options['recaptcha_publickey']; ?>" /></td>
-							</tr>
-							<tr>
-								<th scope="row">Private Key</th>
-								<td><input type="text" name="recaptcha_privatekey" value="<?php echo $this->options['recaptcha_privatekey']; ?>" /></td>
-							</tr>
-							<tr>
-								<th scope="row" colspan="2"><br />
-									<strong>Need a reCAPTCHA account?</strong> &nbsp;&nbsp;&nbsp;<a href="http://www.google.com/recaptcha" target="_blank">Sign Up Here It's Free!</a>
-								</th>
-							</tr>
-						</tbody>
-					</table>
+								<tr>
+									<td colspan="2"><strong>Adding an image to your testimonials? Set the dimensions here.</strong></td>
+								</tr>
+								<tr>
+									<th scope="row">3. Width of the image</th>
+									<td><input type="text" name="image_width" value="<?php echo $this->options['image_width']; ?>" size="3" />px</td>
+								</tr>
+								<tr>
+									<th scope="row">4. Height of the image</th>
+									<td><input type="text" name="image_height" value="<?php echo $this->options['image_height']; ?>" size="3" />px</td>
+								</tr>
+								<tr>
+									<th scope="row">5. Date format</th>
+									<td><input type="text" name="date_format" value="<?php echo $this->options['date_format']; ?>" size="10" /> <a href="<?php echo admin_url('admin.php?page=hms-testimonials-help'); ?>#date_format" target="_blank">Read More</a></td>
+								</tr>
+								<tr>
+									<th scope="row">6. Use the following as a container for the testimonial text</th>
+									<td><select name="testimonial_container">
+											<option value="div" <?php if ($this->options['testimonial_container'] == 'div') echo ' selected="selected"'; ?>>Div</option>
+											<option value="blockquote" <?php if ($this->options['testimonial_container'] == 'blockquote') echo ' selected="selected"'; ?>>Blockquote</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<br />
+										<strong>The Read More link is a URL to a page that shows testimonials. This is useful if you are using character or word limits as it will show a "Read More" 
+											link at the end.</strong>
+									</td>
+								</tr>
+								<tr>
+									<th scope="row">7. "Read More" link</th>
+									<td><input type="text" name="readmore_link" value="<?php echo $this->options['readmore_link']; ?>" /></td>
+								</tr>
+								<tr>
+									<th scope="row">5. "Read More" text</th>
+									<td><input type="text" name="readmore_text" value="<?php echo $this->options['readmore_text']; ?>" size="10" /></td>
+								</tr>
+							</tbody>
+						</table>
+						<br />
 
-					<p class="submit"><input type="submit" class="button-primary" name="save" value="Save Settings" /></p>
-				</div>
+						<h3>reCAPTCHA Settings</h3>
+						<p>We offer a shortcode to allow your visitors to submit testimonials. If you would like to use reCAPTCHA for spam measures, enter those settings here.</p>
+						<table class="form-table" width="100%">
+							<tbody>
+								<tr>
+									<th scope="row">Use reCAPTCHA?</th>
+									<td><input type="checkbox" name="use_recaptcha" value="1" <?php if ($this->options['use_recaptcha']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
+								<tr>
+									<th scope="row">Public Key</th>
+									<td><input type="text" name="recaptcha_publickey" value="<?php echo $this->options['recaptcha_publickey']; ?>" /></td>
+								</tr>
+								<tr>
+									<th scope="row">Private Key</th>
+									<td><input type="text" name="recaptcha_privatekey" value="<?php echo $this->options['recaptcha_privatekey']; ?>" /></td>
+								</tr>
+								<tr>
+									<th scope="row" colspan="2"><br />
+										<strong>Need a reCAPTCHA account?</strong> &nbsp;&nbsp;&nbsp;<a href="http://www.google.com/recaptcha" target="_blank">Sign Up Here It's Free!</a>
+									</th>
+								</tr>
+							</tbody>
+						</table>
 
-			</form>
+						<p class="submit"><input type="submit" class="button-primary" name="save" value="Save Settings" /></p>
+					</div>
+
+				</form>
+			</div>
+			<div style="float:right;width:25%;">
+				<?php $check_akismet = $this->check_akismet(); ?>
+				<strong>Akismet Status: </strong> 
+				<?php if ($check_akismet == -1) echo 'Not Installed';
+					elseif ($check_akismet == 0) echo '<span style="color:red;">Invalid Key</span>';
+					else echo '<span style="color:green;">Valid</span>';
+				?>
+				<br /><br />
+				<p>When using the <strong>hms_testimonials_form</strong> shortcode, HMS Testimonials will automatically use Akismet 
+				if you have it installed and configured.</p>
+				<p>Items marked as spam will <span style="color:red;">NOT</span> be saved to your database. You will still receive an 
+					email with the contents to reconstruct the testimonial if you still want it in your database.</p>
+			</div>
+			<div style="clear:both;"></div>
 		</div>
 
 		<?php
@@ -799,7 +841,7 @@ JS;
 
 			<p>This plugin allows you to add customer testimonials to your site in an easy to manage way. HMS Testimonials offers 3 shortcodes with multiple options and 2 widgets.</p>
 			<br />
-			<h4 align="center"><strong>Do you enjoy this plugin?</strong> <a style="color:red;" href="https://portal.hitmyserver.com/clients/cart.php?a=add&pid=12" target="_blank">Consider purchasing a thank you license!</a></h4>
+			<h4 align="center"><strong>Do you enjoy this plugin?</strong> <a style="color:red;" href="http://hitmyserver.com/wordpress-plugins-donations/" target="_blank">Consider sending us a donation to show your support!</a></h4>
 			<br />
 
 			<div id="accordion">
@@ -1095,6 +1137,8 @@ JS;
 		if (isset($_POST) && (count($_POST)>0)) {
 			check_admin_referer('hms-testimonials-new');
 
+			$_POST = stripslashes_deep($_POST);
+
 			if (!isset($_POST['name']) || trim($_POST['name']) == '')
 				$errors[] = 'Please enter a name for this testimonial.';
 
@@ -1152,7 +1196,7 @@ JS;
 
 			if (count($errors)<1) {
 
-				$_POST = stripslashes_deep($_POST);
+				
 
 				$display_order = $this->wpdb->get_var("SELECT `display_order` FROM `".$this->wpdb->prefix."hms_testimonials` ORDER BY `display_order` DESC LIMIT 1");
 
@@ -1434,6 +1478,8 @@ JS;
 		$image_url = '';
 		$errors = array();
 		if (isset($_POST) && (count($_POST)>0) && count($get_testimonial)>0) {
+			$_POST = stripslashes_deep($_POST);
+
 			check_admin_referer('hms-testimonials-edit');
 			if (!isset($_POST['name']) || trim($_POST['name']) == '')
 				$errors[] = 'Please enter a name for this testimonial.';
@@ -1487,8 +1533,6 @@ JS;
 				$display = 1;
 
 			if (count($errors)<1) {
-				$_POST = stripslashes_deep($_POST);
-
 
 				if (isset($_POST['image']) && ($_POST['image'] != 0)) {
 					$image_url = wp_get_attachment_url($_POST['image']);
@@ -2755,6 +2799,9 @@ JS;
 
 		if (isset($_POST) && (count($_POST)>0)) {
 			check_admin_referer('hms-testimonials-new-template');
+
+			$_POST = stripslashes_deep($_POST);
+
 			$errors = array();
 			$save = array();
 			
@@ -2763,8 +2810,7 @@ JS;
 
 
 			if (count($_POST['item'])>0) {
-				$_POST = stripslashes_deep($_POST);
-
+			
 				foreach($_POST['item'] as $i) {
 					
 					if (isset($system_fields[$i])) {
@@ -2958,6 +3004,7 @@ JS;
 		);
 		$user_fields = array();
 		$used_fields = array();
+		$errors = array();
 		
 		$fields = $this->wpdb->get_results("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials_cf` WHERE `blog_id` = ".(int)$this->blog_id." ORDER BY `name` ASC");
 		if (count($fields) > 0) {
@@ -2978,7 +3025,7 @@ JS;
 
 			
 			if (count($_POST['item'])>0) {
-				$_POST = stripslashes_deep($_POST);
+				
 
 				foreach($_POST['item'] as $i) {
 					

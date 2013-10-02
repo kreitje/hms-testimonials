@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: kreitje
-Donate link: hitmyserver.com/wordpress-plugins/
+Donate link: http://hitmyserver.com/wordpress-plugins-donations/
 Tags: testimonials, reviews, client reviews, what they are saying
 Requires at least: 3.0.1
 Tested up to: 3.6
@@ -12,6 +12,8 @@ Display your customer testimonials on pages or posts. Use groups to organize and
 
 
 == Description ==
+
+** Now with Akismet anti-spam integration! **
 
 * Create your own templates using drag and drop allowing you to display testimonials in different ways through your site.
 * Custom fields! You can now add additional fields to your testimonials.
@@ -72,6 +74,27 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 2.1.12 =
+* Fixed a bug where the session may be started after output thus throwing an error.
+
+= 2.1.11 =
+* Added multiple anti spam measures for the shortcode form.
+* Fixed a PHP notice in the templates screen.
+* Moved jquery-ui to only show on testimonial pages
+
+= 2.1.10 =
+* The js.php script now allows you to load rotating testimonials.
+
+= 2.1.9 =
+* Fixed a PHP notice dealing with custom fields
+* Added random to the order attributes. It works the same as rand
+* Changed email custom field on the form shortcode to be a type of email instead of text
+* Added review microdata to testimonials. See: http://schema.org/Review
+
+= 2.1.8 =
+* hms_testimonials_form shortcode now escapes POST data.
+* Fixed a bug where input did not have slashes stripped when an error occured.
 
 = 2.1.7 =
 * Fixed some notces that are displayed when debugging is turned on.

@@ -170,7 +170,7 @@ class HMS_Testimonials_View extends WP_Widget {
 				echo $args['before_title'].$instance['title'].$args['after_title'];
 
 		if ($single==1) {
-			echo '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].'">';
+			echo '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].'" itemscope itemtype="http://schema.org/Review">';
 				
 			echo HMS_Testimonials::template($instance['template'], $get, (int)$instance['word_limit'], (int)$instance['char_limit']);
 
@@ -179,7 +179,7 @@ class HMS_Testimonials_View extends WP_Widget {
 			$x = 1;
 			foreach($get as $g) {
 
-				echo '<div class="hms-testimonial-container hms-testimonial-counter-'.$x.'">';
+				echo '<div class="hms-testimonial-container hms-testimonial-counter-'.$x.'" itemscope itemtype="http://schema.org/Review">';
 				
 					echo HMS_Testimonials::template($instance['template'], $g, (int)$instance['word_limit'], (int)$instance['char_limit']);
 				
@@ -417,7 +417,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 			if ($instance['show_links'] == 1 && ($instance['link_position'] == 'top' || $instance['link_position'] == 'both'))
 				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$link_text.'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
 
-			echo '<div class="hms-testimonial-container">';
+			echo '<div class="hms-testimonial-container" itemscope itemtype="http://schema.org/Review">';
 				echo HMS_Testimonials::template($instance['template'], $get[0], (int)$instance['word_limit'], (int)$instance['char_limit']);
 			echo '</div>';
 
@@ -430,7 +430,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 			<?php
 				foreach($get as $g) {
-					echo '<div class="hms-testimonial-container">';
+					echo '<div class="hms-testimonial-container" itemscope itemtype="http://schema.org/Review">';
 						echo HMS_Testimonials::template($instance['template'], $g, (int)$instance['word_limit'], (int)$instance['char_limit']);
 					echo '</div>';
 				} ?>

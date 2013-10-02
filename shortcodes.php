@@ -4,6 +4,28 @@ function hms_testimonials_form( $atts ) {
 	global $wpdb, $blog_id, $current_user;
 	get_currentuserinfo();
 
+	/**
+	 * Check if the Akismet plugin is enabled and valid. If so, use that.
+	 **/
+	$use_akismet = false;
+	if ( function_exists( 'akismet_verify_key' ) && function_exists( 'akismet_get_key')) {
+		
+		$key = akismet_get_key();
+		if ($key !== false && $key != '') {
+			$response = akismet_verify_key($key);
+			if ($response == 'valid')
+				$use_akismet = true;
+		}
+
+		if ($use_akismet)
+			require_once HMS_TESTIMONIALS . 'akismet.php';
+	}
+
+
+	if (isset($_SESSION['hms_testimonials_submitted']))
+		return '<div class="hms_testimonial_success">' . __('Your testimonial has been submitted.', 'hms-testimonials' ) . '</div>';
+	
+
 
 	$settings = get_option('hms_testimonials');
 	$fields = $wpdb->get_results("SELECT * FROM `".$wpdb->prefix."hms_testimonials_cf` WHERE `blog_id` = ".$blog_id." ORDER BY `name` ASC");
@@ -14,9 +36,15 @@ function hms_testimonials_form( $atts ) {
 	
 	$ret = '';
 	if (isset($_POST) && isset($_POST['hms_testimonial']) && ($_POST['hms_testimonial'] == 1)) {
+
 		if (! wp_verify_nonce(@$_REQUEST['_wpnonce'], 'hms-testimonials-form') ) die('Security check stopped this request. Not all required fields were entered. <a href="'.$_SERVER['REQUEST_URI'].'">Go back and try again.</a>');
 
+		$_POST = stripslashes_deep($_POST);
+
 		$errors = array();
+
+		if (isset($_POST['hms_testimonials_security_token']) && ($_POST['hms_testimonials_security_token'] != ''))
+			$errors[] = __('Invalid request.', 'hms-testimonials');
 
 		if (!isset($_POST['hms_testimonials_name']) || (($name = trim(@$_POST['hms_testimonials_name'])) == ''))
 			$errors[] = __('Please enter your name.', 'hms-testimonials' );
@@ -24,6 +52,7 @@ function hms_testimonials_form( $atts ) {
 		if (!isset($_POST['hms_testimonials_testimonial']) || (($testimonial = trim(@$_POST['hms_testimonials_testimonial'])) == ''))
 			$errors[] = __('Please enter your testimonial.', 'hms-testimonials' );
 
+		$email = '';
 		if ($field_count>0) {
 			foreach($fields as $f) {
 
@@ -36,6 +65,8 @@ function hms_testimonials_form( $atts ) {
 					case 'email':
 						if (isset($_POST['hms_testimonials_cf'][$f->id]) && ($_POST['hms_testimonials_cf'][$f->id] != '') && !filter_var($_POST['hms_testimonials_cf'][$f->id], FILTER_VALIDATE_EMAIL))
 							$errors[] = sprintf( __('Please enter a valid email for the %1$s field.', 'hms-testimonials'), $f->name );
+
+						$email = $_POST['hms_testimonials_cf'][$f->id];
 					break;
 				}
 
@@ -73,29 +104,47 @@ function hms_testimonials_form( $atts ) {
         	}
         }
 
-
 		if (count($errors)>0)
 			$ret .= '<div class="hms_testimonial_errors">'.join('<br />', $errors).'</div><br />';
-
 		else {
+			$is_spam = false;
+
+			if ($use_akismet) {
+				$akismet = new HMS_Testimonials_Akismet(get_option('home'), $key);
+				$akismet->setCommentAuthor( $name );
+
+				if ($email != '')
+					$akismet->setCommentAuthorEmail( $email );
+
+ 				if ($website != '')
+ 					$akismet->setCommentAuthorURL( $website );
+
+ 				$akismet->setCommentContent( $testimonial );
+ 				$akismet->setPermalink( get_permalink() );
+     			if($akismet->isCommentSpam())
+     				$is_spam = true;
+
+			}
 
 			$display_order = $wpdb->get_var("SELECT `display_order` FROM `".$wpdb->prefix."hms_testimonials` ORDER BY `display_order` DESC LIMIT 1");
 
-			$wpdb->insert($wpdb->prefix."hms_testimonials", 
-				array(
-					'blog_id' => $blog_id, 'user_id' => $current_user->ID, 'name' => strip_tags($name), 
-					'testimonial' => strip_tags($testimonial), 'display' => 0, 'display_order' => ($display_order+1),
-					'url' => $website, 'created_at' => date('Y-m-d h:i:s'), 'testimonial_date' => date('Y-m-d h:i:s')
-				)
-			);
+			if (!$is_spam) {
+				$wpdb->insert($wpdb->prefix."hms_testimonials", 
+					array(
+						'blog_id' => $blog_id, 'user_id' => $current_user->ID, 'name' => strip_tags($name), 
+						'testimonial' => strip_tags($testimonial), 'display' => 0, 'display_order' => ($display_order+1),
+						'url' => $website, 'created_at' => date('Y-m-d h:i:s'), 'testimonial_date' => date('Y-m-d h:i:s')
+					)
+				);
 
-			$id = $wpdb->insert_id;
+				$id = $wpdb->insert_id;
+			}
 
 			$e_message = '';
 			if ($field_count > 0) {
 				foreach($fields as $f) {
 
-					if (isset($_POST['hms_testimonials_cf'][$f->id])) {
+					if (isset($_POST['hms_testimonials_cf'][$f->id]) && !$is_spam) {
 						$wpdb->insert($wpdb->prefix."hms_testimonials_cf_meta", 
 							array(
 								'testimonial_id' => $id, 'key_id' => $f->id, 'value' => trim($_POST['hms_testimonials_cf'][$f->id])
@@ -113,6 +162,13 @@ function hms_testimonials_form( $atts ) {
 				$visitor_name = $current_user->user_login.' ';
 
 			$message = sprintf( __('%1$s as added a testimonial to your site %2$s', 'hms-testimonials' ), $visitor_name, get_bloginfo('name'))."\r\n\r\n";
+
+			if ($is_spam)
+				$message .= __('This message has been detected as spam by Akismet. It has ** NOT ** been saved to your database.', 'hms-testimonials')."\r\n\r\n";
+
+			if ($use_akismet)
+				$message .= sprintf( __('Spam Status: %1$s', 'hms-testimonials' ), (($is_spam) ? 'Spam' : 'Not Spam'))."\r\n";
+			
 			$message .= sprintf( __('Name: %1$s', 'hms-testimonials' ), $name)."\r\n";
 			$message .= sprintf( __('Website: %1$s', 'hms-testimonials' ), $website)."\r\n";
 			$message .= sprintf( __('Testimonial: %1$s', 'hms-testimonials' ), $testimonial)."\r\n";
@@ -120,10 +176,14 @@ function hms_testimonials_form( $atts ) {
 			$message .= $e_message;
 
 			$message .= "\r\n\r\n";
-			$message .= sprintf( __('View this testimonial at %1$s', 'hms-testimonials' ), admin_url('admin.php?page=hms-testimonials-view&id='.$id));
+
+			if (!$is_spam)
+				$message .= sprintf( __('View this testimonial at %1$s', 'hms-testimonials' ), admin_url('admin.php?page=hms-testimonials-view&id='.$id));
 
 			wp_mail(get_bloginfo('admin_email'), sprintf( __('New Visitor Testimonial Added to %1$s', 'hms-testimonials' ), get_bloginfo('name') ), $message);
-				
+			
+			$_SESSION['hms_testimonials_submitted'] = 1;
+
 			if (!isset($settings['guest_submission_redirect']) || ($settings['guest_submission_redirect'] == ''))
 				return '<div class="hms_testimonial_success">' . __('Your testimonial has been submitted.', 'hms-testimonials' ) . '</div>';
 			else
@@ -154,37 +214,41 @@ function hms_testimonials_form( $atts ) {
 	$ret .= <<<HTML
 <form method="post">
 {$nf}
+<input type="hidden" name="hms_testimonials_security_token" value="" />
 <input type="hidden" name="hms_testimonial" value="1" />
 	<table class="hms-testimonials-form">
 		<tr class="name required">
 			<td>{$name_text}</td>
-			<td><input type="text" name="hms_testimonials_name" value="{$name}" />
+			<td><input type="text" class="hms_testimonials_name" name="hms_testimonials_name" value="{$name}" />
 		</tr>
 		<tr class="website">
 			<td>{$website_text}</td>
-			<td><input type="text" name="hms_testimonials_website" value="{$website}" />
+			<td><input type="text" class="hms_testimonials_website" name="hms_testimonials_website" value="{$website}" />
 		</tr>
 		<tr class="testimonial required">
 			<td valign="top">{$testimonial_text}</td>
-			<td><textarea name="hms_testimonials_testimonial" rows="5" style="width:99%;">{$testimonial}</textarea></td>
+			<td><textarea name="hms_testimonials_testimonial" class="hms_testimonials_testimonial" rows="5" style="width:99%;">{$testimonial}</textarea></td>
 		</tr>
 HTML;
 
 	
 	if ($field_count>0) {
 		foreach($fields as $f) {
+			$name = strtolower( str_replace(' ', '_', $f->name) );
 			$ret .= '
-			<tr class="cf-'.strtolower($f->name).(($f->isrequired == 1) ? ' required' : '').'">
+			<tr class="cf-'.$name.(($f->isrequired == 1) ? ' required' : '').'">
 				<td valign="top">'.$f->name.'</td>
 				<td>';
 
 				switch($f->type) {
 					case 'email':
+						$ret .= '<input type="email" class="hms_testimonials_cf_'.$name.'" name="hms_testimonials_cf['.$f->id.']" value="'.$cf_{$f->id}.'" />';
+					break;
 					case 'text':
-						$ret .= '<input type="text" name="hms_testimonials_cf['.$f->id.']" value="'.$cf_{$f->id}.'" />';
+						$ret .= '<input type="text" class="hms_testimonials_cf_'.$name.'" name="hms_testimonials_cf['.$f->id.']" value="'.$cf_{$f->id}.'" />';
 					break;
 					case 'textarea':
-						$ret .= '<textarea name="hms_testimonials_cf['.$f->id.']" rows="5" style="width:99%;">'.$cf_{$f->id}.'</textarea>';
+						$ret .= '<textarea name="hms_testimonials_cf['.$f->id.']"  class="hms_testimonials_cf_'.$name.'" rows="5" style="width:99%;">'.$cf_{$f->id}.'</textarea>';
 					break;
 				}
 
@@ -216,7 +280,7 @@ HTML;
 function hms_testimonials_show( $atts ) {
 	global $wpdb, $blog_id;
 
-	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand');
+	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand', 'random');
 
 	$settings = get_option('hms_testimonials');
 
@@ -240,7 +304,7 @@ function hms_testimonials_show( $atts ) {
 	));
 
 	if (!in_array($order, $order_by)) $order = 'display_order';
-	if ($order == 'rand') $order = 'RAND()';
+	if ($order == 'rand' || $order == 'random') $order = 'RAND()';
 	if ($direction != 'DESC') $direction = 'ASC';
 	if ($start != 0) $start = (int)$start - 1;
 
@@ -303,7 +367,7 @@ function hms_testimonials_show( $atts ) {
 		if (count($get)<1)
 			return '';
 
-		$ret = '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].' hms-testimonial-template-'.$template.'">';
+		$ret = '<div class="hms-testimonial-container hms-testimonial-single hms-testimonial-'.$get['id'].' hms-testimonial-template-'.$template.'" itemprop="review" itemscope itemtype="http://schema.org/Review">';
 			$ret .= HMS_Testimonials::template($template, $get, (int)$word_limit, (int)$char_limit, $options);
 		$ret .= '</div>';
 		
@@ -340,7 +404,7 @@ function hms_testimonials_show( $atts ) {
 
 		foreach($get as $g) {
 
-			$ret .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'">';
+			$ret .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'" itemprop="review" itemscope itemtype="http://schema.org/Review">';
 
 				$ret .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit, $options);
 
@@ -362,7 +426,7 @@ function hms_testimonials_show( $atts ) {
 function hms_testimonials_show_rotating( $atts ) {
 	global $wpdb, $blog_id, $hms_testimonials_random_strings;
 
-	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand');
+	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand', 'random');
 	$settings = get_option('hms_testimonials');
 
 	extract(shortcode_atts(
@@ -387,7 +451,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	));
 
 	if (!in_array($order, $order_by)) $order = 'display_order';
-	if ($order == 'rand') $order = 'RAND()';
+	if ($order == 'rand' || $order == 'random') $order = 'RAND()';
 	if ($direction != 'DESC') $direction = 'ASC';
 	if ($link_position != 'top' && $link_position != 'both') $link_position = 'bottom';
 
@@ -436,7 +500,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	if ($show_links && $show_links != "false" && ($link_position == 'top' || $link_position == 'both'))
 		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$play_pause_init.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
 
-		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$get[0]['id'].' hms-testimonial-template-'.$template.'"">';
+		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$get[0]['id'].' hms-testimonial-template-'.$template.'" itemprop="review" itemscope itemtype="http://schema.org/Review">';
 						
 		$return .= HMS_Testimonials::template($template, $get[0], (int)$word_limit, (int)$char_limit, $options);
 
@@ -451,7 +515,7 @@ function hms_testimonials_show_rotating( $atts ) {
 	$return .= '<div style="display:none;" id="hms-testimonial-sc-list-'.$random_string.'">';
 		
 	foreach($get as $g) {
-		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'"">';
+		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'" itemprop="review" itemscope itemtype="http://schema.org/Review">';
 		
 			$return .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit, $options);
 
