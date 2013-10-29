@@ -50,7 +50,10 @@ class HMS_Testimonials {
 			'js_load' => 0,
 			'testimonial_container' => 'div',
 			'readmore_link' => '',
-			'readmore_text' => '...'
+			'readmore_text' => '...',
+			'flood_limit' => 5,
+			'form_show_url' => 1,
+			'form_show_upload' => 0
 		);
 
 		$this->options = array_merge($defaults, $current_options);
@@ -356,6 +359,10 @@ JS;
 			$options['readmore_link'] = (isset($_POST['readmore_link']) && !empty($_POST['readmore_link'])) ? strip_tags($_POST['readmore_link']) : '';
 			$options['readmore_text'] = (isset($_POST['readmore_text']) && !empty($_POST['readmore_text'])) ? strip_tags($_POST['readmore_text']) : '...';
 
+			$options['flood_limit'] = (isset($_POST['flood_limit'])) ? (int)$_POST['flood_limit'] : 5;
+			$options['form_show_url'] = (isset($_POST['form_show_url']) && $_POST['form_show_url'] == '1') ? 1 : 0;
+			$options['form_show_upload'] = (isset($_POST['form_show_upload']) && $_POST['form_show_upload'] == '1') ? 1 : 0;
+
 			update_option('hms_testimonials', $options);
 			$this->options = $options;
 			$updated = 1;
@@ -430,8 +437,23 @@ JS;
 									<td><input type="text" name="readmore_link" value="<?php echo $this->options['readmore_link']; ?>" /></td>
 								</tr>
 								<tr>
-									<th scope="row">5. "Read More" text</th>
+									<th scope="row">8. "Read More" text</th>
 									<td><input type="text" name="readmore_text" value="<?php echo $this->options['readmore_text']; ?>" size="10" /></td>
+								</tr>
+
+								<tr>
+									<th scope="row">9. Allow visitors to submit a testimonial once every x minutes. If set to 0, there is no limit.</th>
+									<td><input type="text" name="flood_limit" value="<?php echo $this->options['flood_limit']; ?>" size="10" /></td>
+								</tr>
+
+								<tr>
+									<th scope="row">10. Show website field on hms_testimonials_form?</th>
+									<td><input type="checkbox" name="form_show_url" value="1" <?php if ($this->options['form_show_url']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
+
+								<tr>
+									<th scope="row">11. Show image upload field on hms_testimonials_form?</th>
+									<td><input type="checkbox" name="form_show_upload" value="1" <?php if ($this->options['form_show_upload']==1) echo ' checked="checked"'; ?> /></td>
 								</tr>
 							</tbody>
 						</table>
@@ -456,6 +478,8 @@ JS;
 								<tr>
 									<th scope="row" colspan="2"><br />
 										<strong>Need a reCAPTCHA account?</strong> &nbsp;&nbsp;&nbsp;<a href="http://www.google.com/recaptcha" target="_blank">Sign Up Here It's Free!</a>
+										<br /><br />
+										To adjust the style of reCAPTCHA <a href="https://developers.google.com/recaptcha/docs/customization" target="_blank">click here</a>.
 									</th>
 								</tr>
 							</tbody>
@@ -2140,7 +2164,8 @@ JS;
 			$group_found = true;
 
 
-			$get = $this->wpdb->get_results("SELECT t.*, m.display_order AS group_display_order, u.user_login FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
+			$get = $this->wpdb->get_results("SELECT t.*, m.display_order AS group_display_order, u.user_login 
+								FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
 								LEFT JOIN `".$this->wpdb->users."` AS u 
 									ON u.ID = t.user_id
 								INNER JOIN `".$this->wpdb->prefix."hms_testimonials_group_meta` AS m 
@@ -2161,7 +2186,12 @@ JS;
 
 			ksort($testimonials);
 			
-			$get_testimonials = $this->wpdb->get_results("SELECT t.* FROM `".$this->wpdb->prefix."hms_testimonials` AS t WHERE t.blog_id = ".(int)$this->blog_id." ORDER BY t.display_order ASC", ARRAY_A);
+			$get_testimonials = $this->wpdb->get_results("SELECT t.*, u.user_login  
+									FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
+									LEFT JOIN `".$this->wpdb->users."` AS u 
+										ON u.ID = t.user_id
+									WHERE t.blog_id = ".(int)$this->blog_id." ORDER BY t.display_order ASC", ARRAY_A);
+
 			foreach($get_testimonials as $t) {
 				$t_ids[] = $t['id'];
 
@@ -2515,14 +2545,14 @@ JS;
 					<td>URL</td>
 					<td>System</td>
 					<td>No</td>
-					<td>Yes</td>
+					<td><?php if ($this->options['form_show_url'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
 				</tr>
 				<tr>
 					<td>Image</td>
 					<td>System</td>
 					<td>No</td>
-					<td>No</td>
+					<td><?php if ($this->options['form_show_upload'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
 				</tr>
 				<?php if (count($fields)>0) {

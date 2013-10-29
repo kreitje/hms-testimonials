@@ -75,6 +75,17 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.1.14 =
+* Fixed a notice in the group area
+* Fixed reCaptcha method name collisions
+* Adjust the number of minutes for flood control on the form shortcode
+* Added image upload to form
+* Added setting to turn image upload on or off. Defaults to off for security reasons
+* Added setting to turn website field on or off.
+
+= 2.1.13 =
+* Fixed a bug in the testimonial form shortcode where a blank space was added to the name field.
+
 = 2.1.12 =
 * Fixed a bug where the session may be started after output thus throwing an error.
 
