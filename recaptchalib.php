@@ -174,7 +174,7 @@ function hms_tesitmonial_recaptcha_check_answer ($privkey, $remoteip, $challenge
     return $recaptcha_response;
   }
 
-  $response = _recaptcha_http_post(HMS_TESTIMONIAL_RECAPTCHA_VERIFY_SERVER, "/recaptcha/api/verify",
+  $response = _hms_tesitmonial_recaptcha_http_post(HMS_TESTIMONIALS_RECAPTCHA_VERIFY_SERVER, "/recaptcha/api/verify",
     array(
            'privatekey' => $privkey,
            'remoteip' => $remoteip,

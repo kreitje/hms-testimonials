@@ -121,7 +121,7 @@ function hms_testimonials_form( $atts ) {
 		}
 
 		if ($settings['use_recaptcha'] == 1) { 
-			$resp = recaptcha_check_answer ($settings['recaptcha_privatekey'], $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
+			$resp = hms_tesitmonial_recaptcha_check_answer($settings['recaptcha_privatekey'], $_SERVER["REMOTE_ADDR"], $_POST["recaptcha_challenge_field"], $_POST["recaptcha_response_field"]);
 
         	if (!$resp->is_valid) {
         		switch($resp->error) {
@@ -346,7 +346,7 @@ HTML;
 	if ($settings['use_recaptcha'] == 1) { 
 		$ret .= '<tr>
 					<td> </td>
-					<td>'.recaptcha_get_html($settings['recaptcha_publickey'], null).'</td>
+					<td>'.hms_tesitmonial_recaptcha_get_html($settings['recaptcha_publickey'], null).'</td>
 				</tr>';
 	}
 

@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.1.15 =
+* I broke reCAPTCHA so I fixed it.
+
 = 2.1.14 =
 * Fixed a notice in the group area
 * Fixed reCaptcha method name collisions
