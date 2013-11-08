@@ -65,13 +65,13 @@ function hms_testimonials_form( $atts ) {
 		$errors = array();
 
 		if (isset($_POST['hms_testimonials_security_token']) && ($_POST['hms_testimonials_security_token'] != ''))
-			$errors[] = __('Invalid request.', 'hms-testimonials');
+			$errors[] = apply_filters('hms_testimonials_sc_error_token', __('Invalid request.', 'hms-testimonials') );
 
 		if (!isset($_POST['hms_testimonials_name']) || (($name = trim(@$_POST['hms_testimonials_name'])) == ''))
-			$errors[] = __('Please enter your name.', 'hms-testimonials' );
+			$errors[] = apply_filters('hms_testimonials_sc_error_name', __('Please enter your name.', 'hms-testimonials' ) );
 
 		if (!isset($_POST['hms_testimonials_testimonial']) || (($testimonial = trim(@$_POST['hms_testimonials_testimonial'])) == ''))
-			$errors[] = __('Please enter your testimonial.', 'hms-testimonials' );
+			$errors[] = apply_filters('hms_testimonials_sc_error_testimonial', __('Please enter your testimonial.', 'hms-testimonials' ) );
 
 		if (isset($_FILES['hms_testimonials_image']) && ($_FILES['hms_testimonials_image']['size'] > 0) && $settings['form_show_upload'] == 1) {
 
@@ -79,7 +79,7 @@ function hms_testimonials_form( $atts ) {
 			$uploaded_type = $get_file_type['type'];
 
 			if (!in_array($uploaded_type, $allowed))
-				$errors[] = __('You have uploaded an invalid file type.', 'hms-testimonials');
+				$errors[] = apply_filters('hms_testimonials_sc_error_image', __('You have uploaded an invalid file type.', 'hms-testimonials') );
 
 		}
 
@@ -116,7 +116,7 @@ function hms_testimonials_form( $atts ) {
 			
 
 			if (!filter_var($website, FILTER_VALIDATE_URL))
-				$errors[] = __('Please enter a valid URL.', 'hms-testimonials' );
+				$errors[] = apply_filters('hms_testimonials_sc_error_website', __('Please enter a valid URL.', 'hms-testimonials' ) );
 			
 		}
 
@@ -126,7 +126,7 @@ function hms_testimonials_form( $atts ) {
         	if (!$resp->is_valid) {
         		switch($resp->error) {
         			case 'incorrect-captcha-sol':
-        				$errors[] = __('You entered an incorrect captcha. Please try again.', 'hms-testimonials' );
+        				$errors[] = apply_filters('hms_testimonials_sc_error_captcha', __('You entered an incorrect captcha. Please try again.', 'hms-testimonials' ) );
         			break;
         			default:
         				$errors[] = sprintf( __('An error occured with your captcha. ( %1$s )', 'hms-testimonials' ), $resp->error );
@@ -509,7 +509,7 @@ function hms_testimonials_show( $atts ) {
 }
 
 function hms_testimonials_show_rotating( $atts ) {
-	global $wpdb, $blog_id, $hms_testimonials_random_strings;
+	global $wpdb, $blog_id;
 
 	$order_by = array('id', 'name','testimonial','url','testimonial_date','display_order', 'image', 'rand', 'random');
 	$settings = get_option('hms_testimonials');
@@ -580,7 +580,7 @@ function hms_testimonials_show_rotating( $atts ) {
 
 
 
-	$return = '<div id="hms-testimonial-sc-'.$random_string.'" class="hms-testimonials-rotator">';
+	$return = '<div id="hms-testimonial-sc-'.$random_string.'" class="hms-testimonials-rotator" data-start="' . ((!$start) ? 0 : 1) .'" data-seconds="' . $seconds . '" data-play-text="' . $link_play . '" data-pause-text="' . $link_pause .'">';
 
 	if ($show_links && $show_links != "false" && ($link_position == 'top' || $link_position == 'both'))
 		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$play_pause_init.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
@@ -594,13 +594,11 @@ function hms_testimonials_show_rotating( $atts ) {
 	if ($show_links && $show_links != "false" && ($link_position == 'bottom' || $link_position == 'both'))
 		$return .= '<div class="controls"><a href="#" class="prev">'.$link_prev.'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$play_pause_init.'</a> <a href="#" class="next">'.$link_next.'</a></div>';
 	
-	$return .= '</div>';
 
-
-	$return .= '<div style="display:none;" id="hms-testimonial-sc-list-'.$random_string.'">';
+	$return .= '<div class="hms-testimonial-items" style="display:none;">';
 		
 	foreach($get as $g) {
-		$return .= '<div class="hms-testimonial-container hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'" itemprop="review" itemscope itemtype="http://schema.org/Review">';
+		$return .= '<div class="hms-testimonial-item hms-testimonial-'.$g['id'].' hms-testimonial-template-'.$template.'" itemprop="review" itemscope itemtype="http://schema.org/Review">';
 		
 			$return .= HMS_Testimonials::template($template, $g, (int)$word_limit, (int)$char_limit, $options);
 
@@ -608,97 +606,11 @@ function hms_testimonials_show_rotating( $atts ) {
 	}
 	
 	$return .= '</div>';
+	$return .= '</div>';
  
-
-	$hms_testimonials_random_strings .= <<<JS
-	<script type="text/javascript">
-		var index_{$random_string} = 1;
-		var timeout_{$random_string} = null;
-		var play_{$random_string} = $start_int;
-		jQuery(document).ready(function() {
-JS;
-		if ($start)
-			$hms_testimonials_random_strings .= 'si_'.$random_string.'();';
-		
-
-	$hms_testimonials_random_strings .= <<<JS
-				jQuery("#hms-testimonial-sc-{$random_string} .controls .playpause").click(function() {
-					if (play_{$random_string} == 1) {
-						jQuery(this).text('{$link_play}').removeClass('pause').addClass('play');
-						clearInterval(timeout_{$random_string});
-						play_{$random_string} = 0;
-					} else {
-						jQuery(this).text('{$link_pause}').removeClass('play').addClass('pause');
-						si_{$random_string}();
-						play_{$random_string} = 1;
-					}
-
-					return false;
-				});
-
-				jQuery("#hms-testimonial-sc-{$random_string} .controls .prev").click(function() {
-
-					var new_index = (index_{$random_string} - 2);
-					
-					if (new_index < 0) {
-						new_index = (jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").length - 1);
-					}
-
-					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(new_index);
-					if (nextitem == undefined) {
-						index_{$random_string} = 0;
-						var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(0);
-					}
-					jQuery("#hms-testimonial-sc-{$random_string} .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_{$random_string} = new_index + 1;
-
-					if (play_{$random_string} == 1) {
-						clearInterval(timeout_{$random_string});
-						si_{$random_string}();
-					}
-					return false;
-
-				});
-				jQuery("#hms-testimonial-sc-{$random_string} .controls .next").click(function() {
-					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(index_{$random_string});
-					if (nextitem == undefined) {
-						index_{$random_string} = 0;
-						var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(0);
-					}
-					jQuery("#hms-testimonial-sc-{$random_string} .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_{$random_string} = index_{$random_string} + 1;
-
-					if (play_{$random_string} == 1) {
-						clearInterval(timeout_{$random_string});
-						si_{$random_string}();
-					}
-					return false;
-				});
-		});
-
-		function si_{$random_string}() {
-			timeout_{$random_string} = setInterval(function() {
-				var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(index_{$random_string});
-				if (nextitem == undefined) {
-					index_{$random_string} = 0;
-					var nextitem = jQuery("#hms-testimonial-sc-list-{$random_string} .hms-testimonial-container").get(0);
-				}
-				jQuery("#hms-testimonial-sc-{$random_string} .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-				index_{$random_string} = index_{$random_string} + 1;
-			}, {$seconds}000);
-		}
-			
-	</script>
-JS;
-
 	return $return;
 }
 
-function hms_testimonial_footer_js() {
-	global $hms_testimonials_random_strings;
-
-	echo $hms_testimonials_random_strings;
-}
 
 /**
  * Create pagination links

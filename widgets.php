@@ -412,7 +412,7 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 		if (!empty($instance['title']))
 			echo $args['before_title'].$instance['title'].$args['after_title'];
 
-		echo '<div id="hms-testimonial-'.$identifier.'">';
+		echo '<div class="hms-testimonials-rotator" id="hms-testimonial-'.$identifier.'" data-start="' . (($instance['autostart'] == 0) ? 0 : 1) .'" data-seconds="' . $instance['seconds'] .'" data-play-text="' . $instance['link_play']. '" data-pause-text="' . $instance['link_pause'] . '">';
 
 			if ($instance['show_links'] == 1 && ($instance['link_position'] == 'top' || $instance['link_position'] == 'both'))
 				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$link_text.'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
@@ -423,110 +423,26 @@ class HMS_Testimonials_Rotator extends WP_Widget {
 
 			if ($instance['show_links'] == 1 && ($instance['link_position'] == 'bottom' || $instance['link_position'] == 'both'))
 				echo '<div class="controls"><a href="#" class="prev">'.$instance['link_prev'].'</a> <a href="#" class="playpause '.$play_pause_class.'">'.$link_text.'</a> <a href="#" class="next">'.$instance['link_next'].'</a></div>';
-		echo '</div>';
+		
 		?>
 
-		<div style="display:none;" id="hms-testimonial-list-<?php echo $identifier; ?>">
+			<div style="display:none;" class="hms-testimonial-items" id="hms-testimonial-list-<?php echo $identifier; ?>">
 
-			<?php
-				foreach($get as $g) {
-					echo '<div class="hms-testimonial-container" itemscope itemtype="http://schema.org/Review">';
-						echo HMS_Testimonials::template($instance['template'], $g, (int)$instance['word_limit'], (int)$instance['char_limit']);
-					echo '</div>';
-				} ?>
+				<?php
+					foreach($get as $g) {
+						echo '<div itemscope itemtype="http://schema.org/Review">';
+							echo HMS_Testimonials::template($instance['template'], $g, (int)$instance['word_limit'], (int)$instance['char_limit']);
+						echo '</div>';
+					} ?>
+			</div>
 		</div>
-
 		<?php
 		$autostart = ($instance['autostart'] == 1) ? 1 : 0;
 		$link_pause = $instance['link_pause'];
 		$link_play = $instance['link_play'];
 		$seconds = $instance['seconds'].'000';
 
-		$hms_testimonials_random_strings .= <<<JS
-		<script type="text/javascript">
-			var index_$identifier = 1;
-			var timeout_$identifier = null;
-			var play_$identifier = $autostart;
-
-			jQuery(document).ready(function() {
-JS;
-			if ($instance['autostart'] == 1)
-				$hms_testimonials_random_strings .= 'si_'.$identifier.'();';
-				
-		$hms_testimonials_random_strings .= <<<JS
-				jQuery("#hms-testimonial-$identifier .controls .pause").click(function() {
-					if (play_$identifier == 1) {
-						jQuery(this).text('$link_play').removeClass('pause').addClass('play');
-						clearInterval(timeout_$identifier);
-						play_$identifier = 0;
-					} else {
-						jQuery(this).text('$link_pause').removeClass('play').addClass('pause');
-						si_$identifier();
-						play_$identifier = 1;
-					}
-
-					return false;
-				});
-
-				jQuery("#hms-testimonial-$identifier .controls .prev").click(function() {
-
-					var new_index = (index_$identifier - 2);
-					
-					if (new_index < 0) {
-						new_index = (jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").length - 1);
-					}
-					
-
-					var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(new_index);
-					if (nextitem == undefined) {
-						index_$identifier = 0;
-						var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(0);
-					}
-					jQuery("#hms-testimonial-$identifier .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_$identifier = new_index + 1;
-
-					if (play_$identifier == 1) {
-						clearInterval(timeout_$identifier);
-						si_$identifier();
-					}
-					return false;
-
-				});
-				jQuery("#hms-testimonial-$identifier .controls .next").click(function() {
-					var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(index_$identifier);
-					if (nextitem == undefined) {
-						index_$identifier = 0;
-						var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(0);
-					}
-					jQuery("#hms-testimonial-$identifier .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_$identifier = index_$identifier + 1;
-
-					if (play_$identifier == 1) {
-						clearInterval(timeout_$identifier);
-						si_$identifier();
-					}
-					return false;
-				});
-				
-			});
-
-			function si_$identifier() {
-
-				timeout_$identifier = setInterval(function() {
-					var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(index_$identifier);
-					if (nextitem == undefined) {
-						index_$identifier = 0;
-						var nextitem = jQuery("#hms-testimonial-list-$identifier .hms-testimonial-container").get(0);
-					}
-					jQuery("#hms-testimonial-$identifier .hms-testimonial-container").fadeOut('slow', function(){ jQuery(this).html(nextitem.innerHTML)}).fadeIn();
-					index_$identifier = index_$identifier + 1;
-				}, $seconds);
-			}
-			
-		</script>
-JS;
-		
-		
+	
 		echo $args['after_widget'];
 	}
 

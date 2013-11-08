@@ -75,6 +75,10 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.0 =
+* Rotating javascript has been movied to it's own file instead of inline
+* Added the following filters: hms_testimonials_sc_error_token, hms_testimonials_sc_error_name, hms_testimonials_sc_error_testimonial, hms_testimonials_sc_error_image, hms_testimonials_sc_error_website, hms_testimonials_sc_error_captcha
+
 = 2.1.15 =
 * I broke reCAPTCHA so I fixed it.
 
