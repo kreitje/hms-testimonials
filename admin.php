@@ -48,6 +48,7 @@ class HMS_Testimonials {
 			'roleorders' => $default,
 			'image_width' => 100,
 			'image_height' => 100,
+			'image_unit' => 'px',
 			'date_format' => 'm/d/Y',
 			'display_rows' => array('id','name','testimonial','url','testimonial_date','shortcode','user','display'),
 			'js_load' => 0,
@@ -356,6 +357,7 @@ JS;
 
 			$options['image_width'] = (isset($_POST['image_width'])) ? (int)$_POST['image_width'] : 100;
 			$options['image_height'] = (isset($_POST['image_height'])) ? (int)$_POST['image_height'] : 100;
+			$options['image_unit'] = (isset($_POST['image_unit']) && $_POST['image_unit'] == 'percent') ? 'percent' : 'px';
 			$options['date_format'] = (isset($_POST['date_format']) && !empty($_POST['date_format'])) ? strip_tags($_POST['date_format']) : 'm/d/Y';
 
 			$options['testimonial_container'] = (isset($_POST['testimonial_container']) && ($_POST['testimonial_container'] == 'blockquote')) ? 'blockquote' : 'div';
@@ -413,11 +415,16 @@ JS;
 								</tr>
 								<tr>
 									<th scope="row">3. Width of the image</th>
-									<td><input type="text" name="image_width" value="<?php echo $this->options['image_width']; ?>" size="3" />px</td>
+									<td><input type="text" name="image_width" value="<?php echo $this->options['image_width']; ?>" size="3" /> 
+										<select name="image_unit">
+											<option value="px" <?php if ($this->options['image_unit'] == 'px') echo 'selected="selected"'; ?>>px</option>
+											<option value="percent" <?php if ($this->options['image_unit'] == 'percent') echo 'selected="selected"'; ?>>%</option>
+										</select>
+									</td>
 								</tr>
 								<tr>
 									<th scope="row">4. Height of the image</th>
-									<td><input type="text" name="image_height" value="<?php echo $this->options['image_height']; ?>" size="3" />px</td>
+									<td><input type="text" name="image_height" value="<?php echo $this->options['image_height']; ?>" size="3" /></td>
 								</tr>
 								<tr>
 									<th scope="row">5. Date format</th>
@@ -2545,7 +2552,10 @@ JS;
 				<tr>
 					<td>Name</td>
 					<td>System</td>
-					<td>hms_testimonials_sc_name</td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_name<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_name
+					</td>
 					<td>Yes</td>
 					<td>Yes</td>
 					<td> </td>
@@ -2553,7 +2563,10 @@ JS;
 				<tr>
 					<td>Testimonial</td>
 					<td>System</td>
-					<td>hms_testimonials_sc_testimonial</td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_testimonial<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_testimonial
+					</td>
 					<td>Yes</td>
 					<td>Yes</td>
 					<td> </td>
@@ -2561,7 +2574,10 @@ JS;
 				<tr>
 					<td>URL</td>
 					<td>System</td>
-					<td>hms_testimonials_sc_website</td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_website<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_website
+					</td>
 					<td>No</td>
 					<td><?php if ($this->options['form_show_url'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
@@ -2569,7 +2585,10 @@ JS;
 				<tr>
 					<td>Image</td>
 					<td>System</td>
-					<td> </td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_image<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_image
+					</td>
 					<td>No</td>
 					<td><?php if ($this->options['form_show_upload'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
@@ -2581,9 +2600,10 @@ JS;
 							<td><?php echo $f->name; ?></td>
 							<td><?php echo $f->type; ?></td>
 							<td>
-								hms_testimonials_required_cf_<?php echo $f->id; ?>
+								<strong>Field text:</strong> hms_testimonials_cf_text_<?php echo $f->id; ?><br />
+								<strong>Error message:</strong> hms_testimonials_required_cf_<?php echo $f->id; ?>
 								<?php if ($f->type == 'email') { ?>
-									<br />hms_testimonials_email_cf_<?php echo $f->id; ?>
+									<br /><strong>Valid email error message:</strong> hms_testimonials_email_cf_<?php echo $f->id; ?>
 								<?php } ?>
 							</td>
 							<td><?php echo (($f->isrequired == 1) ? 'Yes' : 'No'); ?></td>
@@ -3700,10 +3720,18 @@ JS;
 					if ($image_url == '')
 						continue;
 
-					$height = (int)HMS_Testimonials::getInstance()->options['image_height'].'px';
-					$width = (int)HMS_Testimonials::getInstance()->options['image_width'].'px';
+					$image_unit = ( isset( HMS_Testimonials::getInstance()->options['image_unit']) && HMS_Testimonials::getInstance()->options['image_unit'] == 'percent' ) ? '%' : 'px';
 
-					$builder .= apply_filters('hms_testimonials_system_image', '<img class="image" src="'.$image_url.'" style="height:'.$height.';width:'.$width.';" />', $testimonial);
+					$height = '';
+					$width = '';
+
+					if ( isset(HMS_Testimonials::getInstance()->options['image_height'] ) && HMS_Testimonials::getInstance()->options['image_height'] != '')
+						$height = 'height:'.(int)HMS_Testimonials::getInstance()->options['image_height']. $image_unit .';';
+
+					if ( isset(HMS_Testimonials::getInstance()->options['image_width'] ) && HMS_Testimonials::getInstance()->options['image_width'] != '')
+						$width = 'width:'.(int)HMS_Testimonials::getInstance()->options['image_width']. $image_unit . ';';
+
+					$builder .= apply_filters('hms_testimonials_system_image', '<img class="image" src="'.$image_url.'" style="'. $height . $width .'" />', $testimonial);
 
 				break;
 				default:

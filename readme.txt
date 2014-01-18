@@ -2,8 +2,8 @@
 Contributors: kreitje
 Donate link: http://hitmyserver.com/wordpress-plugins-donations/
 Tags: testimonials, reviews, client reviews, what they are saying
-Requires at least: 3.0.1
-Tested up to: 3.6
+Requires at least: 3.5
+Tested up to: 3.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -75,6 +75,10 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.4 =
+* You can not set the unit measurement of pixels or percent for the height and width of images.
+* Added filters to override the custom field text
+
 = 2.2.3 =
 * Added new setting to redirect the hms_testimonials_form shortcode to another page on submission.
 * Added redirect_url attribute to hms_testimonials_form to override the setting.
@@ -82,7 +86,6 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 * Added filters to override error messages of custom fields. Filters follow the hms_testimonials_required_cf_{field id} format.
 * Added filter to override invalid email on custom fields. Filter follows the hms_testimonials_email_cf_{field id} format.
 * Added filter names to the Custom Fields page.
-
 
 = 2.2.2 =
 * Fixed a bug where the tables were not being created in a multi site.

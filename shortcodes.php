@@ -335,7 +335,7 @@ HTML;
 			$name = strtolower( str_replace(' ', '_', $f->name) );
 			$ret .= '
 			<tr class="cf-'.$name.(($f->isrequired == 1) ? ' required' : '').'">
-				<td valign="top">'.$f->name.'</td>
+				<td valign="top">'.apply_filters( 'hms_testimonials_cf_text_' . $f->id, $f->name).'</td>
 				<td>';
 
 				$value = '';
