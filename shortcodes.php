@@ -4,15 +4,23 @@ function hms_testimonials_form( $atts ) {
 	global $wpdb, $blog_id, $current_user;
 	get_currentuserinfo();
 
+	$sc_atts = shortcode_atts( array('redirect_url' => ''), $atts );
+
 	$settings = get_option('hms_testimonials');
 	$allowed = array( 'image/jpg', 'image/jpeg', 'image/gif', 'image/png' );
-
 
 	if (!isset($settings['form_show_url']))
 		$settings['form_show_url'] = 1;
 
 	if (!isset($settings['form_show_upload']))
 		$settings['form_show_upload'] = 0;
+
+	$url = '';
+	if (isset($settings['redirect_url']) && $settings['redirect_url'] != '')
+		$url = $settings['redirect_url'];
+	
+	if ($sc_atts['redirect_url'] != '')
+		$url = $sc_atts['redirect_url'];
 
 	/**
 	 * Check if the Akismet plugin is enabled and valid. If so, use that.
@@ -88,14 +96,14 @@ function hms_testimonials_form( $atts ) {
 			foreach($fields as $f) {
 
 				if ($f->isrequired == 1 && (!isset($_POST['hms_testimonials_cf'][$f->id]) || trim($_POST['hms_testimonials_cf'][$f->id])=='')) {
-					$errors[] = sprintf( __('%1$s is a required field.', 'hms-testimonials' ), $f->name );
+					$errors[] = apply_filters( 'hms_testimonials_required_cf_' . $f->id, sprintf( __('%1$s is a required field.', 'hms-testimonials' ), $f->name ) );
 					continue;
 				}
 
 				switch($f->type) {
 					case 'email':
 						if (isset($_POST['hms_testimonials_cf'][$f->id]) && ($_POST['hms_testimonials_cf'][$f->id] != '') && !filter_var($_POST['hms_testimonials_cf'][$f->id], FILTER_VALIDATE_EMAIL))
-							$errors[] = sprintf( __('Please enter a valid email for the %1$s field.', 'hms-testimonials'), $f->name );
+							$errors[] = apply_filters('hms_testimonials_email_cf_' . $f->id, sprintf( __('Please enter a valid email for the %1$s field.', 'hms-testimonials'), $f->name ) );
 
 						$email = $_POST['hms_testimonials_cf'][$f->id];
 					break;
@@ -252,9 +260,14 @@ function hms_testimonials_form( $atts ) {
 			$_SESSION['hms_testimonials_submitted'] = 1;
 			$_SESSION['hms_testimonials_flood_limit'] = time();
 
-			if (!isset($settings['guest_submission_redirect']) || ($settings['guest_submission_redirect'] == ''))
-				return '<div class="hms_testimonial_success">' . __('Your testimonial has been submitted.', 'hms-testimonials' ) . '</div>';
-			else
+			if (!isset($settings['guest_submission_redirect']) || ($settings['guest_submission_redirect'] == '')) {
+				if ($url == '')
+					return apply_filters( 'hms_testimonials_submitted_success', '<div class="hms_testimonial_success">' . __('Your testimonial has been submitted.', 'hms-testimonials' ) . '</div>' );
+				else {
+
+					die(header('Location: ' . $url));
+				}
+			} else
 				die(header('Location: '.$settings['guest_submission_redirect']));
 		}
 
@@ -325,15 +338,19 @@ HTML;
 				<td valign="top">'.$f->name.'</td>
 				<td>';
 
+				$value = '';
+				if ( isset( $cf_{$f->id} ))
+					$value = $cf_{$f->id};
+
 				switch($f->type) {
 					case 'email':
-						$ret .= '<input type="email" class="hms_testimonials_cf_'.$name.'" name="hms_testimonials_cf['.$f->id.']" value="'.$cf_{$f->id}.'" />';
+						$ret .= '<input type="email" class="hms_testimonials_cf_'.$name.'" name="hms_testimonials_cf['.$f->id.']" value="'.$value.'" />';
 					break;
 					case 'text':
-						$ret .= '<input type="text" class="hms_testimonials_cf_'.$name.'" name="hms_testimonials_cf['.$f->id.']" value="'.$cf_{$f->id}.'" />';
+						$ret .= '<input type="text" class="hms_testimonials_cf_'.$name.'" name="hms_testimonials_cf['.$f->id.']" value="'.$value.'" />';
 					break;
 					case 'textarea':
-						$ret .= '<textarea name="hms_testimonials_cf['.$f->id.']"  class="hms_testimonials_cf_'.$name.'" rows="5" style="width:99%;">'.$cf_{$f->id}.'</textarea>';
+						$ret .= '<textarea name="hms_testimonials_cf['.$f->id.']"  class="hms_testimonials_cf_'.$name.'" rows="5" style="width:99%;">'.$value.'</textarea>';
 					break;
 				}
 

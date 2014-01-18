@@ -75,6 +75,20 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.3 =
+* Added new setting to redirect the hms_testimonials_form shortcode to another page on submission.
+* Added redirect_url attribute to hms_testimonials_form to override the setting.
+* Added the hms_testimonials_submitted_success filter to override the successful submission message
+* Added filters to override error messages of custom fields. Filters follow the hms_testimonials_required_cf_{field id} format.
+* Added filter to override invalid email on custom fields. Filter follows the hms_testimonials_email_cf_{field id} format.
+* Added filter names to the Custom Fields page.
+
+= 2.2.2 =
+* Fixed a bug where the tables were not being created in a multi site.
+
+= 2.2.1 =
+* I forgot to add rotator.js to svn so it didn't get uploaded
+
 = 2.2.0 =
 * Rotating javascript has been movied to it's own file instead of inline
 * Added the following filters: hms_testimonials_sc_error_token, hms_testimonials_sc_error_name, hms_testimonials_sc_error_testimonial, hms_testimonials_sc_error_image, hms_testimonials_sc_error_website, hms_testimonials_sc_error_captcha
