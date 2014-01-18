@@ -75,6 +75,15 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.3 =
+* Added new setting to redirect the hms_testimonials_form shortcode to another page on submission.
+* Added redirect_url attribute to hms_testimonials_form to override the setting.
+* Added the hms_testimonials_submitted_success filter to override the successful submission message
+* Added filters to override error messages of custom fields. Filters follow the hms_testimonials_required_cf_{field id} format.
+* Added filter to override invalid email on custom fields. Filter follows the hms_testimonials_email_cf_{field id} format.
+* Added filter names to the Custom Fields page.
+
+
 = 2.2.2 =
 * Fixed a bug where the tables were not being created in a multi site.
 

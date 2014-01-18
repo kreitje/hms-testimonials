@@ -56,7 +56,8 @@ class HMS_Testimonials {
 			'readmore_text' => '...',
 			'flood_limit' => 5,
 			'form_show_url' => 1,
-			'form_show_upload' => 0
+			'form_show_upload' => 0,
+			'redirect_url' => '',
 		);
 
 		$this->options = array_merge($defaults, $current_options);
@@ -366,6 +367,8 @@ JS;
 			$options['form_show_url'] = (isset($_POST['form_show_url']) && $_POST['form_show_url'] == '1') ? 1 : 0;
 			$options['form_show_upload'] = (isset($_POST['form_show_upload']) && $_POST['form_show_upload'] == '1') ? 1 : 0;
 
+			$options['redirect_url'] = (isset($_POST['redirect_url'])) ? strip_tags($_POST['redirect_url']) : '';
+
 			update_option('hms_testimonials', $options);
 			$this->options = $options;
 			$updated = 1;
@@ -457,6 +460,11 @@ JS;
 								<tr>
 									<th scope="row">11. Show image upload field on hms_testimonials_form?</th>
 									<td><input type="checkbox" name="form_show_upload" value="1" <?php if ($this->options['form_show_upload']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
+
+								<tr>
+									<th scope="row">12. Redirect to this page after a visitor submits a testimonial.</th>
+									<td><input type="text" name="redirect_url" value="<?php echo $this->options['redirect_url']; ?>" /></td>
 								</tr>
 							</tbody>
 						</table>
@@ -925,6 +933,8 @@ JS;
 					<p>Use <strong>[hms_testimonials_form]</strong> to allow your visitors to submit testimonials.  To help combat spam you can enable reCAPTCHA in the settings.</p>
 
 					<p>Place these shortcodes in your posts or pages. If you prefer to stick them in your sidebar see below for the widgets we offer.</p>
+
+					<p>You can use the redirect_url attribute to override what page is shown after a successful submission.<br /> Ex. <strong>[hms_testimonials_form redirect_url="/thankyou"]</strong></p>
 
 					<br /><br />
 				</div>
@@ -2519,6 +2529,7 @@ JS;
 				<tr>
 					<td><strong>Name</strong></td>
 					<td><strong>Type</strong></td>
+					<td><strong>Filter</strong></td>
 					<td><strong>Required</strong></td>
 					<td><strong>Show on Public Form</strong></td>
 					<td> </td>
@@ -2526,6 +2537,7 @@ JS;
 				<tr>
 					<td>ID</td>
 					<td>System</td>
+					<td> </td>
 					<td>Automatic</td>
 					<td>No</td>
 					<td> </td>
@@ -2533,6 +2545,7 @@ JS;
 				<tr>
 					<td>Name</td>
 					<td>System</td>
+					<td>hms_testimonials_sc_name</td>
 					<td>Yes</td>
 					<td>Yes</td>
 					<td> </td>
@@ -2540,6 +2553,7 @@ JS;
 				<tr>
 					<td>Testimonial</td>
 					<td>System</td>
+					<td>hms_testimonials_sc_testimonial</td>
 					<td>Yes</td>
 					<td>Yes</td>
 					<td> </td>
@@ -2547,6 +2561,7 @@ JS;
 				<tr>
 					<td>URL</td>
 					<td>System</td>
+					<td>hms_testimonials_sc_website</td>
 					<td>No</td>
 					<td><?php if ($this->options['form_show_url'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
@@ -2554,6 +2569,7 @@ JS;
 				<tr>
 					<td>Image</td>
 					<td>System</td>
+					<td> </td>
 					<td>No</td>
 					<td><?php if ($this->options['form_show_upload'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
@@ -2564,6 +2580,12 @@ JS;
 						<tr>
 							<td><?php echo $f->name; ?></td>
 							<td><?php echo $f->type; ?></td>
+							<td>
+								hms_testimonials_required_cf_<?php echo $f->id; ?>
+								<?php if ($f->type == 'email') { ?>
+									<br />hms_testimonials_email_cf_<?php echo $f->id; ?>
+								<?php } ?>
+							</td>
 							<td><?php echo (($f->isrequired == 1) ? 'Yes' : 'No'); ?></td>
 							<td><?php echo (($f->showonform == 1) ? 'Yes' : 'No'); ?></td>
 							<td><a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings-fields-edit&id='.$f->id); ?>">Edit</a> | 
