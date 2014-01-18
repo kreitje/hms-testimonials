@@ -32,6 +32,9 @@ class HMS_Testimonials {
 		$current_options = get_option('hms_testimonials');
 		$default = array('administrator' => 5, 'editor' => 4, 'author' => 3, 'contributor' => 2, 'subscriber' => 1);
 
+		if (!is_array($current_options))
+			$current_options = array();
+
 		$defaults = array(
 			'role' => 'administrator',
 			'autoapprove' => 'administrator',
