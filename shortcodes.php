@@ -415,6 +415,10 @@ function hms_testimonials_show( $atts ) {
 		'readmore_text' => $readmore_text
 	);
 
+	if (isset($_GET['testimonial_id']) && is_numeric($_GET['testimonial_id']))
+		$id = $_GET['testimonial_id'];
+
+
 	$sql_limit = '';
 	
 	$pages = 0;

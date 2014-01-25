@@ -3641,9 +3641,16 @@ JS;
 
 					$readmore_text = (isset($options['readmore_text'])) ? $options['readmore_text'] : HMS_Testimonials::getInstance()->getOption('readmore_text', '');
 					$readmore_link = (isset($options['readmore_link'])) ? $options['readmore_link'] : HMS_Testimonials::getInstance()->getOption('readmore_link', '');
+					$add_id = true;
 
 					if (isset($testimonial['readmore']) && $testimonial['readmore'] != '')
 						$readmore_link = $testimonial['readmore'];
+					else {
+						if (strpos( $readmore_link, '?') === false)
+							$readmore_link .= '?testimonial_id=' . $testimonial['id'];
+						else
+							$readmore_link .= '&testimonial_id=' . $testimonial['id'];
+					}
 
 					$readmore = '';
 					if ($readmore_link != '')
