@@ -55,6 +55,7 @@ class HMS_Testimonials {
 			'testimonial_container' => 'div',
 			'readmore_link' => '',
 			'readmore_text' => '...',
+			'readmore_append_testimonial_id' => 1,
 			'flood_limit' => 5,
 			'form_show_url' => 1,
 			'form_show_upload' => 0,
@@ -364,6 +365,7 @@ JS;
 
 			$options['readmore_link'] = (isset($_POST['readmore_link']) && !empty($_POST['readmore_link'])) ? strip_tags($_POST['readmore_link']) : '';
 			$options['readmore_text'] = (isset($_POST['readmore_text']) && !empty($_POST['readmore_text'])) ? strip_tags($_POST['readmore_text']) : '...';
+			$options['readmore_append_testimonial_id'] = (isset($_POST['readmore_append_testimonial_id']) && $_POST['readmore_append_testimonial_id'] == '1') ? 1 : 0;
 
 			$options['flood_limit'] = (isset($_POST['flood_limit'])) ? (int)$_POST['flood_limit'] : 5;
 			$options['form_show_url'] = (isset($_POST['form_show_url']) && $_POST['form_show_url'] == '1') ? 1 : 0;
@@ -453,24 +455,27 @@ JS;
 									<th scope="row">8. "Read More" text</th>
 									<td><input type="text" name="readmore_text" value="<?php echo $this->options['readmore_text']; ?>" size="10" /></td>
 								</tr>
-
 								<tr>
-									<th scope="row">9. Allow visitors to submit a testimonial once every x minutes. If set to 0, there is no limit.</th>
+									<th scope="row">9. <a href="<?php echo admin_url('admin.php?page=hms-testimonials-help&active=7#append-testimonial-id'); ?>">Append the testimonial ID to the default "Read More" link?</a></th>
+									<td><input type="checkbox" name="readmore_append_testimonial_id" value="1" <?php if ($this->options['readmore_append_testimonial_id']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
+								<tr>
+									<th scope="row">10. Allow visitors to submit a testimonial once every x minutes. If set to 0, there is no limit.</th>
 									<td><input type="text" name="flood_limit" value="<?php echo $this->options['flood_limit']; ?>" size="10" /></td>
 								</tr>
 
 								<tr>
-									<th scope="row">10. Show website field on hms_testimonials_form?</th>
+									<th scope="row">11. Show website field on hms_testimonials_form?</th>
 									<td><input type="checkbox" name="form_show_url" value="1" <?php if ($this->options['form_show_url']==1) echo ' checked="checked"'; ?> /></td>
 								</tr>
 
 								<tr>
-									<th scope="row">11. Show image upload field on hms_testimonials_form?</th>
+									<th scope="row">12. Show image upload field on hms_testimonials_form?</th>
 									<td><input type="checkbox" name="form_show_upload" value="1" <?php if ($this->options['form_show_upload']==1) echo ' checked="checked"'; ?> /></td>
 								</tr>
 
 								<tr>
-									<th scope="row">12. Redirect to this page after a visitor submits a testimonial.</th>
+									<th scope="row">13. Redirect to this page after a visitor submits a testimonial.</th>
 									<td><input type="text" name="redirect_url" value="<?php echo $this->options['redirect_url']; ?>" /></td>
 								</tr>
 							</tbody>
@@ -1120,6 +1125,15 @@ JS;
 					</pre>
 
 					<br /><br />
+				</div>
+
+				<h3 id="other">Other Help</h3>
+				<div>
+					<strong id="append-testimonial-id">Append the testimonial ID to the default "Read More" link?</strong>
+					<p>If you are using the [hms_testimonials] shortcode on the page your "Read More" link goes to, we can append testimonial_id={id} 
+						to the URL to show only that testimonial. If you do not like this functionality you can uncheck the checkbox in the settings 
+						to disable testimonial_id={id} from being added to the URL.
+					</p>
 				</div>
 			</div>
 
@@ -3641,11 +3655,12 @@ JS;
 
 					$readmore_text = (isset($options['readmore_text'])) ? $options['readmore_text'] : HMS_Testimonials::getInstance()->getOption('readmore_text', '');
 					$readmore_link = (isset($options['readmore_link'])) ? $options['readmore_link'] : HMS_Testimonials::getInstance()->getOption('readmore_link', '');
+					$append_link = ( HMS_Testimonials::getInstance()->getOption('readmore_append_testimonial_id') == 1) ? true : false;
 					$add_id = true;
 
 					if (isset($testimonial['readmore']) && $testimonial['readmore'] != '')
 						$readmore_link = $testimonial['readmore'];
-					else {
+					elseif ( $append_link ) {
 						if (strpos( $readmore_link, '?') === false)
 							$readmore_link .= '?testimonial_id=' . $testimonial['id'];
 						else

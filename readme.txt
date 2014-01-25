@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.6 =
+* Added option to not append the testimonial ID to the default read more link.
+
 = 2.2.5 =
 * testimonial_id={id} is now appended to the read more links.
 * hms_testimonials shortcode will now accept a testimonial_id $_GET parameter to override what testimonials are shown. This allows the read more link to go to a dynamic single testimonial page.
