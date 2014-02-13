@@ -48,12 +48,14 @@ class HMS_Testimonials {
 			'roleorders' => $default,
 			'image_width' => 100,
 			'image_height' => 100,
+			'image_unit' => 'px',
 			'date_format' => 'm/d/Y',
-			'display_rows' => array('id','name','testimonial','url','testimonial_date','shortcode','user','display'),
+			'display_rows' => array('id','name','testimonial','url','testimonial_date','shortcode','group', 'user','display'),
 			'js_load' => 0,
 			'testimonial_container' => 'div',
 			'readmore_link' => '',
 			'readmore_text' => '...',
+			'readmore_append_testimonial_id' => 1,
 			'flood_limit' => 5,
 			'form_show_url' => 1,
 			'form_show_upload' => 0,
@@ -211,6 +213,9 @@ class HMS_Testimonials {
 				<input type="checkbox" class="hms-testimonial-row-selector" name="testimonial" id="testimonial" value="1"<?php if (in_array('testimonial', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="testimonial">Testimonial</label> &nbsp;&nbsp;
 				<input type="checkbox" class="hms-testimonial-row-selector" name="url" id="url" value="1"<?php if (in_array('url', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="url">URL</label> &nbsp;&nbsp;
 				<input type="checkbox" class="hms-testimonial-row-selector" name="testimonial_date" id="testimonial_date" value="1"<?php if (in_array('testimonial_date', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="testimonial_date">Testimonial Date</label> &nbsp;&nbsp;
+				<input type="checkbox" class="hms-testimonial-row-selector" name="group" id="group" value="1"<?php if (in_array('group', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="testimonial_group">Groups</label> &nbsp;&nbsp;
+
+				<br />
 				<input type="checkbox" class="hms-testimonial-row-selector" name="shortcode" id="shortcode" value="1"<?php if (in_array('shortcode', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="shortcode">Shortcode</label> &nbsp;&nbsp;
 				<input type="checkbox" class="hms-testimonial-row-selector" name="user" id="user" value="1"<?php if (in_array('user', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="user">User</label> &nbsp;&nbsp;
 				<input type="checkbox" class="hms-testimonial-row-selector" name="display" id="display" value="1"<?php if (in_array('display', $this->options['display_rows'])) echo ' checked="checked"'; ?> /> <label for="display">Display</label> &nbsp;&nbsp;
@@ -356,12 +361,14 @@ JS;
 
 			$options['image_width'] = (isset($_POST['image_width'])) ? (int)$_POST['image_width'] : 100;
 			$options['image_height'] = (isset($_POST['image_height'])) ? (int)$_POST['image_height'] : 100;
+			$options['image_unit'] = (isset($_POST['image_unit']) && $_POST['image_unit'] == 'percent') ? 'percent' : 'px';
 			$options['date_format'] = (isset($_POST['date_format']) && !empty($_POST['date_format'])) ? strip_tags($_POST['date_format']) : 'm/d/Y';
 
 			$options['testimonial_container'] = (isset($_POST['testimonial_container']) && ($_POST['testimonial_container'] == 'blockquote')) ? 'blockquote' : 'div';
 
 			$options['readmore_link'] = (isset($_POST['readmore_link']) && !empty($_POST['readmore_link'])) ? strip_tags($_POST['readmore_link']) : '';
 			$options['readmore_text'] = (isset($_POST['readmore_text']) && !empty($_POST['readmore_text'])) ? strip_tags($_POST['readmore_text']) : '...';
+			$options['readmore_append_testimonial_id'] = (isset($_POST['readmore_append_testimonial_id']) && $_POST['readmore_append_testimonial_id'] == '1') ? 1 : 0;
 
 			$options['flood_limit'] = (isset($_POST['flood_limit'])) ? (int)$_POST['flood_limit'] : 5;
 			$options['form_show_url'] = (isset($_POST['form_show_url']) && $_POST['form_show_url'] == '1') ? 1 : 0;
@@ -413,11 +420,16 @@ JS;
 								</tr>
 								<tr>
 									<th scope="row">3. Width of the image</th>
-									<td><input type="text" name="image_width" value="<?php echo $this->options['image_width']; ?>" size="3" />px</td>
+									<td><input type="text" name="image_width" value="<?php echo $this->options['image_width']; ?>" size="3" /> 
+										<select name="image_unit">
+											<option value="px" <?php if ($this->options['image_unit'] == 'px') echo 'selected="selected"'; ?>>px</option>
+											<option value="percent" <?php if ($this->options['image_unit'] == 'percent') echo 'selected="selected"'; ?>>%</option>
+										</select>
+									</td>
 								</tr>
 								<tr>
 									<th scope="row">4. Height of the image</th>
-									<td><input type="text" name="image_height" value="<?php echo $this->options['image_height']; ?>" size="3" />px</td>
+									<td><input type="text" name="image_height" value="<?php echo $this->options['image_height']; ?>" size="3" /></td>
 								</tr>
 								<tr>
 									<th scope="row">5. Date format</th>
@@ -446,24 +458,27 @@ JS;
 									<th scope="row">8. "Read More" text</th>
 									<td><input type="text" name="readmore_text" value="<?php echo $this->options['readmore_text']; ?>" size="10" /></td>
 								</tr>
-
 								<tr>
-									<th scope="row">9. Allow visitors to submit a testimonial once every x minutes. If set to 0, there is no limit.</th>
+									<th scope="row">9. <a href="<?php echo admin_url('admin.php?page=hms-testimonials-help&active=7#append-testimonial-id'); ?>">Append the testimonial ID to the default "Read More" link?</a></th>
+									<td><input type="checkbox" name="readmore_append_testimonial_id" value="1" <?php if ($this->options['readmore_append_testimonial_id']==1) echo ' checked="checked"'; ?> /></td>
+								</tr>
+								<tr>
+									<th scope="row">10. Allow visitors to submit a testimonial once every x minutes. If set to 0, there is no limit.</th>
 									<td><input type="text" name="flood_limit" value="<?php echo $this->options['flood_limit']; ?>" size="10" /></td>
 								</tr>
 
 								<tr>
-									<th scope="row">10. Show website field on hms_testimonials_form?</th>
+									<th scope="row">11. Show website field on hms_testimonials_form?</th>
 									<td><input type="checkbox" name="form_show_url" value="1" <?php if ($this->options['form_show_url']==1) echo ' checked="checked"'; ?> /></td>
 								</tr>
 
 								<tr>
-									<th scope="row">11. Show image upload field on hms_testimonials_form?</th>
+									<th scope="row">12. Show image upload field on hms_testimonials_form?</th>
 									<td><input type="checkbox" name="form_show_upload" value="1" <?php if ($this->options['form_show_upload']==1) echo ' checked="checked"'; ?> /></td>
 								</tr>
 
 								<tr>
-									<th scope="row">12. Redirect to this page after a visitor submits a testimonial.</th>
+									<th scope="row">13. Redirect to this page after a visitor submits a testimonial.</th>
 									<td><input type="text" name="redirect_url" value="<?php echo $this->options['redirect_url']; ?>" /></td>
 								</tr>
 							</tbody>
@@ -709,7 +724,7 @@ JS;
 	
 	public function admin_page() {
 
-		$rows_to_show = array('id','name','testimonial','url','testimonial_date','shortcode','user','display','readmore');
+		$rows_to_show = array('id','name','testimonial','url','testimonial_date','shortcode', 'group', 'user','display','readmore');
 
 		$fields = $this->wpdb->get_results("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials_cf` WHERE `blog_id` = ".(int)$this->blog_id." ORDER BY `name` ASC");
 		$field_count = count($fields);
@@ -757,6 +772,7 @@ JS;
 						<th class="row-readmore">Read More Link</th>
 						<th class="row-testimonial_date">Testimonial Date</th>
 						<th class="row-shortcode">Shortcode</th>
+						<th class="row-group">Groups</th>
 						<th class="row-user">User</th>
 						<th class="row-display">Display?</th>
 						<?php echo $row_th; ?>
@@ -772,6 +788,7 @@ JS;
 						<th class="row-readmore">Read More Link</th>
 						<th class="row-testimonial_date">Testimonial Date</th>
 						<th class="row-shortcode">Shortcode</th>
+						<th class="row-group">Groups</th>
 						<th class="row-user">User</th>
 						<th class="row-display">Display?</th>
 						<?php echo $row_th; ?>
@@ -782,13 +799,13 @@ JS;
 					<?php
 
 					if ($this->is_moderator()) {
-						$get = $this->wpdb->get_results("SELECT t.*, u.user_login 
+						$get = $this->wpdb->get_results("SELECT t.*, u.user_login, (SELECT COUNT(`id`) FROM `". $this->wpdb->prefix."hms_testimonials_group_meta` WHERE `testimonial_id` = t.id) AS num_groups 
 													FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
 													LEFT JOIN `".$this->wpdb->users."` AS u 
 														ON u.ID = t.user_id
 													WHERE t.blog_id = ".(int)$this->blog_id." ORDER BY t.display_order ASC", ARRAY_A);
 					} else {
-						$get = $this->wpdb->get_results("SELECT t.*, u.user_login 
+						$get = $this->wpdb->get_results("SELECT t.*, u.user_login, (SELECT COUNT(`id`) FROM `". $this->wpdb->prefix."hms_testimonials_group_meta` WHERE `testimonial_id` = t.id) AS num_groups 
 														FROM `".$this->wpdb->prefix."hms_testimonials` AS t 
 														LEFT JOIN `".$this->wpdb->users."` AS u
 															ON u.ID = t.user_id
@@ -820,6 +837,23 @@ JS;
 								<td class="row-readmore"><?php echo $g['readmore']; ?></td>
 								<td class="row-testimonial_date"><?php if ($g['testimonial_date'] != '0000-00-00 00:00:00') echo date($this->options['date_format'], strtotime($g['testimonial_date'])); else echo 'Not Set'; ?></td>
 								<td class="row-shortcode">[hms_testimonials id="<?php echo $g['id']; ?>"]</td>
+								<td class="row-group">
+									<?php if ($g['num_groups'] > 0) {
+										$get_groups = $this->wpdb->get_results("SELECT * FROM `". $this->wpdb->prefix."hms_testimonials_group_meta` AS m 
+																					INNER JOIN `".$this->wpdb->prefix."hms_testimonials_groups` AS g 
+																						ON g.id = m.group_id
+																					WHERE m.testimonial_id = " . (int)$g['id']);
+										$group_listing = '';
+										foreach($get_groups as $gr)
+											$group_listing .= '<a href="'. admin_url('admin.php?page=hms-testimonials-viewgroup&id=' . $gr->id) .'">'.$gr->name . '</a>, ';
+
+										echo rtrim( $group_listing, ', ');
+										
+										
+									} else {
+										echo 'No Groups.'; 
+									} ?>
+								</td>
 								<td class="row-user"><?php if ($g['user_id'] == 0) echo 'Website Visitor'; else echo $g['user_login']; ?></td>
 								<td class="row-display"><?php echo ($g['display']==1) ? 'Yes' : 'No'; ?></td>
 								<?php if ($field_count>0) {
@@ -857,7 +891,7 @@ JS;
 
 					var data = jQuery('#frm-display-rows').serialize();
 					jQuery.post('<?php echo admin_url('admin.php?page=hms-testimonials-templates-ajax-save-display-rows&noheader=true&'); ?>', data, function(response) {
-						console.log(response);
+						
 					});
 				});
 			});
@@ -1114,6 +1148,15 @@ JS;
 
 					<br /><br />
 				</div>
+
+				<h3 id="other">Other Help</h3>
+				<div>
+					<strong id="append-testimonial-id">Append the testimonial ID to the default "Read More" link?</strong>
+					<p>If you are using the [hms_testimonials] shortcode on the page your "Read More" link goes to, we can append testimonial_id={id} 
+						to the URL to show only that testimonial. If you do not like this functionality you can uncheck the checkbox in the settings 
+						to disable testimonial_id={id} from being added to the URL.
+					</p>
+				</div>
 			</div>
 
 			<br /><br />
@@ -1351,7 +1394,8 @@ JS;
 						<div class="stuffbox">
 							<h3><label for="name"><span style="color:red;">*</span> Source of Testimonial</label></h3>
 							<div class="inside">
-								<textarea id="name" name="name"  style="width:99%;" rows="3"><?php echo @$_POST['name']; ?></textarea>
+								<?php wp_editor(@$_POST['name'], 'name', array('textarea_name' => 'name', 'textarea_rows' => 10) ); ?>
+								
 								<div style="float:left;width:50%;">
 									<p>Example:<br /> &nbsp;&nbsp;John Doe<br />&nbsp;&nbsp;ACME LLC</p>
 								</div>
@@ -1753,7 +1797,8 @@ JS;
 						<div class="stuffbox">
 							<h3><label for="name">Name</label></h3>
 							<div class="inside">
-								<textarea id="name" name="name"  style="width:99%;" rows="3"><?php echo (!isset($_POST['name']) ? $get_testimonial['name'] : ((isset($name)) ? $name : $_POST['name'])); ?></textarea>
+								<?php wp_editor( (!isset($_POST['name']) ? $get_testimonial['name'] : ((isset($name)) ? $name : $_POST['name'])), 'name', array('textarea_name' => 'name', 'textarea_rows' => 10) ); ?>
+
 								<div style="float:left;width:50%;">
 									<p>Example:<br /> &nbsp;&nbsp;John Doe<br />&nbsp;&nbsp;ACME LLC</p>
 								</div>
@@ -2545,7 +2590,10 @@ JS;
 				<tr>
 					<td>Name</td>
 					<td>System</td>
-					<td>hms_testimonials_sc_name</td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_name<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_name
+					</td>
 					<td>Yes</td>
 					<td>Yes</td>
 					<td> </td>
@@ -2553,7 +2601,10 @@ JS;
 				<tr>
 					<td>Testimonial</td>
 					<td>System</td>
-					<td>hms_testimonials_sc_testimonial</td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_testimonial<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_testimonial
+					</td>
 					<td>Yes</td>
 					<td>Yes</td>
 					<td> </td>
@@ -2561,7 +2612,10 @@ JS;
 				<tr>
 					<td>URL</td>
 					<td>System</td>
-					<td>hms_testimonials_sc_website</td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_website<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_website
+					</td>
 					<td>No</td>
 					<td><?php if ($this->options['form_show_url'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
@@ -2569,7 +2623,10 @@ JS;
 				<tr>
 					<td>Image</td>
 					<td>System</td>
-					<td> </td>
+					<td>
+						<strong>Field text:</strong> hms_testimonials_sc_image<br />
+						<strong>Error message:</strong> hms_testimonials_sc_error_image
+					</td>
 					<td>No</td>
 					<td><?php if ($this->options['form_show_upload'] == 1) echo 'Yes'; else echo 'No'; ?> (<a href="<?php echo admin_url('admin.php?page=hms-testimonials-settings'); ?>">Change in settings</a>)</td>
 					<td> </td>
@@ -2581,9 +2638,10 @@ JS;
 							<td><?php echo $f->name; ?></td>
 							<td><?php echo $f->type; ?></td>
 							<td>
-								hms_testimonials_required_cf_<?php echo $f->id; ?>
+								<strong>Field text:</strong> hms_testimonials_cf_text_<?php echo $f->id; ?><br />
+								<strong>Error message:</strong> hms_testimonials_required_cf_<?php echo $f->id; ?>
 								<?php if ($f->type == 'email') { ?>
-									<br />hms_testimonials_email_cf_<?php echo $f->id; ?>
+									<br /><strong>Valid email error message:</strong> hms_testimonials_email_cf_<?php echo $f->id; ?>
 								<?php } ?>
 							</td>
 							<td><?php echo (($f->isrequired == 1) ? 'Yes' : 'No'); ?></td>
@@ -3467,7 +3525,7 @@ JS;
 
 	public function ajax_display_rows_save() {
 
-		$defaults = array('id','name','testimonial','url','testimonial_date','shortcode','user','display', 'readmore');
+		$defaults = array('id','name','testimonial','url','testimonial_date','shortcode', 'group', 'user','display', 'readmore');
 		$fields = array();
 		$get_fields = $this->wpdb->get_results("SELECT * FROM `".$this->wpdb->prefix."hms_testimonials_cf` WHERE `blog_id` = ".(int)$this->blog_id." ORDER BY `name` ASC");
 		if (count($get_fields)>0) {
@@ -3621,9 +3679,17 @@ JS;
 
 					$readmore_text = (isset($options['readmore_text'])) ? $options['readmore_text'] : HMS_Testimonials::getInstance()->getOption('readmore_text', '');
 					$readmore_link = (isset($options['readmore_link'])) ? $options['readmore_link'] : HMS_Testimonials::getInstance()->getOption('readmore_link', '');
+					$append_link = ( HMS_Testimonials::getInstance()->getOption('readmore_append_testimonial_id') == 1) ? true : false;
+					$add_id = true;
 
 					if (isset($testimonial['readmore']) && $testimonial['readmore'] != '')
 						$readmore_link = $testimonial['readmore'];
+					elseif ( $append_link ) {
+						if (strpos( $readmore_link, '?') === false)
+							$readmore_link .= '?testimonial_id=' . $testimonial['id'];
+						else
+							$readmore_link .= '&testimonial_id=' . $testimonial['id'];
+					}
 
 					$readmore = '';
 					if ($readmore_link != '')
@@ -3651,6 +3717,10 @@ JS;
 
 					} else {
 						$testimonial['testimonial'] = nl2br($testimonial['testimonial']);
+					}
+
+					if (HMS_Testimonials::getInstance()->is_moderator() ) {
+						$testimonial['testimonial'] .= '&nbsp;&nbsp; <a href="'. admin_url('admin.php?page=hms-testimonials-view&id=' . $testimonial['id']) . '">Edit</a>';
 					}
 
 					$container = HMS_Testimonials::getInstance()->options['testimonial_container'];
@@ -3700,10 +3770,18 @@ JS;
 					if ($image_url == '')
 						continue;
 
-					$height = (int)HMS_Testimonials::getInstance()->options['image_height'].'px';
-					$width = (int)HMS_Testimonials::getInstance()->options['image_width'].'px';
+					$image_unit = ( isset( HMS_Testimonials::getInstance()->options['image_unit']) && HMS_Testimonials::getInstance()->options['image_unit'] == 'percent' ) ? '%' : 'px';
 
-					$builder .= apply_filters('hms_testimonials_system_image', '<img class="image" src="'.$image_url.'" style="height:'.$height.';width:'.$width.';" />', $testimonial);
+					$height = '';
+					$width = '';
+
+					if ( isset(HMS_Testimonials::getInstance()->options['image_height'] ) && HMS_Testimonials::getInstance()->options['image_height'] != '')
+						$height = 'height:'.(int)HMS_Testimonials::getInstance()->options['image_height']. $image_unit .';';
+
+					if ( isset(HMS_Testimonials::getInstance()->options['image_width'] ) && HMS_Testimonials::getInstance()->options['image_width'] != '')
+						$width = 'width:'.(int)HMS_Testimonials::getInstance()->options['image_width']. $image_unit . ';';
+
+					$builder .= apply_filters('hms_testimonials_system_image', '<img class="image" src="'.$image_url.'" style="'. $height . $width .'" />', $testimonial);
 
 				break;
 				default:

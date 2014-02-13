@@ -4,7 +4,7 @@ function hms_testimonials_install() {
 
 	global $wpdb, $hms_testimonials_db_version, $blog_id;
 
-	$curr_ver = get_site_option('hms_testimonials_db_version');
+	$curr_ver = get_option('hms_testimonials_db_version');
 
 
 	$table_name = $wpdb->prefix . "hms_testimonials";
@@ -90,8 +90,7 @@ function hms_testimonials_install() {
 			}
 		}
 
-
-		update_site_option('hms_testimonials_db_version', $hms_testimonials_db_version);
+		update_option('hms_testimonials_db_version', $hms_testimonials_db_version);
 
 		if ($curr_ver < 10) {
 
@@ -152,7 +151,7 @@ function hms_testimonials_uninstall() {
 function hms_testimonials_db_check() {
 	global $hms_testimonials_db_version;
 
-	if (get_site_option('hms_testimonials_db_version') != $hms_testimonials_db_version)
+	if (get_option('hms_testimonials_db_version') != $hms_testimonials_db_version)
 		hms_testimonials_install();
 }
 

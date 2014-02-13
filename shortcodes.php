@@ -335,7 +335,7 @@ HTML;
 			$name = strtolower( str_replace(' ', '_', $f->name) );
 			$ret .= '
 			<tr class="cf-'.$name.(($f->isrequired == 1) ? ' required' : '').'">
-				<td valign="top">'.$f->name.'</td>
+				<td valign="top">'.apply_filters( 'hms_testimonials_cf_text_' . $f->id, $f->name).'</td>
 				<td>';
 
 				$value = '';
@@ -414,6 +414,10 @@ function hms_testimonials_show( $atts ) {
 		'readmore_link' => $readmore_link,
 		'readmore_text' => $readmore_text
 	);
+
+	if (isset($_GET['testimonial_id']) && is_numeric($_GET['testimonial_id']))
+		$id = $_GET['testimonial_id'];
+
 
 	$sql_limit = '';
 	
@@ -647,18 +651,18 @@ function hms_testimonials_build_pagination($current_page, $total_pages, $prev, $
 	$return = '';
 	
 	if ($current_page > 1)
-		$return .= '<a href="' . $url[0] . 'hms_testimonials_page='.($current_page - 1).'" class="prev">'.$prev.'</a> ';
+		$return .= '<a href="' . $url[0] . 'hms_testimonials_page='.($current_page - 1).'" class="prev">'.apply_filters('hms_testimonials_pagination_previous', $prev ).'</a> ';
 
 	for($x = 1; $x <= $total_pages; $x++) {
 
 		if ($x == $current_page)
-			$return .= '<span class="current-page">'.$x.'</span> ';
+			$return .= '<span class="current-page">' . apply_filters('hms_testimonials_pagination_current', $x ) . '</span> ';
 		else
-			$return .= '<a href="'.$url[0] . 'hms_testimonials_page='.$x.'">'.$x.'</a> ';
+			$return .= '<a href="'.$url[0] . 'hms_testimonials_page='.$x.'">' . apply_filters('hms_testimonials_pagination_link', $x ) . '</a> ';
 	}
 
 	if ($current_page < $total_pages)
-		$return .= '<a href="'.$url[0] . 'hms_testimonials_page='.($current_page + 1).'" class="next">'.$next.'</a> ';
+		$return .= '<a href="'.$url[0] . 'hms_testimonials_page='.($current_page + 1).'" class="next">'.apply_filters('hms_testimonials_pagination_next', $next ).'</a> ';
 
 	return $return;
 }

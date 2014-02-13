@@ -2,8 +2,8 @@
 Contributors: kreitje
 Donate link: http://hitmyserver.com/wordpress-plugins-donations/
 Tags: testimonials, reviews, client reviews, what they are saying
-Requires at least: 3.0.1
-Tested up to: 3.6
+Requires at least: 3.5
+Tested up to: 3.8
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -74,6 +74,23 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 3. Sidebar demonstration
 
 == Changelog ==
+
+= 2.2.7 =
+* Added list of groups a testimonial is in on the main testimonials page
+* Added visual editor to author fields
+* Added edit links to testimonials on shortcode if you are a moderator
+* Added the following filters to alter the shortcode pagination links: hms_testimonials_pagination_link, hms_testimonials_pagination_next, hms_testimonials_pagination_previous, and hms_testimonials_pagination_current
+
+= 2.2.6 =
+* Added option to not append the testimonial ID to the default read more link.
+
+= 2.2.5 =
+* testimonial_id={id} is now appended to the read more links.
+* hms_testimonials shortcode will now accept a testimonial_id $_GET parameter to override what testimonials are shown. This allows the read more link to go to a dynamic single testimonial page.
+
+= 2.2.4 =
+* You can not set the unit measurement of pixels or percent for the height and width of images.
+* Added filters to override the custom field text
 
 = 2.2.3 =
 * Added new setting to redirect the hms_testimonials_form shortcode to another page on submission.
