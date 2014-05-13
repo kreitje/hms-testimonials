@@ -17,6 +17,7 @@ function hms_testimonials_form( $atts ) {
 	if (!isset($settings['form_show_upload']))
 		$settings['form_show_upload'] = 0;
 
+
 	$url = '';
 	if (isset($settings['redirect_url']) && $settings['redirect_url'] != '')
 		$url = $settings['redirect_url'];
@@ -229,6 +230,10 @@ function hms_testimonials_form_submission() {
 	if (!isset($settings['form_show_upload']))
 		$settings['form_show_upload'] = 0;
 
+	$dont_moderate = 0;
+	if (isset($settings['moderate_form_submission']) && $settings['moderate_form_submission'] == 0)
+		$dont_moderate = 1;
+
 	$url = '';
 	if (isset($settings['redirect_url']) && $settings['redirect_url'] != '')
 		$url = $settings['redirect_url'];
@@ -247,11 +252,11 @@ function hms_testimonials_form_submission() {
 		 * Check if the Akismet plugin is enabled and valid. If so, use that.
 		 **/
 		$use_akismet = false;
-		if ( function_exists( 'akismet_verify_key' ) && function_exists( 'akismet_get_key')) {
+		if ( class_exists( 'Akismet' ) ) {
 			
-			$key = akismet_get_key();
+			$key = Akismet::get_api_key();
 			if ($key !== false && $key != '') {
-				$response = akismet_verify_key($key);
+				$response = Akismet::verify_key($key);
 				if ($response == 'valid')
 					$use_akismet = true;
 			}
@@ -410,13 +415,20 @@ function hms_testimonials_form_submission() {
 
 			}
 
+			$token = '';
+			if ( $dont_moderate == 0) {
+				$token = sha1( uniqid(rand(), true) );
+			}
+
+			$created_date = date('Y-m-d h:i:s');
+
 			$wpdb->insert($wpdb->prefix."hms_testimonials", 
 				array(
 					'blog_id' => $blog_id, 'user_id' => $current_user->ID, 'name' => strip_tags($name), 
-					'testimonial' => strip_tags($testimonial), 'display' => 0, 'display_order' => ($display_order+1),
+					'testimonial' => strip_tags($testimonial), 'display' => $dont_moderate, 'display_order' => ($display_order+1),
 					'image' => $attach_id,
-					'url' => $website, 'created_at' => date('Y-m-d h:i:s'), 'testimonial_date' => date('Y-m-d h:i:s'),
-					'rating' => $my_rating
+					'url' => $website, 'created_at' => $created_date, 'testimonial_date' => date('Y-m-d h:i:s'),
+					'rating' => $my_rating, 'autoapprove_token' => $token
 				)
 			);
 
@@ -452,7 +464,10 @@ function hms_testimonials_form_submission() {
 			$message .= __('This message has been detected as spam by Akismet. It has ** NOT ** been saved to your database.', 'hms-testimonials')."\r\n\r\n";
 
 		if ($use_akismet)
-			$message .= sprintf( __('Spam Status: %1$s', 'hms-testimonials' ), (($is_spam) ? 'Spam' : 'Not Spam'))."\r\n";
+			$message .= sprintf( __('Spam Status: %1$s', 'hms-testimonials' ), (($is_spam) ? 'Spam' : 'Not Spam'))."\r\n\r\n";
+
+		if ( $dont_moderate == 1 )
+			$message .= __('Based on your settings, this testimonial was automatically approved.', 'hms-testimonials')."\r\n\r\n";
 		
 		$message .= sprintf( __('Name: %1$s', 'hms-testimonials' ), $name)."\r\n";
 		$message .= sprintf( __('Website: %1$s', 'hms-testimonials' ), $website)."\r\n";
@@ -466,7 +481,12 @@ function hms_testimonials_form_submission() {
 		$message .= "\r\n\r\n";
 
 		if (!$is_spam)
-			$message .= sprintf( __('View this testimonial at %1$s', 'hms-testimonials' ), admin_url('admin.php?page=hms-testimonials-view&id='.$id));
+			$message .= sprintf( __('View this testimonial at %1$s', 'hms-testimonials' ), admin_url('admin.php?page=hms-testimonials-view&id='.$id)) ."\r\n\r\n";
+
+		if ($token != '') {
+			$link = plugins_url( 'autoapprove.php?token=' . $token . '&id=' . $id . '&key=' . md5($name . '/' . $created_date), __FILE__);
+			$message .= sprintf( __('Automatically approve this testimonial by going to %1$s', 'hms-testimonials'), $link) ."\r\n";
+		}
 
 		wp_mail(get_bloginfo('admin_email'), sprintf( __('New Visitor Testimonial Added to %1$s', 'hms-testimonials' ), get_bloginfo('name') ), $message);
 		
