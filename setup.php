@@ -25,11 +25,13 @@ function hms_testimonials_install() {
 			image int(11) DEFAULT '0' NOT NULL,
 			testimonial text NOT NULL,
 			url VARCHAR(255) DEFAULT '' NOT NULL,
+			rating int(1) DEFAULT '0' NOT NULL,
 			readmore VARCHAR(255) DEFAULT '' NOT NULL,
 			testimonial_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 			created_at datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 			display_order int(11) DEFAULT 0 NOT NULL,
 			display int(1) DEFAULT 1 NOT NULL,
+			autoapprove_token VARCHAR(255) DEFAULT '' NOT NULL,
 			UNIQUE KEY id (id)
 		);";
 		$sql_2 = "CREATE TABLE $table_name_2 (
