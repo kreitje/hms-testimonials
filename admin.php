@@ -464,6 +464,7 @@ JS;
 							</tr>
 
 							<tr>
+
 								<th scope="row">12. Require approval of user submitted testimonials</th>
 								<td><input type="checkbox" name="moderate_form_submission" value="1" <?php if ($this->options['moderate_form_submission']==1) echo ' checked="checked"'; ?> /></td>
 							</tr>
@@ -484,11 +485,20 @@ JS;
 
 							<tr>
 								<th scope="row">15. Show 5 star rating on the hms_testimonials_form?</th>
-								<td><input type="checkbox" name="form_show_rating" value="1" <?php if ($this->options['form_show_rating']==1) echo ' checked="checked"'; ?> /></td>
+
+								<th scope="row">12. Show website field on the hms_testimonials_form?</th>
+								<td><input type="checkbox" name="form_show_url" value="1" <?php if ($this->options['form_show_url']==1) echo ' checked="checked"'; ?> /></td>
 							</tr>
 
 							<tr>
-								<th scope="row">16. Redirect to this page after a visitor submits a testimonial.</th>
+								<th scope="row">13. Show image upload field on the hms_testimonials_form?</th>
+								<td><input type="checkbox" name="form_show_upload" value="1" <?php if ($this->options['form_show_upload']==1) echo ' checked="checked"'; ?> /></td>
+							</tr>
+
+							<tr>
+								<th scope="row">13. Show 5 star rating on the hms_testimonials_form?</th>
+								<th scope="row">14. Redirect to this page after a visitor submits a testimonial.</th>
+
 								<td><input type="text" name="redirect_url" value="<?php echo $this->options['redirect_url']; ?>" /></td>
 							</tr>
 

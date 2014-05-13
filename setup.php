@@ -157,4 +157,5 @@ function hms_testimonials_db_check() {
 		hms_testimonials_install();
 }
 
+
 register_activation_hook(__FILE__, 'hms_testimonials_install');
