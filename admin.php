@@ -3718,9 +3718,11 @@ JS;
 	 **/
 
 	public static function template($template_id, $testimonial, $word_limit = 0, $char_limit = 0, $options = array()) {
-		global $wpdb, $blog_id;
+		global $wpdb, $blog_id, $hms_testimonials_is_js;
 		
-		self::injectAggregate();
+		if ( !isset($hms_testimonials_is_js) ) {
+			self::injectAggregate();
+		}
 		/**
 		 * Purify the testimonial field
 		 **/

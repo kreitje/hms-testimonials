@@ -75,6 +75,9 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.12 =
+* Fixed a bug where review markup was being output on js.php causing the javascript to break.
+
 = 2.2.11 =
 * Added setting to automatically approve testimonials
 * Added a link to the admin email to automatically approve testimonials without logging in

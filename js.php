@@ -1,5 +1,6 @@
 <?php
 $hms_testimonials_random_strings = '';
+$hms_testimonials_is_js = true;
 
 require_once '../../../wp-load.php';
 require_once './admin.php';
