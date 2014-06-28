@@ -6,7 +6,7 @@ function hms_testimonials_form( $atts ) {
 	global $wpdb, $blog_id, $current_user, $hms_testimonials_sc_form_errors, $hms_testimonials_sc_form_success;
 	get_currentuserinfo();
 
-	$sc_atts = shortcode_atts( array('redirect_url' => ''), $atts );
+	$sc_atts = shortcode_atts( array('redirect_url' => '', 'group' => 0), $atts );
 
 	$settings = get_option('hms_testimonials');
 	$allowed = array( 'image/jpg', 'image/jpeg', 'image/gif', 'image/png' );
@@ -17,6 +17,8 @@ function hms_testimonials_form( $atts ) {
 	if (!isset($settings['form_show_upload']))
 		$settings['form_show_upload'] = 0;
 
+
+	$group = $sc_atts['group'];
 
 	$url = '';
 	if (isset($settings['redirect_url']) && $settings['redirect_url'] != '')
@@ -108,6 +110,7 @@ function hms_testimonials_form( $atts ) {
 {$nf}
 <input type="hidden" name="hms_testimonials_security_token" value="" />
 <input type="hidden" name="hms_testimonial" value="1" />
+<input type="hidden" name="hms_testimonials_group" value="{$group}" />
 	<table class="hms-testimonials-form">
 		<tr class="name required">
 			<td class="hms-testimonials-label">{$name_text}</td>
@@ -449,6 +452,21 @@ function hms_testimonials_form_submission() {
 					);
 				}
 				$e_message .= $f->name.': '.@$_POST['hms_testimonials_cf'][$f->id]."\r\n";
+			}
+
+		}
+
+		if ( isset($_POST['hms_testimonials_group']) && (is_numeric($_POST['hms_testimonials_group'])) && ($_POST['hms_testimonials_group'] != 0) ) {
+			$group = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM `".$wpdb->prefix."hms_testimonials_groups` WHERE `id` = %d AND `blog_id` = %d",
+					$_POST['hms_testimonials_group'],
+					$blog_id
+				),ARRAY_A);
+
+
+			if ( !is_null($group) && count($group) > 0) {
+				$wpdb->insert($wpdb->prefix."hms_testimonials_group_meta", array('testimonial_id' => $id, 'group_id' => $group['id']));
 			}
 
 		}

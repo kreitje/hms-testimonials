@@ -945,7 +945,8 @@ JS;
 			<p>This plugin allows you to add customer testimonials to your site in an easy to manage way. HMS Testimonials offers 3 shortcodes with multiple options and 2 widgets.</p>
 			<br />
 			<h4 align="center"><strong>Do you enjoy this plugin?</strong> <a style="color:red;" href="http://hitmyserver.com/wordpress-plugins-donations/" target="_blank">Consider sending us a donation to show your support!</a></h4>
-			<br />
+			<p align="center">Need general tech help? Checkout a new message board called <a style="color:red;" href="http://thetech.io" target="_blank">The Tech IO</a> sponsored by the plugin developer.</p>
+			<br /><br />
 
 			<div id="accordion">
 				<h3 id="hms_testimonials_features">Features</h3>
@@ -1750,7 +1751,7 @@ JS;
 					}
 				}
 
-				if (!$this->is_moderator() || $this->options['user_role_can_select_group'] == 1) {
+				if ($this->is_moderator() || $this->options['user_role_can_select_group'] == 1) {
 					if (isset($_POST['groups']) && is_array($_POST['groups'])) {
 
 						$del_groups = $my_groups;
@@ -2304,9 +2305,10 @@ JS;
 				foreach($get as $g) {
 					$in_group[] = $g['id'];
 
-					$testimonials[$g['group_display_order']] = $g;
+					$testimonials[] = $g;
 				}
 			}
+			
 			$num_in_group = $total_in_group;
 			$total_in_group++;
 

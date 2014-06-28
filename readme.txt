@@ -75,6 +75,11 @@ Go to Testimonials. Then click the ID of the testimonial. On the right hand side
 
 == Changelog ==
 
+= 2.2.13 =
+* Fixed a bug where testimonials were not showing up in for a group in the admin
+* Fixed a bug where groups were not saving for some users
+* Added a group attribute to the form shortcode so you can have submissions be automatically added to a form
+
 = 2.2.12 =
 * Fixed a bug where review markup was being output on js.php causing the javascript to break.
 
